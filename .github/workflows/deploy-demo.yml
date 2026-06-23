@@ -62,7 +62,7 @@ jobs:
                     --base "${{ steps.pages.outputs.base_path }}"
               working-directory: ${{ env.BUILD_PATH }}
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
               with:
                   path: ${{ env.BUILD_PATH }}/dist
 
@@ -76,4 +76,4 @@ jobs:
         steps:
             - name: Deploy to GitHub Pages
               id: deployment
-              uses: actions/deploy-pages@v5
+              uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
