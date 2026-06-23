@@ -1,0 +1,11 @@
+pages:
+  image: node:22
+  script:
+    - corepack enable
+    - pnpm install
+    - pnpm build
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

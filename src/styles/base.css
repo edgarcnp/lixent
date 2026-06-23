@@ -1,0 +1,77 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--lp-font-body);
+  font-size: var(--lp-font-size);
+  line-height: var(--lp-line-height);
+  color: var(--lp-text);
+  background-color: var(--lp-bg);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--lp-max-width);
+  margin: 0 auto;
+  padding: var(--lp-padding);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.copyright {
+  color: var(--lp-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.license-body p {
+  margin-bottom: 1em;
+}
+
+.license-body p:last-child {
+  margin-bottom: 0;
+}
+
+footer {
+  text-align: center;
+  padding: 1.5rem var(--lp-padding);
+  color: var(--lp-text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--lp-border);
+}
+
+footer a {
+  color: var(--lp-accent);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --lp-padding: 1.5rem;
+    --lp-font-size: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+}

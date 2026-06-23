@@ -1,0 +1,15 @@
+:root {
+  --lp-bg: #1a1a1a;
+  --lp-text: #e5e5e5;
+  --lp-text-muted: #a3a3a3;
+  --lp-accent: #60a5fa;
+  --lp-border: #404040;
+  --lp-surface: #262626;
+  --lp-font-body: "Georgia", "Times New Roman", serif;
+  --lp-font-mono: "Menlo", "Consolas", monospace;
+  --lp-font-size: 1.125rem;
+  --lp-line-height: 1.8;
+  --lp-max-width: 680px;
+  --lp-padding: 3rem;
+  --lp-border-radius: 4px;
+}

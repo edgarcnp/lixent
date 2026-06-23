@@ -1,0 +1,12 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const paragraphs = text.split("\n").filter((p): p is string => p.trim() !== "");
+---
+
+<div class="license-body">
+  {paragraphs.map((p: string) => <p>{p}</p>)}
+</div>

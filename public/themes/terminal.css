@@ -1,0 +1,15 @@
+:root {
+  --lp-bg: #0a0a0a;
+  --lp-text: #33ff33;
+  --lp-text-muted: #1a8c1a;
+  --lp-accent: #33ff33;
+  --lp-border: #1a3a1a;
+  --lp-surface: #0f1a0f;
+  --lp-font-body: "IBM Plex Mono", "Courier New", monospace;
+  --lp-font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --lp-font-size: 0.95rem;
+  --lp-line-height: 1.6;
+  --lp-max-width: 640px;
+  --lp-padding: 2rem;
+  --lp-border-radius: 0;
+}

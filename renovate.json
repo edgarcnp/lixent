@@ -1,0 +1,76 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended",
+        ":disableDependencyDashboard"
+    ],
+    "abandonmentThreshold": "1 year",
+    "addLabels": [
+        "renovate",
+        "dependencies"
+    ],
+    "assignAutomerge": true,
+    "assignees": [
+        "edgarcnp"
+    ],
+    "automerge": false,
+    "keepUpdatedLabel": "renovate-keep-updated",
+    "lockFileMaintenance": {
+        "enabled": true,
+        "recreateWhen": "always",
+        "branchTopic": "lock-file-maintenance",
+        "commitMessageAction": "Lock file maintenance",
+        "schedule": [
+            "* 0 * * 5"
+        ],
+        "prBodyDefinitions": {
+            "Change": "All locks refreshed"
+        }
+    },
+    "osvVulnerabilityAlerts": true,
+    "postUpdateOptions": [
+        "pnpmDedupe"
+    ],
+    "pruneBranchAfterAutomerge": true,
+    "reviewers": [
+        "edgarcnp"
+    ],
+    "rollbackPrs": true,
+    "schedule": [
+        "* * * * *"
+    ],
+    "vulnerabilityAlerts": {
+        "groupName": null,
+        "schedule": [],
+        "dependencyDashboardApproval": false,
+        "minimumReleaseAge": null,
+        "rangeStrategy": "update-lockfile",
+        "commitMessageSuffix": "[SECURITY]",
+        "branchTopic": "{{{datasource}}}-{{{depNameSanitized}}}-vulnerability",
+        "prCreation": "immediate",
+        "vulnerabilityFixStrategy": "lowest"
+    },
+    "packageRules": [
+        {
+            "matchPackageNames": [
+                "astro",
+                "/^@astrojs\\//"
+            ],
+            "groupName": "Astro"
+        },
+        {
+            "matchPackageNames": [
+                "/^eslint/",
+                "/^@eslint\\//"
+            ],
+            "groupName": "ESLint"
+        },
+        {
+            "matchPackageNames": [
+                "/^typescript-eslint/",
+                "/^@typescript-eslint\\//"
+            ],
+            "groupName": "TypeScript ESLint"
+        }
+    ]
+}

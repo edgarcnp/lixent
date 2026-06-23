@@ -1,0 +1,15 @@
+:root {
+  --lp-bg: #ffffff;
+  --lp-text: #1a1a1a;
+  --lp-text-muted: #666666;
+  --lp-accent: #2563eb;
+  --lp-border: #e5e7eb;
+  --lp-surface: #f9fafb;
+  --lp-font-body: "Inter", system-ui, sans-serif;
+  --lp-font-mono: "JetBrains Mono", monospace;
+  --lp-font-size: 1.125rem;
+  --lp-line-height: 1.7;
+  --lp-max-width: 720px;
+  --lp-padding: 2.5rem;
+  --lp-border-radius: 8px;
+}

@@ -1,0 +1,20 @@
+---
+import { getGravatarUrl } from "../lib/gravatar.ts";
+
+interface Props {
+  email: string;
+  size?: number;
+  alt?: string;
+}
+
+const { email, size = 48, alt = "Avatar" } = Astro.props;
+const src = getGravatarUrl(email, size);
+---
+
+<img class="gravatar" {src} {alt} width={size} height={size} />
+
+<style>
+  .gravatar {
+    border-radius: 50%;
+  }
+</style>
