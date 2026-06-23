@@ -1,7 +1,7 @@
 {
-  "copyright": "Edgar Carranza",
-  "url": "https://edgar.doctor",
-  "email": "edgar@edgar.doctor",
+  "copyright": "John Doe",
+  "url": "https://example.com",
+  "email": "john@example.com",
   "license": "MIT",
   "theme": "minimal",
   "gravatar": true
