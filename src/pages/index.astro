@@ -1,14 +1,14 @@
 ---
-import LicenseLayout from "../layouts/LicenseLayout.astro";
-import LicenseBody from "../components/LicenseBody.astro";
-import { loadConfig } from "../lib/config.ts";
-import { getLicenseText, getLicenseName } from "../licenses/index.ts";
+import LicenseLayout from "../layouts/LicenseLayout.astro"
+import LicenseBody from "../components/LicenseBody.astro"
+import { loadConfig } from "../lib/config.ts"
+import { getLicenseText, getLicenseName } from "../licenses/index.ts"
 
-const config = loadConfig();
-const renderedText = getLicenseText(config);
+const config = loadConfig()
+const renderedText = getLicenseText(config)
 const licenseName = getLicenseName(config);
 ---
 
 <LicenseLayout title={`${licenseName} License`}>
-  <LicenseBody text={renderedText} />
+    <LicenseBody text={renderedText} />
 </LicenseLayout>

@@ -1,78 +1,78 @@
 ---
-import { loadConfig } from "../lib/config.ts";
-import { getGravatarUrl } from "../lib/gravatar.ts";
-import { formatYear, formatYearRange } from "../lib/year.ts";
-import { getTheme } from "../themes/index.ts";
-import "../styles/base.css";
+import { loadConfig } from "../lib/config.ts"
+import { getGravatarUrl } from "../lib/gravatar.ts"
+import { formatYear, formatYearRange } from "../lib/year.ts"
+import { getTheme } from "../themes/index.ts"
+import "../styles/base.css"
 
 interface Props {
-  title: string;
-  copyright?: string;
+    title: string
+    copyright?: string
 }
 
-const { title, copyright } = Astro.props;
-const config = loadConfig();
+const { title, copyright } = Astro.props
+const config = loadConfig()
 
-const builtInTheme = getTheme(config.theme);
-const themePath =
-  builtInTheme != null || !config.theme.startsWith("/")
-    ? `/themes/${config.theme}.css`
-    : config.theme;
+const builtInTheme = getTheme(config.theme)
+const themePath
+    = builtInTheme != null || !config.theme.startsWith("/")
+        ? `/themes/${config.theme}.css`
+        : config.theme
 
-const themeOverrides =
-  config.themeOverrides != null
-    ? Object.entries(config.themeOverrides)
-        .map(([k, v]) => `${k}: ${v};`)
-        .join(" ")
-    : "";
+const themeOverrides
+    = config.themeOverrides != null
+        ? Object.entries(config.themeOverrides)
+            .map(([k, v]) => `${k}: ${v};`)
+            .join(" ")
+        : ""
 
-let displayCopyright = copyright ?? config.copyright;
+let displayCopyright = copyright ?? config.copyright
 if (config.year != null) {
-  displayCopyright = `© ${formatYear(config.year)} ${displayCopyright}`;
+    displayCopyright = `© ${formatYear(config.year)} ${displayCopyright}`
 } else if (config.yearRange != null) {
-  displayCopyright = `© ${formatYearRange(config.yearRange.start, config.yearRange.end)} ${displayCopyright}`;
+    displayCopyright = `© ${formatYearRange(config.yearRange.start, config.yearRange.end)} ${displayCopyright}`
 } else {
-  displayCopyright = `© ${formatYear()} ${displayCopyright}`;
+    displayCopyright = `© ${formatYear()} ${displayCopyright}`
 }
 
-const gravatarUrl =
-  config.gravatar === true && config.email != null
-    ? getGravatarUrl(config.email, 48)
-    : null;
+const gravatarUrl
+    = config.gravatar === true && config.email != null
+        ? getGravatarUrl(config.email, 48)
+        : null;
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <link rel="stylesheet" href={themePath} />
-    {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled theme overrides are safe */}
-    {themeOverrides && <style set:html={`:root { ${themeOverrides} }`} />}
-  </head>
-  <body>
-    <main>
-      {gravatarUrl && (
-        <img
-          class="gravatar"
-          src={gravatarUrl}
-          alt={config.copyright}
-          width="48"
-          height="48"
-        />
-      )}
-      <h1>{title}</h1>
-      <p class="copyright">{displayCopyright}</p>
-      <slot />
-    </main>
-    <footer>
-      Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
-    </footer>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+        <link rel="stylesheet" href={themePath} />
+        {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled theme overrides are safe */}
+        {themeOverrides && <style set:html={`:root { ${themeOverrides} }`} />}
+    </head>
+    <body>
+        <main>
+            {gravatarUrl && (
+                <img
+                    class="gravatar"
+                    src={gravatarUrl}
+                    alt={config.copyright}
+                    width="48"
+                    height="48"
+                />
+            )}
+            <h1>{title}</h1>
+            <p class="copyright">{displayCopyright}</p>
+            <slot />
+        </main>
+        <footer>
+            Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
+        </footer>
+    </body>
 </html>
 
 <style>

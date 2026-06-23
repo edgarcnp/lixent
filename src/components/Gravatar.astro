@@ -1,13 +1,13 @@
 ---
-import { getGravatarUrl } from "../lib/gravatar.ts";
+import { getGravatarUrl } from "../lib/gravatar.ts"
 
 interface Props {
-  email: string;
-  size?: number;
-  alt?: string;
+    email: string
+    size?: number
+    alt?: string
 }
 
-const { email, size = 48, alt = "Avatar" } = Astro.props;
+const { email, size = 48, alt = "Avatar" } = Astro.props
 const src = getGravatarUrl(email, size);
 ---
 
