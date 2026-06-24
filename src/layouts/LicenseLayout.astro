@@ -27,18 +27,23 @@ const themeOverrides
             .join(" ")
         : ""
 
-let displayCopyright = copyright ?? config.copyright
+const name = copyright ?? config.copyright
+
+let yearStr: string
 if (config.year != null) {
-    displayCopyright = `\u00A9 ${formatYear(config.year)} ${displayCopyright}`
+    yearStr = formatYear(config.year)
 } else if (config.yearRange != null) {
-    displayCopyright = `\u00A9 ${formatYearRange(config.yearRange.start, config.yearRange.end)} ${displayCopyright}`
+    yearStr = formatYearRange(config.yearRange.start, config.yearRange.end)
 } else {
-    displayCopyright = `\u00A9 ${formatYear()} ${displayCopyright}`
+    yearStr = formatYear()
 }
 
+const hasUrl = config.url != null && config.url.length > 0
+const hasEmail = config.email != null && config.email.length > 0
+
 const gravatarUrl
-    = config.gravatar === true && config.email != null
-        ? getGravatarUrl(config.email, 48)
+    = config.gravatar === true && hasEmail && config.email != null
+        ? getGravatarUrl(config.email, 64)
         : null;
 ---
 
@@ -64,13 +69,22 @@ const gravatarUrl
                             class="gravatar"
                             src={gravatarUrl}
                             alt={config.copyright}
-                            width={48}
-                            height={48}
+                            width={64}
+                            height={64}
                             loading="eager"
                         />
                     )}
                     <h1>{title}</h1>
-                    <p class="copyright">{displayCopyright}</p>
+                    <p class="copyright">
+                        Copyright &copy; {yearStr}
+                        {hasUrl
+                            ? <a href={config.url} target="_blank" rel="noopener noreferrer">{name}</a>
+                            : name
+                        }
+                        {hasEmail && (
+                            <span class="email">&lt;{config.email}&gt;</span>
+                        )}
+                    </p>
                 </header>
                 <div class="license-content">
                     <slot />
