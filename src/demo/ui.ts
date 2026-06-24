@@ -194,7 +194,7 @@ export function initDemo(): void {
         copyrightInput.value = "John Doe"
         emailInput.value = ""
         urlInput.value = ""
-        yearInput.value = String(new Date().getFullYear())
+        yearInput.value = String(currentYear)
         gravatarToggle.checked = false
         applyMode(getPreferredMode())
         onControlChange()
@@ -245,13 +245,15 @@ export function initDemo(): void {
         })
     })
 
+    const currentYear = new Date().getFullYear()
+
     const saved = loadSettings()
     if (saved.theme) themeSelect.value = saved.theme
     if (saved.license) licenseSelect.value = saved.license
     if (saved.copyright) copyrightInput.value = saved.copyright
     if (saved.email) emailInput.value = saved.email
     if (saved.url) urlInput.value = saved.url
-    yearInput.value = saved.year ?? String(new Date().getFullYear())
+    yearInput.value = saved.year && saved.year.length > 0 ? saved.year : String(currentYear)
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
 
     applyMode(getPreferredMode())
