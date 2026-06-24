@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs"
 import { resolve } from "node:path"
 import type { LixentConfig } from "./types.ts"
-import { isValidLicense } from "../licenses/index.ts"
+import { isValidLicense } from "./license.ts"
 
 const CONFIG_FILE = "lixent.config.json"
 

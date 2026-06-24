@@ -1,0 +1,5 @@
+{
+  "id": "Ferguson-Twofish",
+  "name": "Ferguson Twofish License",
+  "text": " The author hereby grants a perpetual license to everybody to \n use this code for any purpose as long as the copyright message is included \n in the source code of this or any derived work. \n  \n Yes, this means that you, your company, your club, and anyone else \n can use this code anywhere you want. You can change it and distribute it \n under the GPL, include it in your commercial product without releasing \n the source code, put it on the web, etc.  \n The only thing you cannot do is remove my copyright message,  \n or distribute any source code based on this implementation that does not  \n include my copyright message.  \n  \n I appreciate a mention in the documentation or credits,  \n but I understand if that is difficult to do. \n I also appreciate it if you tell me where and why you used my code. \n"
+}

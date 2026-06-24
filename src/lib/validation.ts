@@ -4,7 +4,7 @@ const MAX_LICENSE_BYTES = 50 * 1024
 const SPDX_ID_PATTERN = /^[A-Za-z0-9\-+.]+$/
 
 export const TRUSTED_SPDX_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
-export const OUTPUT_DIR = resolve(import.meta.dirname, "../src/data/licenses")
+export const OUTPUT_DIR = resolve(import.meta.dirname, "../../data/licenses")
 
 export function assertTrustedSource(url: string): void {
     if (!url.startsWith(TRUSTED_SPDX_BASE)) {

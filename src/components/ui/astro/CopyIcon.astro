@@ -1,0 +1,66 @@
+---
+import IconCopy from "./icons/IconCopy.astro"
+import IconLink from "./icons/IconLink.astro"
+import IconCheck from "./icons/IconCheck.astro"
+
+interface Props {
+    check: boolean
+    link?: boolean
+    class?: string
+}
+
+const { check, link = false, class: className } = Astro.props;
+---
+
+<div class:list={["copy-animation", check && "check", className]}>
+    <div class="icon-copy">
+        {link ? <IconLink /> : <IconCopy />}
+    </div>
+    <div class="icon-check">
+        <IconCheck />
+    </div>
+</div>
+
+<style>
+    .copy-animation {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 18px;
+        width: 18px;
+    }
+
+    .copy-animation :global(svg) {
+        width: 18px;
+        height: 18px;
+        will-change: transform;
+    }
+
+    .icon-copy,
+    .icon-check {
+        display: flex;
+        position: absolute;
+        transition: transform 0.25s, opacity 0.25s;
+    }
+
+    .icon-copy {
+        transform: none;
+        opacity: 1;
+    }
+
+    .icon-check {
+        transform: scale(0.4);
+        opacity: 0;
+    }
+
+    .check .icon-copy {
+        transform: scale(0.4);
+        opacity: 0;
+    }
+
+    .check .icon-check {
+        transform: none;
+        opacity: 1;
+    }
+</style>

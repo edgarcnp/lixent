@@ -1,14 +1,192 @@
 ---
-import LicenseLayout from "../layouts/LicenseLayout.astro"
-import LicenseBody from "../components/LicenseBody.astro"
-import { loadConfig } from "../lib/config.ts"
-import { getLicenseText, getLicenseName } from "../licenses/index.ts"
+import { themes } from "../themes/index.ts"
+import { LICENSE_IDS } from "../demo/licenses.ts"
+import Button from "../components/ui/astro/Button.astro"
+import IconX from "../components/ui/astro/icons/IconX.astro"
+import IconCheck from "../components/ui/astro/icons/IconCheck.astro"
+import "../styles/base.css"
+import "../styles/demo.css"
 
-const config = loadConfig()
-const renderedText = getLicenseText(config)
-const licenseName = getLicenseName(config);
+const themeList = themes
+const licenseList = LICENSE_IDS
 ---
 
-<LicenseLayout title={`${licenseName} License`}>
-    <LicenseBody text={renderedText} />
-</LicenseLayout>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <title>Lixent Demo</title>
+        <link rel="stylesheet" href="/themes/minimal.css" id="preview-theme" />
+        <script is:inline>
+            (function() {
+                var saved = localStorage.getItem("lixent-demo-mode");
+                if (saved === "dark") {
+                    document.documentElement.classList.add("dark");
+                } else if (saved === "light") {
+                    document.documentElement.classList.remove("dark");
+                } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <div class="demo-layout">
+            <aside class="util-menu" id="util-menu">
+                <div class="util-header">
+                    <h2>Lixent Demo</h2>
+                    <button class="util-toggle" id="util-toggle" aria-label="Close menu">
+                        <IconX />
+                    </button>
+                </div>
+
+                <div class="util-scroll">
+                    <div class="util-section">
+                        <label>Appearance</label>
+                        <button class="mode-toggle" id="mode-toggle" type="button">
+                            <span class="mode-toggle-icon" id="mode-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            </span>
+                            <span id="mode-label">Dark Mode</span>
+                        </button>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="theme-select">Theme</label>
+                        <select id="theme-select">
+                            {themeList.map((t) => (
+                                <option value={t.id} selected={t.id === "minimal"}>
+                                    {t.name} {t.dark ? "(dark)" : ""}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="font-select">Font</label>
+                        <select id="font-select">
+                            <option value="" selected>Default (from theme)</option>
+                            <option value="Inter, -apple-system, BlinkMacSystemFont, sans-serif">Inter</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="Merriweather, Georgia, serif">Merriweather</option>
+                            <option value="Playfair Display, Georgia, serif">Playfair Display</option>
+                            <option value="Lora, Georgia, serif">Lora</option>
+                            <option value="Source Sans 3, sans-serif">Source Sans</option>
+                            <option value="Nunito, sans-serif">Nunito</option>
+                            <option value="IBM Plex Mono, monospace">IBM Plex Mono</option>
+                            <option value="JetBrains Mono, monospace">JetBrains Mono</option>
+                        </select>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="license-select">License</label>
+                        <select id="license-select">
+                            {licenseList.map((id) => (
+                                <option value={id} selected={id === "MIT"}>
+                                    {id}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="copyright-input">Copyright Name</label>
+                        <input type="text" id="copyright-input" value="John Doe" />
+                    </div>
+
+                    <div class="util-section">
+                        <label for="email-input">Email</label>
+                        <div class="util-input-wrap">
+                            <input type="email" id="email-input" placeholder="john@example.com" />
+                            <span class="util-warn-icon" id="email-warning" style="display:none;" data-tip="Enter an email to use Gravatar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="url-input">URL</label>
+                        <div class="util-input-wrap">
+                            <input type="url" id="url-input" placeholder="https://example.com" />
+                            <span class="util-warn-icon" id="url-warning" style="display:none;" data-tip="Invalid URL format">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="util-section">
+                        <label for="year-input">Year</label>
+                        <input type="number" id="year-input" min="1900" max="2100" />
+                    </div>
+
+                    <div class="util-section">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="gravatar-toggle" />
+                            Show Gravatar
+                        </label>
+                    </div>
+                </div>
+
+                <div class="util-actions">
+                    <Button id="util-reset" transparent>Reset to Defaults</Button>
+                    <div class="util-actions-row">
+                        <Button id="util-copy" primary>
+                            <span id="util-copy-label">Copy</span>
+                            <span id="util-copy-check" class="copy-check"><IconCheck /></span>
+                        </Button>
+                        <Button id="util-download" primary>
+                            Download
+                        </Button>
+                    </div>
+                </div>
+            </aside>
+
+            <button class="util-open" id="util-open" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" />
+                </svg>
+            </button>
+
+            <div class="preview-area">
+                <div class="preview-frame">
+                    <div class="preview-header">
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-url" id="preview-url">preview</span>
+                    </div>
+                    <div class="preview-content" id="preview-content">
+                        <main>
+                            <div class="islands">
+                                <article class="license-card identity-card">
+                                    <header class="license-header">
+                                        <div id="preview-gravatar" style="display:none;">
+                                            <img class="gravatar" id="preview-gravatar-img" src="" alt="" width="64" height="64" />
+                                        </div>
+                                        <h1 id="preview-title">MIT License</h1>
+                                        <p class="copyright" id="preview-copyright">Copyright © 2026 John Doe</p>
+                                    </header>
+                                </article>
+                                <article class="license-card content-card">
+                                    <div class="license-body" id="preview-license-text"></div>
+                                </article>
+                            </div>
+                        </main>
+                        <footer>
+                            <span class="footer-pill">
+                                Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
+                            </span>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            import { initDemo } from "../demo/index.ts"
+            initDemo()
+        </script>
+    </body>
+</html>
