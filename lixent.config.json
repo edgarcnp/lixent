@@ -2,7 +2,7 @@
     "copyright": "John Doe",
     "url": "https://example.com",
     "email": "john@example.com",
-    "license": "gpl-3.0-only",
+    "license": "MIT",
     "theme": "minimal-dark",
     "gravatar": true
 }
