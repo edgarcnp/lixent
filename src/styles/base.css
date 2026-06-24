@@ -58,6 +58,19 @@ main {
   padding: var(--lx-padding);
 }
 
+.islands {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.identity-card .license-header {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
 .license-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
