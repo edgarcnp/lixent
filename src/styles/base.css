@@ -65,6 +65,22 @@ main {
   gap: 1.5rem;
 }
 
+.islands::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--lx-border);
+  order: 1;
+}
+
+.identity-card {
+  order: 0;
+}
+
+.content-card {
+  order: 2;
+}
+
 .identity-card .license-header {
   margin-bottom: 0;
   padding-bottom: 0;
