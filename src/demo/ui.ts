@@ -100,6 +100,7 @@ export function initDemo(): void {
         const licenseId = licenseSelect.value
         const copyright = copyrightInput.value || "John Doe"
         const email = emailInput.value
+        const url = urlInput.value
         const year = yearInput.value ? parseInt(yearInput.value) : new Date().getFullYear()
         const showGravatar = gravatarToggle.checked
 
@@ -111,12 +112,22 @@ export function initDemo(): void {
             : "License text not found"
 
         previewTitle.textContent = `${license != null ? license.name : licenseId} License`
-        previewCopyright.textContent = `\u00A9 ${year} ${copyright}`
+
+        const hasUrl = url.length > 0
+        const hasEmail = email.length > 0
+        const nameHtml = hasUrl
+            ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${copyright}</a>`
+            : copyright
+        const emailHtml = hasEmail
+            ? ` &lt;<a href="mailto:${email}">${email}</a>&gt;`
+            : ""
+        previewCopyright.innerHTML = `Copyright &copy; ${year} ${nameHtml}${emailHtml}`
+
         previewLicenseText.innerHTML = formatParagraphs(rendered)
 
         if (showGravatar && email) {
             previewGravatar.style.display = "block"
-            previewGravatarImg.src = getGravatarUrl(email, 48)
+            previewGravatarImg.src = getGravatarUrl(email, 64)
             previewGravatarImg.alt = copyright
         } else {
             previewGravatar.style.display = "none"
