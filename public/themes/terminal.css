@@ -1,10 +1,10 @@
 :root {
-  --lp-bg: #0a0a0a;
-  --lp-text: #33ff33;
-  --lp-text-muted: #1a8c1a;
-  --lp-accent: #33ff33;
-  --lp-border: #1a3a1a;
-  --lp-surface: #0f1a0f;
-  --lp-font-body: "IBM Plex Mono", "Courier New", monospace;
-  --lp-font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --lx-bg: #0a0a0a;
+  --lx-text: #33ff33;
+  --lx-text-muted: #1a8c1a;
+  --lx-accent: #33ff33;
+  --lx-border: #1a3a1a;
+  --lx-surface: #0f1a0f;
+  --lx-font-body: "IBM Plex Mono", "Courier New", monospace;
+  --lx-font-mono: "IBM Plex Mono", "Courier New", monospace;
 }

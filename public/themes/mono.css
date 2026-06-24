@@ -1,10 +1,10 @@
 :root {
-  --lp-bg: #ffffff;
-  --lp-text: #171717;
-  --lp-text-muted: #525252;
-  --lp-accent: #171717;
-  --lp-border: #d4d4d4;
-  --lp-surface: #f5f5f5;
-  --lp-font-body: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-  --lp-font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --lx-bg: #ffffff;
+  --lx-text: #171717;
+  --lx-text-muted: #525252;
+  --lx-accent: #171717;
+  --lx-border: #d4d4d4;
+  --lx-surface: #f5f5f5;
+  --lx-font-body: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --lx-font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }

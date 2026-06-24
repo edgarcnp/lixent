@@ -72,9 +72,9 @@ Override any CSS custom property without creating a full theme:
 {
   "theme": "minimal",
   "themeOverrides": {
-    "--lp-bg": "#1a1a1a",
-    "--lp-text": "#e5e5e5",
-    "--lp-accent": "#60a5fa"
+    "--lx-bg": "#1a1a1a",
+    "--lx-text": "#e5e5e5",
+    "--lx-accent": "#60a5fa"
   }
 }
 ```
@@ -100,19 +100,19 @@ Create a CSS file defining all required custom properties:
 
 ```css
 :root {
-  --lp-bg: #ffffff;
-  --lp-text: #1a1a1a;
-  --lp-text-muted: #666666;
-  --lp-accent: #2563eb;
-  --lp-border: #e5e7eb;
-  --lp-surface: #f9fafb;
-  --lp-font-body: "Inter", system-ui, sans-serif;
-  --lp-font-mono: "JetBrains Mono", monospace;
-  --lp-font-size: 1.125rem;
-  --lp-line-height: 1.7;
-  --lp-max-width: 720px;
-  --lp-padding: 2.5rem;
-  --lp-border-radius: 8px;
+  --lx-bg: #ffffff;
+  --lx-text: #1a1a1a;
+  --lx-text-muted: #666666;
+  --lx-accent: #2563eb;
+  --lx-border: #e5e7eb;
+  --lx-surface: #f9fafb;
+  --lx-font-body: "Inter", system-ui, sans-serif;
+  --lx-font-mono: "JetBrains Mono", monospace;
+  --lx-font-size: 1.125rem;
+  --lx-line-height: 1.7;
+  --lx-max-width: 720px;
+  --lx-padding: 2.5rem;
+  --lx-border-radius: 8px;
 }
 ```
 
