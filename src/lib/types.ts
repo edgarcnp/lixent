@@ -9,6 +9,7 @@ export interface LixentConfig {
     }
     theme: string
     themeOverrides?: Record<string, string>
+    font?: string
     gravatar?: boolean
     format?: "html" | "txt" | "json"
     basePath?: string
