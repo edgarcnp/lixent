@@ -113,12 +113,16 @@ export function initDemo(): void {
 
     function updateGravatarWarning(): void {
         const email = emailInput.value.trim()
-        emailWarning.style.display = gravatarToggle.checked && email.length === 0 ? "block" : "none"
+        const show = gravatarToggle.checked && email.length === 0
+        emailWarning.style.display = show ? "flex" : "none"
+        emailInput.classList.toggle("warn", show)
     }
 
     function updateUrlWarning(): void {
         const url = urlInput.value.trim()
-        urlWarning.style.display = url.length > 0 && !isValidUrl(url) ? "block" : "none"
+        const show = url.length > 0 && !isValidUrl(url)
+        urlWarning.style.display = show ? "flex" : "none"
+        urlInput.classList.toggle("warn", show)
     }
 
     function updatePreview(): void {
