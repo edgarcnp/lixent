@@ -139,7 +139,8 @@ export function initDemo(): void {
     utilReset.addEventListener("click", resetSettings)
 
     const utilCopy = $("util-copy")
-    const utilCopyStatus = $("util-copy-status")
+    const utilCopyLabel = $("util-copy-label")
+    const utilCopyCheck = $("util-copy-check")
 
     utilCopy.addEventListener("click", () => {
         const config: Record<string, string | boolean> = {
@@ -153,8 +154,12 @@ export function initDemo(): void {
 
         const json = JSON.stringify(config, null, 2)
         void navigator.clipboard.writeText(json).then(() => {
-            utilCopyStatus.textContent = "Copied!"
-            setTimeout(() => { utilCopyStatus.textContent = "" }, 2000)
+            utilCopyLabel.textContent = "Copied!"
+            utilCopyCheck.style.display = "inline-flex"
+            setTimeout(() => {
+                utilCopyLabel.textContent = "Copy Config"
+                utilCopyCheck.style.display = "none"
+            }, 2000)
         })
     })
 

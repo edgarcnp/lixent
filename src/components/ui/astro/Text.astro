@@ -1,0 +1,80 @@
+---
+type Variant = "display" | "title" | "heading" | "subheading" | "body" | "caption"
+type Tone = "primary" | "secondary" | "tertiary" | "white"
+type Tag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div"
+
+interface BaseProps {
+    tone?: Tone
+    center?: boolean
+    class?: string
+}
+
+interface VariantProps extends BaseProps {
+    variant?: Variant
+    tag?: never
+}
+
+interface TagProps extends BaseProps {
+    tag: Tag
+    variant?: never
+}
+
+type Props = VariantProps | TagProps
+
+const defaultTag = (variant: Variant): Tag => {
+    if (variant === "display") return "h1"
+    if (variant === "title") return "h2"
+    if (variant === "heading") return "h3"
+    if (variant === "subheading") return "h4"
+    return "p"
+}
+
+const {
+    variant = "body",
+    tone,
+    tag,
+    center = false,
+    class: className,
+} = Astro.props
+
+const element = tag ?? defaultTag(variant)
+const classes = ["text", tone && `tone-${tone}`, center && "center", className]
+    .filter(Boolean)
+    .join(" ");
+---
+
+{element === "h1" && <h1 class={classes}><slot /></h1>}
+{element === "h2" && <h2 class={classes}><slot /></h2>}
+{element === "h3" && <h3 class={classes}><slot /></h3>}
+{element === "h4" && <h4 class={classes}><slot /></h4>}
+{element === "h5" && <h5 class={classes}><slot /></h5>}
+{element === "h6" && <h6 class={classes}><slot /></h6>}
+{element === "p" && <p class={classes}><slot /></p>}
+{element === "span" && <span class={classes}><slot /></span>}
+{element === "div" && <div class={classes}><slot /></div>}
+
+<style>
+    .text {
+        margin: 0;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .tone-primary {
+        color: var(--primary);
+    }
+
+    .tone-secondary {
+        color: var(--secondary);
+    }
+
+    .tone-tertiary {
+        color: var(--tertiary);
+    }
+
+    .tone-white {
+        color: var(--white);
+    }
+</style>

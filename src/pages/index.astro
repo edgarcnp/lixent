@@ -1,6 +1,9 @@
 ---
 import { themes } from "../themes/index.ts"
 import { CORE_LICENSE_IDS } from "../licenses/index.ts"
+import Button from "../components/ui/astro/Button.astro"
+import IconX from "../components/ui/astro/icons/IconX.astro"
+import IconCheck from "../components/ui/astro/icons/IconCheck.astro"
 import "../styles/base.css"
 import "../styles/demo.css"
 
@@ -22,7 +25,9 @@ const licenseList = CORE_LICENSE_IDS
             <aside class="util-menu">
                 <div class="util-header">
                     <h2>Lixent Demo</h2>
-                    <button class="util-toggle" id="util-toggle" aria-label="Toggle menu">✕</button>
+                    <Button class="util-toggle" id="util-toggle" circle transparent aria-label="Toggle menu">
+                        <IconX />
+                    </Button>
                 </div>
 
                 <div class="util-section">
@@ -74,17 +79,20 @@ const licenseList = CORE_LICENSE_IDS
                     </label>
                 </div>
 
-                <div class="util-section">
-                    <button class="util-reset" id="util-reset">Reset to Defaults</button>
-                </div>
-
-                <div class="util-section">
-                    <button class="util-copy" id="util-copy">Copy Config</button>
-                    <span class="util-copy-status" id="util-copy-status"></span>
+                <div class="util-actions">
+                    <Button id="util-reset" transparent>Reset to Defaults</Button>
+                    <Button id="util-copy" primary>
+                        <span id="util-copy-label">Copy Config</span>
+                        <span id="util-copy-check" class="copy-check"><IconCheck /></span>
+                    </Button>
                 </div>
             </aside>
 
-            <button class="util-open" id="util-open" aria-label="Open menu">☰</button>
+            <button class="util-open" id="util-open" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" />
+                </svg>
+            </button>
 
             <div class="preview-area">
                 <div class="preview-frame">

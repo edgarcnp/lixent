@@ -1,78 +1,103 @@
 /* Lixent Demo Styles */
 .demo-layout {
+    --demo-bg: #0f0f0f;
+    --demo-surface: #1a1a1a;
+    --demo-surface-2: #242424;
+    --demo-border: #2a2a2a;
+    --demo-border-hover: #3a3a3a;
+    --demo-text: #e4e4e7;
+    --demo-text-muted: #71717a;
+    --demo-accent: #3b82f6;
+    --demo-accent-hover: #2563eb;
+    --demo-success: #22c55e;
+    --demo-radius: 8px;
+    --demo-radius-lg: 12px;
+
     display: flex;
     min-height: 100vh;
-    background: #1a1a1a;
+    background: var(--demo-bg);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #e0e0e0;
+    color: var(--demo-text);
 }
 
 /* Utility Menu */
 .util-menu {
-    width: 280px;
-    background: #252525;
-    border-right: 1px solid #333;
+    width: 300px;
+    background: var(--demo-surface);
+    border-right: 1px solid var(--demo-border);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
     overflow-y: auto;
     flex-shrink: 0;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .util-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--demo-border);
 }
 
 .util-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--demo-text);
+    letter-spacing: -0.01em;
 }
 
-.util-toggle {
+.util-header .util-toggle {
+    width: 32px;
+    height: 32px;
     display: none;
-    background: none;
-    border: none;
-    color: #999;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0.25rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--demo-text-muted);
+}
+
+.util-header .util-toggle:hover {
+    color: var(--demo-text);
 }
 
 .util-section {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
+    gap: 0.5rem;
 }
 
 .util-section label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #999;
+    color: var(--demo-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .util-section select,
 .util-section input {
-    background: #1a1a1a;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    color: #e0e0e0;
-    font-size: 0.9rem;
+    background: var(--demo-bg);
+    border: 1px solid var(--demo-border);
+    border-radius: var(--demo-radius);
+    padding: 0.625rem 0.75rem;
+    color: var(--demo-text);
+    font-size: 0.875rem;
+    font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.util-section select:hover,
+.util-section input:hover {
+    border-color: var(--demo-border-hover);
 }
 
 .util-section select:focus,
 .util-section input:focus {
-    border-color: #666;
+    border-color: var(--demo-accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .toggle-label {
@@ -80,51 +105,67 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    color: var(--demo-text);
 }
 
 .toggle-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #4a9eff;
+    accent-color: var(--demo-accent);
     cursor: pointer;
 }
 
-.util-reset {
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 0.625rem;
-    color: #ccc;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: background 0.2s;
+/* Actions */
+.util-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--demo-border);
 }
 
-.util-reset:hover {
-    background: #444;
-}
-
-.util-copy {
-    background: #2563eb;
-    border: none;
-    border-radius: 6px;
+.util-actions .button {
+    width: 100%;
+    justify-content: center;
     padding: 0.625rem;
-    color: #fff;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    border-radius: var(--demo-radius);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.15s, opacity 0.15s;
 }
 
-.util-copy:hover {
-    background: #1d4ed8;
+.util-actions .button.primary {
+    background: var(--demo-accent);
+    color: #fff;
+    border: none;
 }
 
-.util-copy-status {
-    font-size: 0.8rem;
-    color: #22c55e;
-    margin-top: 0.25rem;
+.util-actions .button.primary:hover {
+    background: var(--demo-accent-hover);
+}
+
+.util-actions .button.transparent {
+    background: transparent;
+    color: var(--demo-text-muted);
+    border: none;
+}
+
+.util-actions .button.transparent:hover {
+    color: var(--demo-text);
+    background: var(--demo-surface-2);
+}
+
+.copy-check {
+    display: none;
+    align-items: center;
+}
+
+.copy-check svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* Open Menu Button */
@@ -134,13 +175,19 @@
     top: 1rem;
     left: 1rem;
     z-index: 100;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 0.5rem 0.75rem;
-    color: #fff;
-    font-size: 1.25rem;
+    background: var(--demo-surface);
+    border: 1px solid var(--demo-border);
+    border-radius: var(--demo-radius);
+    padding: 0.5rem;
+    color: var(--demo-text);
     cursor: pointer;
+    transition: background 0.15s;
+    align-items: center;
+    justify-content: center;
+}
+
+.util-open:hover {
+    background: var(--demo-surface-2);
 }
 
 /* Preview Area */
@@ -156,46 +203,52 @@
     width: 100%;
     max-width: 800px;
     background: #fff;
-    border-radius: 12px;
+    border-radius: var(--demo-radius-lg);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 20px 40px -8px rgba(0, 0, 0, 0.4);
 }
 
 .preview-header {
-    background: #e8e8e8;
+    background: #f4f4f5;
     padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    border-bottom: 1px solid #e4e4e7;
 }
 
 .preview-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #ccc;
+    background: #d4d4d8;
 }
 
-.preview-dot:first-child { background: #ff5f57; }
-.preview-dot:nth-child(2) { background: #febc2e; }
-.preview-dot:nth-child(3) { background: #28c840; }
+.preview-dot:first-child { background: #ef4444; }
+.preview-dot:nth-child(2) { background: #eab308; }
+.preview-dot:nth-child(3) { background: #22c55e; }
 
 .preview-url {
     flex: 1;
     text-align: center;
     font-size: 0.8rem;
-    color: #666;
+    color: #71717a;
     margin-right: 3rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
 .preview-content {
-    padding: 2rem;
+    padding: 2.5rem;
     min-height: 400px;
 }
 
 .preview-content .gravatar {
     border-radius: 50%;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .preview-content h1 {
@@ -203,16 +256,18 @@
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
 }
 
 .preview-content .copyright {
-    color: #666;
+    color: #71717a;
     font-size: 0.95rem;
     margin-bottom: 2rem;
 }
 
 .preview-content .license-body p {
     margin-bottom: 1em;
+    line-height: 1.7;
 }
 
 /* Responsive */
@@ -224,26 +279,31 @@
         bottom: 0;
         z-index: 200;
         transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
     }
 
     .util-menu.open {
         transform: translateX(0);
     }
 
-    .util-toggle {
-        display: block;
+    .util-header .util-toggle {
+        display: flex;
     }
 
     .util-open {
-        display: block;
+        display: flex;
     }
 
     .preview-area {
         padding: 1rem;
-        padding-top: 4rem;
+        padding-top: 4.5rem;
     }
 
     .preview-frame {
-        border-radius: 8px;
+        border-radius: var(--demo-radius);
+    }
+
+    .preview-content {
+        padding: 1.5rem;
     }
 }
