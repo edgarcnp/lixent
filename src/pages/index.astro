@@ -1,6 +1,6 @@
 ---
 import { themes } from "../themes/index.ts"
-import { CORE_LICENSE_IDS } from "../licenses/index.ts"
+import { LICENSE_IDS } from "../demo/licenses.ts"
 import Button from "../components/ui/astro/Button.astro"
 import IconX from "../components/ui/astro/icons/IconX.astro"
 import IconCheck from "../components/ui/astro/icons/IconCheck.astro"
@@ -8,7 +8,7 @@ import "../styles/base.css"
 import "../styles/demo.css"
 
 const themeList = themes
-const licenseList = CORE_LICENSE_IDS
+const licenseList = LICENSE_IDS
 ---
 
 <!doctype html>
@@ -83,7 +83,7 @@ const licenseList = CORE_LICENSE_IDS
                     <div class="util-section">
                         <label for="license-select">License</label>
                         <select id="license-select">
-                            {licenseList.sort().map((id) => (
+                            {licenseList.map((id) => (
                                 <option value={id} selected={id === "MIT"}>
                                     {id}
                                 </option>
