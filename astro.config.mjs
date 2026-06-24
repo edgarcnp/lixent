@@ -7,4 +7,7 @@ const lixent = loadConfig();
 export default defineConfig({
   site: lixent.url,
   base: lixent.basePath,
+  image: {
+    domains: ["gravatar.com"],
+  },
 });

@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets"
 import { loadConfig } from "../lib/config.ts"
 import { getGravatarUrl } from "../lib/gravatar.ts"
 import { formatYear, formatYearRange } from "../lib/year.ts"
@@ -59,12 +60,12 @@ const gravatarUrl
             <article class="license-card">
                 <header class="license-header">
                     {gravatarUrl && (
-                        <img
+                        <Image
                             class="gravatar"
                             src={gravatarUrl}
                             alt={config.copyright}
-                            width="48"
-                            height="48"
+                            width={48}
+                            height={48}
                         />
                     )}
                     <h1>{title}</h1>
