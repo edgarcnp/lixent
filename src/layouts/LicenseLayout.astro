@@ -82,7 +82,7 @@ const gravatarUrl
                             : name
                         }
                         {hasEmail && (
-                            <span class="email"> &lt;{config.email}&gt;</span>
+                            <span class="email"> &lt;<a href={`mailto:${config.email}`}>{config.email}</a>&gt;</span>
                         )}
                     </p>
                 </header>
