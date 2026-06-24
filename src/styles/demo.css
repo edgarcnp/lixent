@@ -29,6 +29,10 @@
     --demo-accent-hover: #2563eb;
 }
 
+.dark .util-warning {
+    color: #fbbf24;
+}
+
 .demo-layout {
     display: flex;
     height: 100vh;
@@ -161,6 +165,13 @@
     height: 18px;
     accent-color: var(--demo-accent);
     cursor: pointer;
+}
+
+.util-warning {
+    font-size: 0.75rem;
+    color: #f59e0b;
+    display: block;
+    margin-top: 0.25rem;
 }
 
 /* Dark/Light Mode Toggle */

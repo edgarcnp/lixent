@@ -18,6 +18,20 @@ function $(id: string): HTMLElement {
     return el
 }
 
+function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isValidUrl(value: string): boolean {
+    if (value.length === 0) return true
+    try {
+        const parsed = new URL(value)
+        return parsed.protocol === "http:" || parsed.protocol === "https:"
+    } catch {
+        return false
+    }
+}
+
 function convertPlaceholders(text: string, copyright: string, year: number): string {
     return text
         .replace(/\{\{year\}\}/g, String(year))
@@ -94,13 +108,25 @@ export function initDemo(): void {
     const utilReset = $("util-reset")
     const previewUrl = $("preview-url")
     const modeToggle = $("mode-toggle")
+    const emailWarning = $("email-warning")
+    const urlWarning = $("url-warning")
+
+    function updateGravatarWarning(): void {
+        const email = emailInput.value.trim()
+        emailWarning.style.display = gravatarToggle.checked && email.length === 0 ? "block" : "none"
+    }
+
+    function updateUrlWarning(): void {
+        const url = urlInput.value.trim()
+        urlWarning.style.display = url.length > 0 && !isValidUrl(url) ? "block" : "none"
+    }
 
     function updatePreview(): void {
         const theme = themeSelect.value
         const licenseId = licenseSelect.value
         const copyright = copyrightInput.value || "John Doe"
-        const email = emailInput.value
-        const url = urlInput.value
+        const email = emailInput.value.trim()
+        const url = urlInput.value.trim()
         const year = yearInput.value ? parseInt(yearInput.value) : new Date().getFullYear()
         const showGravatar = gravatarToggle.checked
 
@@ -113,8 +139,8 @@ export function initDemo(): void {
 
         previewTitle.textContent = `${license != null ? license.name : licenseId} License`
 
-        const hasUrl = url.length > 0
-        const hasEmail = email.length > 0
+        const hasUrl = url.length > 0 && isValidUrl(url)
+        const hasEmail = email.length > 0 && isValidEmail(email)
         const nameHtml = hasUrl
             ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${copyright}</a>`
             : copyright
@@ -125,7 +151,7 @@ export function initDemo(): void {
 
         previewLicenseText.innerHTML = formatParagraphs(rendered)
 
-        if (showGravatar && email) {
+        if (showGravatar && hasEmail) {
             previewGravatar.style.display = "block"
             previewGravatarImg.src = getGravatarUrl(email, 64)
             previewGravatarImg.alt = copyright
@@ -150,6 +176,8 @@ export function initDemo(): void {
     }
 
     function onControlChange(): void {
+        updateGravatarWarning()
+        updateUrlWarning()
         updatePreview()
         saveSettings(getCurrentSettings())
     }
@@ -162,10 +190,10 @@ export function initDemo(): void {
         copyrightInput.value = "John Doe"
         emailInput.value = ""
         urlInput.value = ""
-        yearInput.value = ""
+        yearInput.value = String(new Date().getFullYear())
         gravatarToggle.checked = false
         applyMode(getPreferredMode())
-        updatePreview()
+        onControlChange()
     }
 
     function toggleMode(): void {
@@ -198,8 +226,8 @@ export function initDemo(): void {
             license: licenseSelect.value,
             theme: themeSelect.value,
         }
-        if (emailInput.value) config.email = emailInput.value
-        if (urlInput.value) config.url = urlInput.value
+        if (emailInput.value.trim()) config.email = emailInput.value.trim()
+        if (urlInput.value.trim() && isValidUrl(urlInput.value.trim())) config.url = urlInput.value.trim()
         if (gravatarToggle.checked) config.gravatar = true
 
         const json = JSON.stringify(config, null, 2)
@@ -219,9 +247,9 @@ export function initDemo(): void {
     if (saved.copyright) copyrightInput.value = saved.copyright
     if (saved.email) emailInput.value = saved.email
     if (saved.url) urlInput.value = saved.url
-    if (saved.year) yearInput.value = saved.year
+    yearInput.value = saved.year ?? String(new Date().getFullYear())
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
 
     applyMode(getPreferredMode())
-    updatePreview()
+    onControlChange()
 }

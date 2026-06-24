@@ -83,16 +83,18 @@ const licenseList = CORE_LICENSE_IDS
                     <div class="util-section">
                         <label for="email-input">Email (for Gravatar)</label>
                         <input type="email" id="email-input" placeholder="john@example.com" />
+                        <span class="util-warning" id="email-warning" style="display:none;">Enter an email to use Gravatar</span>
                     </div>
 
                     <div class="util-section">
                         <label for="url-input">URL</label>
                         <input type="url" id="url-input" placeholder="https://example.com" />
+                        <span class="util-warning" id="url-warning" style="display:none;">Invalid URL format</span>
                     </div>
 
                     <div class="util-section">
-                        <label for="year-input">Year (optional)</label>
-                        <input type="number" id="year-input" placeholder={String(new Date().getFullYear())} />
+                        <label for="year-input">Year</label>
+                        <input type="number" id="year-input" placeholder={String(new Date().getFullYear())} min="1900" max="2100" />
                     </div>
 
                     <div class="util-section">
