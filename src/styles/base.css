@@ -110,7 +110,7 @@ footer {
   color: var(--lp-text-muted);
   font-size: 0.8125rem;
   white-space: nowrap;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 footer a {
