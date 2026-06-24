@@ -84,6 +84,21 @@ h1 {
   font-size: 0.9375rem;
 }
 
+.copyright a {
+  color: var(--lx-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.copyright a:hover {
+  text-decoration: underline;
+}
+
+.copyright .email {
+  color: var(--lx-text-muted);
+}
+
 .license-content p {
   margin-bottom: 1.5em;
   text-align: justify;
