@@ -15,11 +15,6 @@ const THEME_VARIABLES = [
     "--lp-surface",
     "--lp-font-body",
     "--lp-font-mono",
-    "--lp-font-size",
-    "--lp-line-height",
-    "--lp-max-width",
-    "--lp-padding",
-    "--lp-border-radius",
 ]
 
 export const themes: ThemeMeta[] = [

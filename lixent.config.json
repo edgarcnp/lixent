@@ -1,8 +1,8 @@
 {
-  "copyright": "John Doe",
-  "url": "https://example.com",
-  "email": "john@example.com",
-  "license": "MIT",
-  "theme": "minimal",
-  "gravatar": true
+    "copyright": "John Doe",
+    "url": "https://example.com",
+    "email": "john@example.com",
+    "license": "MIT",
+    "theme": "github-dark",
+    "gravatar": true
 }

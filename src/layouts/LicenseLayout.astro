@@ -28,11 +28,11 @@ const themeOverrides
 
 let displayCopyright = copyright ?? config.copyright
 if (config.year != null) {
-    displayCopyright = `© ${formatYear(config.year)} ${displayCopyright}`
+    displayCopyright = `\u00A9 ${formatYear(config.year)} ${displayCopyright}`
 } else if (config.yearRange != null) {
-    displayCopyright = `© ${formatYearRange(config.yearRange.start, config.yearRange.end)} ${displayCopyright}`
+    displayCopyright = `\u00A9 ${formatYearRange(config.yearRange.start, config.yearRange.end)} ${displayCopyright}`
 } else {
-    displayCopyright = `© ${formatYear()} ${displayCopyright}`
+    displayCopyright = `\u00A9 ${formatYear()} ${displayCopyright}`
 }
 
 const gravatarUrl
@@ -56,28 +56,27 @@ const gravatarUrl
     </head>
     <body>
         <main>
-            {gravatarUrl && (
-                <img
-                    class="gravatar"
-                    src={gravatarUrl}
-                    alt={config.copyright}
-                    width="48"
-                    height="48"
-                />
-            )}
-            <h1>{title}</h1>
-            <p class="copyright">{displayCopyright}</p>
-            <slot />
+            <article class="license-card">
+                <header class="license-header">
+                    {gravatarUrl && (
+                        <img
+                            class="gravatar"
+                            src={gravatarUrl}
+                            alt={config.copyright}
+                            width="48"
+                            height="48"
+                        />
+                    )}
+                    <h1>{title}</h1>
+                    <p class="copyright">{displayCopyright}</p>
+                </header>
+                <div class="license-content">
+                    <slot />
+                </div>
+            </article>
         </main>
         <footer>
             Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
         </footer>
     </body>
 </html>
-
-<style>
-  .gravatar {
-    border-radius: 50%;
-    margin-bottom: 1rem;
-  }
-</style>

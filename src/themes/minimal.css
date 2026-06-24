@@ -1,15 +1,10 @@
 :root {
-  --lp-bg: #ffffff;
-  --lp-text: #1a1a1a;
+  --lp-bg: #faf9f7;
+  --lp-text: #374151;
   --lp-text-muted: #6b7280;
   --lp-accent: #2563eb;
-  --lp-border: #e5e7eb;
-  --lp-surface: #f9fafb;
-  --lp-font-body: "Georgia", "Times New Roman", serif;
-  --lp-font-mono: "Menlo", "Consolas", monospace;
-  --lp-font-size: 1.125rem;
-  --lp-line-height: 1.8;
-  --lp-max-width: 680px;
-  --lp-padding: 3rem;
-  --lp-border-radius: 4px;
+  --lp-border: #e5e1dc;
+  --lp-surface: #f3f1ed;
+  --lp-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --lp-font-mono: "JetBrains Mono", "Fira Code", "Menlo", monospace;
 }
