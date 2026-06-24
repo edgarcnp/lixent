@@ -138,6 +138,26 @@ export function initDemo(): void {
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
     utilReset.addEventListener("click", resetSettings)
 
+    const utilCopy = $("util-copy")
+    const utilCopyStatus = $("util-copy-status")
+
+    utilCopy.addEventListener("click", () => {
+        const config: Record<string, string | boolean> = {
+            copyright: copyrightInput.value || "John Doe",
+            license: licenseSelect.value,
+            theme: themeSelect.value,
+        }
+        if (emailInput.value) config.email = emailInput.value
+        if (urlInput.value) config.url = urlInput.value
+        if (gravatarToggle.checked) config.gravatar = true
+
+        const json = JSON.stringify(config, null, 2)
+        void navigator.clipboard.writeText(json).then(() => {
+            utilCopyStatus.textContent = "Copied!"
+            setTimeout(() => { utilCopyStatus.textContent = "" }, 2000)
+        })
+    })
+
     const saved = loadSettings()
     if (saved.theme) themeSelect.value = saved.theme
     if (saved.license) licenseSelect.value = saved.license

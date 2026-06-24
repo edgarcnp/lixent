@@ -106,6 +106,27 @@
     background: #444;
 }
 
+.util-copy {
+    background: #2563eb;
+    border: none;
+    border-radius: 6px;
+    padding: 0.625rem;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.util-copy:hover {
+    background: #1d4ed8;
+}
+
+.util-copy-status {
+    font-size: 0.8rem;
+    color: #22c55e;
+    margin-top: 0.25rem;
+}
+
 /* Open Menu Button */
 .util-open {
     display: none;

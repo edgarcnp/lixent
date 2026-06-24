@@ -4,7 +4,7 @@ import { loadConfig } from "./src/lib/config.ts";
 
 const lixent = loadConfig();
 
-export default defineConfig({
-  site: lixent.url,
-  base: lixent.basePath,
-});
+export default defineConfig(({ command }) => ({
+  site: command === "build" ? lixent.url : undefined,
+  base: command === "build" ? lixent.basePath : undefined,
+}));
