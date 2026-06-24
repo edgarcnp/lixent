@@ -283,6 +283,15 @@
     background: var(--demo-surface);
 }
 
+.util-actions-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.util-actions-row .button {
+    flex: 1;
+}
+
 .util-actions .button {
     width: 100%;
     justify-content: center;

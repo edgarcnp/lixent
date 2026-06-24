@@ -3,6 +3,7 @@ import { licenses } from "./licenses.ts"
 
 interface DemoSettings {
     theme: string
+    font: string
     license: string
     copyright: string
     email: string
@@ -87,8 +88,22 @@ function applyMode(mode: "dark" | "light"): void {
     }
 }
 
+function buildConfigJson(settings: DemoSettings): Record<string, string | boolean> {
+    const config: Record<string, string | boolean> = {
+        copyright: settings.copyright || "John Doe",
+        license: settings.license,
+        theme: settings.theme,
+    }
+    if (settings.font.length > 0) config.font = settings.font
+    if (settings.email.length > 0) config.email = settings.email
+    if (settings.url.length > 0 && isValidUrl(settings.url)) config.url = settings.url
+    if (settings.gravatar) config.gravatar = true
+    return config
+}
+
 export function initDemo(): void {
     const themeSelect = $("theme-select") as HTMLSelectElement
+    const fontSelect = $("font-select") as HTMLSelectElement
     const licenseSelect = $("license-select") as HTMLSelectElement
     const copyrightInput = $("copyright-input") as HTMLInputElement
     const emailInput = $("email-input") as HTMLInputElement
@@ -111,6 +126,8 @@ export function initDemo(): void {
     const emailWarning = $("email-warning")
     const urlWarning = $("url-warning")
 
+    const currentYear = new Date().getFullYear()
+
     function updateGravatarWarning(): void {
         const email = emailInput.value.trim()
         const show = gravatarToggle.checked && email.length === 0
@@ -127,14 +144,22 @@ export function initDemo(): void {
 
     function updatePreview(): void {
         const theme = themeSelect.value
+        const font = fontSelect.value
         const licenseId = licenseSelect.value
         const copyright = copyrightInput.value || "John Doe"
         const email = emailInput.value.trim()
         const url = urlInput.value.trim()
-        const year = yearInput.value ? parseInt(yearInput.value) : new Date().getFullYear()
+        const year = yearInput.value.length > 0 ? parseInt(yearInput.value) : currentYear
         const showGravatar = gravatarToggle.checked
 
         previewTheme.href = `/themes/${theme}.css`
+
+        const previewContent = $("preview-content")
+        if (font.length > 0) {
+            previewContent.style.setProperty("--lx-font-body", font)
+        } else {
+            previewContent.style.removeProperty("--lx-font-body")
+        }
 
         const license = licenses[licenseId]
         const rendered = license != null
@@ -156,9 +181,12 @@ export function initDemo(): void {
         previewLicenseText.innerHTML = formatParagraphs(rendered)
 
         if (showGravatar && hasEmail) {
+            const newSrc = getGravatarUrl(email, 64)
+            if (previewGravatarImg.src !== newSrc) {
+                previewGravatarImg.src = newSrc
+                previewGravatarImg.alt = copyright
+            }
             previewGravatar.style.display = "block"
-            previewGravatarImg.src = getGravatarUrl(email, 64)
-            previewGravatarImg.alt = copyright
         } else {
             previewGravatar.style.display = "none"
         }
@@ -169,6 +197,7 @@ export function initDemo(): void {
     function getCurrentSettings(): DemoSettings {
         return {
             theme: themeSelect.value,
+            font: fontSelect.value,
             license: licenseSelect.value,
             copyright: copyrightInput.value,
             email: emailInput.value,
@@ -190,6 +219,7 @@ export function initDemo(): void {
         localStorage.removeItem("lixent-demo")
         localStorage.removeItem("lixent-demo-mode")
         themeSelect.value = "minimal"
+        fontSelect.value = ""
         licenseSelect.value = "MIT"
         copyrightInput.value = "John Doe"
         emailInput.value = ""
@@ -207,13 +237,31 @@ export function initDemo(): void {
         saveSettings(getCurrentSettings())
     }
 
+    function downloadConfig(): void {
+        const settings = getCurrentSettings()
+        const config = buildConfigJson(settings)
+        const json = JSON.stringify(config, null, 2)
+        const blob = new Blob([json], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "lixent.config.json"
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     themeSelect.addEventListener("change", onControlChange)
+    fontSelect.addEventListener("change", onControlChange)
     licenseSelect.addEventListener("change", onControlChange)
     copyrightInput.addEventListener("input", onControlChange)
     emailInput.addEventListener("input", onControlChange)
     urlInput.addEventListener("input", onControlChange)
     yearInput.addEventListener("input", onControlChange)
-    gravatarToggle.addEventListener("change", onControlChange)
+
+    gravatarToggle.addEventListener("click", (e) => {
+        e.stopPropagation()
+        queueMicrotask(() => onControlChange())
+    })
 
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
@@ -223,32 +271,27 @@ export function initDemo(): void {
     const utilCopy = $("util-copy")
     const utilCopyLabel = $("util-copy-label")
     const utilCopyCheck = $("util-copy-check")
+    const utilDownload = $("util-download")
 
     utilCopy.addEventListener("click", () => {
-        const config: Record<string, string | boolean> = {
-            copyright: copyrightInput.value || "John Doe",
-            license: licenseSelect.value,
-            theme: themeSelect.value,
-        }
-        if (emailInput.value.trim()) config.email = emailInput.value.trim()
-        if (urlInput.value.trim() && isValidUrl(urlInput.value.trim())) config.url = urlInput.value.trim()
-        if (gravatarToggle.checked) config.gravatar = true
-
+        const settings = getCurrentSettings()
+        const config = buildConfigJson(settings)
         const json = JSON.stringify(config, null, 2)
         void navigator.clipboard.writeText(json).then(() => {
             utilCopyLabel.textContent = "Copied!"
             utilCopyCheck.style.display = "inline-flex"
             setTimeout(() => {
-                utilCopyLabel.textContent = "Copy Config"
+                utilCopyLabel.textContent = "Copy"
                 utilCopyCheck.style.display = "none"
             }, 2000)
         })
     })
 
-    const currentYear = new Date().getFullYear()
+    utilDownload.addEventListener("click", downloadConfig)
 
     const saved = loadSettings()
     if (saved.theme) themeSelect.value = saved.theme
+    if (saved.font) fontSelect.value = saved.font
     if (saved.license) licenseSelect.value = saved.license
     if (saved.copyright) copyrightInput.value = saved.copyright
     if (saved.email) emailInput.value = saved.email

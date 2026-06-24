@@ -65,9 +65,25 @@ const licenseList = CORE_LICENSE_IDS
                     </div>
 
                     <div class="util-section">
+                        <label for="font-select">Font</label>
+                        <select id="font-select">
+                            <option value="" selected>Default (from theme)</option>
+                            <option value="Inter, -apple-system, BlinkMacSystemFont, sans-serif">Inter</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="Merriweather, Georgia, serif">Merriweather</option>
+                            <option value="Playfair Display, Georgia, serif">Playfair Display</option>
+                            <option value="Lora, Georgia, serif">Lora</option>
+                            <option value="Source Sans 3, sans-serif">Source Sans</option>
+                            <option value="Nunito, sans-serif">Nunito</option>
+                            <option value="IBM Plex Mono, monospace">IBM Plex Mono</option>
+                            <option value="JetBrains Mono, monospace">JetBrains Mono</option>
+                        </select>
+                    </div>
+
+                    <div class="util-section">
                         <label for="license-select">License</label>
                         <select id="license-select">
-                            {licenseList.map((id) => (
+                            {licenseList.sort().map((id) => (
                                 <option value={id} selected={id === "MIT"}>
                                     {id}
                                 </option>
@@ -115,10 +131,15 @@ const licenseList = CORE_LICENSE_IDS
 
                 <div class="util-actions">
                     <Button id="util-reset" transparent>Reset to Defaults</Button>
-                    <Button id="util-copy" primary>
-                        <span id="util-copy-label">Copy Config</span>
-                        <span id="util-copy-check" class="copy-check"><IconCheck /></span>
-                    </Button>
+                    <div class="util-actions-row">
+                        <Button id="util-copy" primary>
+                            <span id="util-copy-label">Copy</span>
+                            <span id="util-copy-check" class="copy-check"><IconCheck /></span>
+                        </Button>
+                        <Button id="util-download" primary>
+                            Download
+                        </Button>
+                    </div>
                 </div>
             </aside>
 
