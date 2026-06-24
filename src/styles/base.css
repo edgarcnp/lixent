@@ -99,10 +99,18 @@ h1 {
 
 footer {
   text-align: center;
-  padding: 2rem var(--lx-padding);
+  padding: 0.5rem 1.25rem;
   color: var(--lx-text-muted);
-  font-size: 0.875rem;
-  border-top: 1px solid var(--lx-border);
+  font-size: 0.8125rem;
+  display: flex;
+  justify-content: center;
+}
+
+footer .footer-pill {
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-border);
+  border-radius: 9999px;
+  padding: 0.5rem 1.25rem;
 }
 
 footer a {
