@@ -76,13 +76,13 @@ const gravatarUrl
                     )}
                     <h1>{title}</h1>
                     <p class="copyright">
-                        Copyright &copy; {yearStr}
+                        Copyright &copy; {yearStr}{" "}
                         {hasUrl
                             ? <a href={config.url} target="_blank" rel="noopener noreferrer">{name}</a>
                             : name
                         }
                         {hasEmail && (
-                            <span class="email">&lt;{config.email}&gt;</span>
+                            <span class="email"> &lt;{config.email}&gt;</span>
                         )}
                     </p>
                 </header>
