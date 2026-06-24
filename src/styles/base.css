@@ -43,7 +43,7 @@ main {
   width: 100%;
   max-width: var(--lx-max-width);
   margin: 0 auto;
-  padding: var(--lx-padding);
+  padding: 1.5rem var(--lx-padding);
   padding-bottom: 0;
   display: flex;
   align-items: flex-start;
@@ -128,7 +128,7 @@ h1 {
 
 footer {
   text-align: center;
-  padding: 2rem 1.25rem;
+  padding: 1.5rem 1.25rem;
   color: var(--lx-text-muted);
   font-size: 0.8125rem;
   display: flex;
