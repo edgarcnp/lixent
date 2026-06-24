@@ -7,11 +7,11 @@
 }
 
 :root {
-  --lp-font-size: clamp(1rem, 0.9375rem + 0.25vw, 1.125rem);
-  --lp-line-height: 1.7;
-  --lp-max-width: clamp(320px, 92vw, 960px);
-  --lp-padding: clamp(1.25rem, 1rem + 2vw, 3rem);
-  --lp-border-radius: 6px;
+  --lx-font-size: clamp(1rem, 0.9375rem + 0.25vw, 1.125rem);
+  --lx-line-height: 1.7;
+  --lx-max-width: clamp(320px, 92vw, 960px);
+  --lx-padding: clamp(1.25rem, 1rem + 2vw, 3rem);
+  --lx-border-radius: 6px;
 }
 
 html {
@@ -19,11 +19,11 @@ html {
 }
 
 body {
-  font-family: var(--lp-font-body);
-  font-size: var(--lp-font-size);
-  line-height: var(--lp-line-height);
-  color: var(--lp-text);
-  background-color: var(--lp-bg);
+  font-family: var(--lx-font-body);
+  font-size: var(--lx-font-size);
+  line-height: var(--lx-line-height);
+  color: var(--lx-text);
+  background-color: var(--lx-bg);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -34,16 +34,16 @@ body {
 }
 
 ::selection {
-  background-color: var(--lp-accent);
+  background-color: var(--lx-accent);
   color: #fff;
 }
 
 main {
   flex: 1;
   width: 100%;
-  max-width: var(--lp-max-width);
+  max-width: var(--lx-max-width);
   margin: 0 auto;
-  padding: var(--lp-padding);
+  padding: var(--lx-padding);
   padding-bottom: 4rem;
   display: flex;
   align-items: flex-start;
@@ -52,16 +52,16 @@ main {
 
 .license-card {
   width: 100%;
-  background: var(--lp-surface);
-  border: 1px solid var(--lp-border);
-  border-radius: var(--lp-border-radius);
-  padding: var(--lp-padding);
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-border);
+  border-radius: var(--lx-border-radius);
+  padding: var(--lx-padding);
 }
 
 .license-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--lp-border);
+  border-bottom: 1px solid var(--lx-border);
   text-align: center;
 }
 
@@ -80,11 +80,11 @@ h1 {
   line-height: 1.2;
   margin-bottom: 0.5rem;
   letter-spacing: -0.025em;
-  color: var(--lp-text);
+  color: var(--lx-text);
 }
 
 .copyright {
-  color: var(--lp-text-muted);
+  color: var(--lx-text-muted);
   font-size: 0.9375rem;
 }
 
@@ -103,18 +103,18 @@ footer {
   bottom: 1.25rem;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--lp-surface);
-  border: 1px solid var(--lp-border);
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-border);
   border-radius: 9999px;
   padding: 0.5rem 1.25rem;
-  color: var(--lp-text-muted);
+  color: var(--lx-text-muted);
   font-size: 0.8125rem;
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 footer a {
-  color: var(--lp-accent);
+  color: var(--lx-accent);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s ease;

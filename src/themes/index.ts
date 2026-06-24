@@ -7,14 +7,14 @@ export interface ThemeMeta {
 }
 
 const THEME_VARIABLES = [
-    "--lp-bg",
-    "--lp-text",
-    "--lp-text-muted",
-    "--lp-accent",
-    "--lp-border",
-    "--lp-surface",
-    "--lp-font-body",
-    "--lp-font-mono",
+    "--lx-bg",
+    "--lx-text",
+    "--lx-text-muted",
+    "--lx-accent",
+    "--lx-border",
+    "--lx-surface",
+    "--lx-font-body",
+    "--lx-font-mono",
 ]
 
 export const themes: ThemeMeta[] = [
