@@ -3,6 +3,6 @@
     "url": "https://example.com",
     "email": "john@example.com",
     "license": "MIT",
-    "theme": "github-dark",
+    "theme": "minimal",
     "gravatar": true
 }

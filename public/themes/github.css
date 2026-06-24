@@ -7,9 +7,4 @@
   --lp-surface: #f6f8fa;
   --lp-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   --lp-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  --lp-font-size: 1rem;
-  --lp-line-height: 1.6;
-  --lp-max-width: 720px;
-  --lp-padding: 2rem;
-  --lp-border-radius: 6px;
 }
