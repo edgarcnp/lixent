@@ -44,7 +44,6 @@ main {
   max-width: var(--lx-max-width);
   margin: 0 auto;
   padding: var(--lx-padding);
-  padding-bottom: 4rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -99,18 +98,11 @@ h1 {
 }
 
 footer {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--lx-surface);
-  border: 1px solid var(--lx-border);
-  border-radius: 9999px;
-  padding: 0.5rem 1.25rem;
+  text-align: center;
+  padding: 2rem var(--lx-padding);
   color: var(--lx-text-muted);
-  font-size: 0.8125rem;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--lx-border);
 }
 
 footer a {
