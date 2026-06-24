@@ -19,64 +19,88 @@ const licenseList = CORE_LICENSE_IDS
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <title>Lixent Demo</title>
         <link rel="stylesheet" href="/themes/minimal.css" id="preview-theme" />
+        <script is:inline>
+            (function() {
+                var saved = localStorage.getItem("lixent-demo-mode");
+                if (saved === "dark") {
+                    document.documentElement.classList.add("dark");
+                } else if (saved === "light") {
+                    document.documentElement.classList.remove("dark");
+                } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
     </head>
     <body>
         <div class="demo-layout">
-            <aside class="util-menu">
+            <aside class="util-menu" id="util-menu">
                 <div class="util-header">
                     <h2>Lixent Demo</h2>
-                    <Button class="util-toggle" id="util-toggle" circle transparent aria-label="Toggle menu">
+                    <button class="util-toggle" id="util-toggle" aria-label="Close menu">
                         <IconX />
-                    </Button>
+                    </button>
                 </div>
 
-                <div class="util-section">
-                    <label for="theme-select">Theme</label>
-                    <select id="theme-select">
-                        {themeList.map((t) => (
-                            <option value={t.id} selected={t.id === "minimal"}>
-                                {t.name} {t.dark ? "(dark)" : ""}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <div class="util-scroll">
+                    <div class="util-section">
+                        <label>Appearance</label>
+                        <button class="mode-toggle" id="mode-toggle" type="button">
+                            <span class="mode-toggle-icon" id="mode-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            </span>
+                            <span id="mode-label">Dark Mode</span>
+                        </button>
+                    </div>
 
-                <div class="util-section">
-                    <label for="license-select">License</label>
-                    <select id="license-select">
-                        {licenseList.map((id) => (
-                            <option value={id} selected={id === "MIT"}>
-                                {id}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                    <div class="util-section">
+                        <label for="theme-select">Theme</label>
+                        <select id="theme-select">
+                            {themeList.map((t) => (
+                                <option value={t.id} selected={t.id === "minimal"}>
+                                    {t.name} {t.dark ? "(dark)" : ""}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                <div class="util-section">
-                    <label for="copyright-input">Copyright Name</label>
-                    <input type="text" id="copyright-input" value="John Doe" />
-                </div>
+                    <div class="util-section">
+                        <label for="license-select">License</label>
+                        <select id="license-select">
+                            {licenseList.map((id) => (
+                                <option value={id} selected={id === "MIT"}>
+                                    {id}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                <div class="util-section">
-                    <label for="email-input">Email (for Gravatar)</label>
-                    <input type="email" id="email-input" placeholder="john@example.com" />
-                </div>
+                    <div class="util-section">
+                        <label for="copyright-input">Copyright Name</label>
+                        <input type="text" id="copyright-input" value="John Doe" />
+                    </div>
 
-                <div class="util-section">
-                    <label for="url-input">URL</label>
-                    <input type="url" id="url-input" placeholder="https://example.com" />
-                </div>
+                    <div class="util-section">
+                        <label for="email-input">Email (for Gravatar)</label>
+                        <input type="email" id="email-input" placeholder="john@example.com" />
+                    </div>
 
-                <div class="util-section">
-                    <label for="year-input">Year (optional)</label>
-                    <input type="number" id="year-input" placeholder={String(new Date().getFullYear())} />
-                </div>
+                    <div class="util-section">
+                        <label for="url-input">URL</label>
+                        <input type="url" id="url-input" placeholder="https://example.com" />
+                    </div>
 
-                <div class="util-section">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="gravatar-toggle" />
-                        Show Gravatar
-                    </label>
+                    <div class="util-section">
+                        <label for="year-input">Year (optional)</label>
+                        <input type="number" id="year-input" placeholder={String(new Date().getFullYear())} />
+                    </div>
+
+                    <div class="util-section">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="gravatar-toggle" />
+                            Show Gravatar
+                        </label>
+                    </div>
                 </div>
 
                 <div class="util-actions">

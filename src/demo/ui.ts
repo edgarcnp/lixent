@@ -9,6 +9,7 @@ interface DemoSettings {
     url: string
     year: string
     gravatar: boolean
+    mode: string
 }
 
 function $(id: string): HTMLElement {
@@ -46,6 +47,32 @@ function loadSettings(): Partial<DemoSettings> {
     }
 }
 
+function getPreferredMode(): "dark" | "light" {
+    const saved = localStorage.getItem("lixent-demo-mode")
+    if (saved === "dark" || saved === "light") return saved
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"
+    return "light"
+}
+
+function applyMode(mode: "dark" | "light"): void {
+    if (mode === "dark") {
+        document.documentElement.classList.add("dark")
+    } else {
+        document.documentElement.classList.remove("dark")
+    }
+    localStorage.setItem("lixent-demo-mode", mode)
+
+    const modeLabel = $("mode-label")
+    const modeIcon = $("mode-icon")
+    if (mode === "dark") {
+        modeLabel.textContent = "Dark Mode"
+        modeIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>'
+    } else {
+        modeLabel.textContent = "Light Mode"
+        modeIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+    }
+}
+
 export function initDemo(): void {
     const themeSelect = $("theme-select") as HTMLSelectElement
     const licenseSelect = $("license-select") as HTMLSelectElement
@@ -66,6 +93,7 @@ export function initDemo(): void {
     if (!utilMenu) throw new Error("Element .util-menu not found")
     const utilReset = $("util-reset")
     const previewUrl = $("preview-url")
+    const modeToggle = $("mode-toggle")
 
     function updatePreview(): void {
         const theme = themeSelect.value
@@ -106,6 +134,7 @@ export function initDemo(): void {
             url: urlInput.value,
             year: yearInput.value,
             gravatar: gravatarToggle.checked,
+            mode: getPreferredMode(),
         }
     }
 
@@ -116,6 +145,7 @@ export function initDemo(): void {
 
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo")
+        localStorage.removeItem("lixent-demo-mode")
         themeSelect.value = "minimal"
         licenseSelect.value = "MIT"
         copyrightInput.value = "John Doe"
@@ -123,7 +153,15 @@ export function initDemo(): void {
         urlInput.value = ""
         yearInput.value = ""
         gravatarToggle.checked = false
+        applyMode(getPreferredMode())
         updatePreview()
+    }
+
+    function toggleMode(): void {
+        const current = getPreferredMode()
+        const next = current === "dark" ? "light" : "dark"
+        applyMode(next)
+        saveSettings(getCurrentSettings())
     }
 
     themeSelect.addEventListener("change", onControlChange)
@@ -137,6 +175,7 @@ export function initDemo(): void {
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
     utilReset.addEventListener("click", resetSettings)
+    modeToggle.addEventListener("click", toggleMode)
 
     const utilCopy = $("util-copy")
     const utilCopyLabel = $("util-copy-label")
@@ -172,5 +211,6 @@ export function initDemo(): void {
     if (saved.year) yearInput.value = saved.year
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
 
+    applyMode(getPreferredMode())
     updatePreview()
 }
