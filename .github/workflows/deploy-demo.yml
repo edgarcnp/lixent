@@ -38,6 +38,14 @@ jobs:
               run: bun install --frozen-lockfile
               working-directory: ${{ env.BUILD_PATH }}
 
+            - name: Prepare public assets
+              working-directory: ${{ env.BUILD_PATH }}
+              run: |
+                  cp lixent.config.json public/lixent.config.json
+                  curl -fsSL --retry 2 --retry-delay 5 \
+                    "https://raw.githubusercontent.com/edgarcnp/lixent/fonts-data/fonts.json" \
+                    -o public/fonts.json
+
             - name: Build with Astro
               run: |
                   bunx astro build \
