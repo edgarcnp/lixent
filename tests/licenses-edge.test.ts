@@ -7,7 +7,7 @@ import {
     getLicenseText,
     getLicenseName,
     CORE_LICENSE_IDS,
-} from "../src/lib/license.ts"
+} from "../src/licenses/index.ts"
 import type { LixentConfig } from "../src/lib/types.ts"
 
 const baseConfig: LixentConfig = {
@@ -145,20 +145,13 @@ describe("getLicenseName edge cases", () => {
 })
 
 describe("CORE_LICENSE_IDS", () => {
-    it("contains all original core licenses", () => {
-        const core = [
+    it("contains all expected licenses", () => {
+        const expected = [
             "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC",
             "MPL-2.0", "GPL-2.0-only", "GPL-3.0-only", "LGPL-2.1-only",
             "LGPL-3.0-only", "AGPL-3.0-only", "Unlicense", "CC0-1.0",
             "WTFPL", "0BSD",
         ]
-        for (const id of core) {
-            assert.ok(CORE_LICENSE_IDS.includes(id), `Missing core license: ${id}`)
-        }
-    })
-
-    it("is sorted alphabetically", () => {
-        const sorted = [...CORE_LICENSE_IDS].sort()
-        assert.deepEqual(CORE_LICENSE_IDS, sorted)
+        assert.deepEqual(CORE_LICENSE_IDS.sort(), expected.sort())
     })
 })

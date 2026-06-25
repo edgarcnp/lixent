@@ -10,33 +10,25 @@ import {
     convertPlaceholders,
 } from "../src/lib/validation.ts"
 
-interface SpdxLicense {
-    licenseId: string
-    name: string
-    isDeprecatedLicenseId: boolean
-}
+const CORE_LICENSES = [
+    { id: "MIT", name: "MIT" },
+    { id: "Apache-2.0", name: "Apache 2.0" },
+    { id: "BSD-2-Clause", name: "BSD 2-Clause" },
+    { id: "BSD-3-Clause", name: "BSD 3-Clause" },
+    { id: "ISC", name: "ISC" },
+    { id: "MPL-2.0", name: "MPL 2.0" },
+    { id: "GPL-2.0-only", name: "GPL v2" },
+    { id: "GPL-3.0-only", name: "GPL v3" },
+    { id: "LGPL-2.1-only", name: "LGPL v2.1" },
+    { id: "LGPL-3.0-only", name: "LGPL v3" },
+    { id: "AGPL-3.0-only", name: "AGPL v3" },
+    { id: "Unlicense", name: "Unlicense" },
+    { id: "CC0-1.0", name: "CC0 1.0" },
+    { id: "WTFPL", name: "WTFPL" },
+    { id: "0BSD", name: "0BSD" },
+] as const
 
-interface SpdxLicenseList {
-    licenses: SpdxLicense[]
-}
-
-interface LicenseData {
-    id: string
-    name: string
-    text: string
-}
-
-async function fetchLicenseList(): Promise<SpdxLicense[]> {
-    const listUrl = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
-    const response = await fetch(listUrl)
-    if (!response.ok) {
-        throw new Error(`Failed to fetch license list: ${response.statusText}`)
-    }
-    const data = await response.json() as SpdxLicenseList
-    return data.licenses
-}
-
-async function fetchLicenseText(id: string): Promise<string> {
+async function fetchLicense(id: string): Promise<string> {
     assertValidLicenseId(id)
     const url = `${TRUSTED_SPDX_BASE}/${id}.txt`
     assertTrustedSource(url)
@@ -55,107 +47,34 @@ function safeWriteFile(filePath: string, data: string): void {
     writeFileSync(filePath, data)
 }
 
-function sanitizeId(id: string): string {
-    return id.replace(/[^A-Za-z0-9\-+.]/g, "_")
-}
-
-function sanitizeVarName(id: string): string {
-    return `_LX_${id.replace(/[^A-Za-z0-9]/g, "_")}`
-}
-
 async function main() {
     mkdirSync(OUTPUT_DIR, { recursive: true })
 
-    console.log("Fetching SPDX license list...")
-    const allLicenses = await fetchLicenseList()
-    const activeLicenses = allLicenses.filter((l) => !l.isDeprecatedLicenseId)
-    console.log(`Found ${allLicenses.length} total, ${activeLicenses.length} active licenses`)
+    const index: Record<string, { name: string, file: string }> = {}
 
-    let successCount = 0
-    let failCount = 0
-    const failedIds: string[] = []
+    for (const license of CORE_LICENSES) {
+        console.log(`Fetching ${license.id}...`)
+        const text = await fetchLicense(license.id)
+        const converted = convertPlaceholders(text)
 
-    const BATCH_SIZE = 5
-    const allLicenseData: LicenseData[] = []
+        const fileName = `${license.id}.json`
+        const filePath = resolve(OUTPUT_DIR, fileName)
+        assertValidPath(filePath)
 
-    for (let i = 0; i < activeLicenses.length; i += BATCH_SIZE) {
-        const batch = activeLicenses.slice(i, i + BATCH_SIZE)
-        const results = await Promise.allSettled(
-            batch.map(async (license) => {
-                const text = await fetchLicenseText(license.licenseId)
-                const converted = convertPlaceholders(text)
-                const safeId = sanitizeId(license.licenseId)
-
-                const data: LicenseData = {
-                    id: license.licenseId,
-                    name: license.name,
-                    text: converted,
-                }
-
-                const fileName = `${safeId}.json`
-                const filePath = resolve(OUTPUT_DIR, fileName)
-                safeWriteFile(filePath, JSON.stringify(data, null, 2))
-
-                return data
-            }),
-        )
-
-        for (const result of results) {
-            if (result.status === "fulfilled") {
-                successCount++
-                allLicenseData.push(result.value)
-            } else {
-                failCount++
-                const idx = results.indexOf(result)
-                failedIds.push(batch[idx].licenseId)
-            }
+        const data = {
+            id: license.id,
+            name: license.name,
+            text: converted,
         }
 
-        const progress = Math.min(i + BATCH_SIZE, activeLicenses.length)
-        process.stdout.write(`\r  Progress: ${progress}/${activeLicenses.length}`)
+        safeWriteFile(filePath, JSON.stringify(data, null, 2))
+        index[license.id] = { name: license.name, file: fileName }
+        console.log(`  Saved ${fileName}`)
     }
 
-    allLicenseData.sort((a, b) => a.id.localeCompare(b.id))
-
-    const imports = allLicenseData
-        .map((l) => {
-            const safeId = sanitizeId(l.id)
-            const varName = sanitizeVarName(l.id)
-            return `import ${varName} from "./${safeId}.json"`
-        })
-        .join("\n")
-
-    const entries = allLicenseData
-        .map((l) => {
-            const varName = sanitizeVarName(l.id)
-            return `    "${l.id}": ${varName}`
-        })
-        .join(",\n")
-
-    const indexContent = `// Auto-generated by scripts/fetch-spdx.ts — do not edit manually
-${imports}
-
-export interface LicenseData {
-    id: string
-    name: string
-    text: string
-}
-
-export const licenses: Record<string, LicenseData | undefined> = {
-${entries},
-}
-
-export const LICENSE_IDS = Object.keys(licenses).sort()
-`
-
-    const indexPath = resolve(OUTPUT_DIR, "index.ts")
-    safeWriteFile(indexPath, indexContent)
-
-    console.log(`\n  Success: ${successCount}, Failed: ${failCount}`)
-    if (failedIds.length > 0) {
-        console.log(`  Failed IDs: ${failedIds.join(", ")}`)
-    }
-    console.log(`\nSaved ${successCount} license files + index.ts to ${OUTPUT_DIR}`)
+    const indexPath = resolve(OUTPUT_DIR, "index.json")
+    safeWriteFile(indexPath, JSON.stringify(index, null, 2))
+    console.log(`\nSaved index with ${CORE_LICENSES.length} licenses`)
 }
 
 main().catch((err: unknown) => {

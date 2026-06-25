@@ -7,7 +7,7 @@ import {
     getLicenseText,
     getLicenseName,
     CORE_LICENSE_IDS,
-} from "../src/lib/license.ts"
+} from "../src/licenses/index.ts"
 import type { LixentConfig } from "../src/lib/types.ts"
 
 const baseConfig: LixentConfig = {
@@ -21,7 +21,7 @@ describe("getLicense", () => {
         const license = getLicense("MIT")
         assert.ok(license)
         assert.equal(license.id, "MIT")
-        assert.equal(license.name, "MIT License")
+        assert.equal(license.name, "MIT")
         assert.ok(license.text.includes("MIT License"))
     })
 
@@ -104,7 +104,7 @@ describe("getLicenseText", () => {
 
 describe("getLicenseName", () => {
     it("returns license name", () => {
-        assert.equal(getLicenseName(baseConfig), "MIT License")
+        assert.equal(getLicenseName(baseConfig), "MIT")
     })
 
     it("returns custom license name", () => {
@@ -118,8 +118,8 @@ describe("getLicenseName", () => {
 })
 
 describe("CORE_LICENSE_IDS", () => {
-    it("contains all SPDX licenses", () => {
-        assert.ok(CORE_LICENSE_IDS.length > 15)
+    it("contains 15 licenses", () => {
+        assert.equal(CORE_LICENSE_IDS.length, 15)
     })
 
     it("includes MIT", () => {
