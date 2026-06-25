@@ -1,10 +1,16 @@
 import { getGravatarUrl } from "./gravatar.ts"
 import { loadLicenses, loadLicenseText, loadProjectConfig, renderLicenseText } from "./licenses.ts"
+import { fetchFontList, getGoogleFontsUrl, getFontFamily } from "../lib/font.ts"
 import type { SpdxLicense } from "../lib/license.ts"
+import type { GoogleFont } from "../lib/font.ts"
 
 interface DemoSettings {
     theme: string
     font: string
+    fontSize: string
+    fontWeight: string
+    lineHeight: string
+    letterSpacing: string
     license: string
     copyright: string
     email: string
@@ -98,6 +104,10 @@ function buildConfigJson(settings: DemoSettings): Record<string, string | boolea
         theme: settings.theme,
     }
     if (settings.font.length > 0) config.font = settings.font
+    if (settings.fontSize.length > 0) config.fontSize = settings.fontSize
+    if (settings.fontWeight.length > 0) config.fontWeight = settings.fontWeight
+    if (settings.lineHeight.length > 0) config.lineHeight = settings.lineHeight
+    if (settings.letterSpacing.length > 0) config.letterSpacing = settings.letterSpacing
     if (settings.email.length > 0) config.email = settings.email
     if (settings.url.length > 0 && isValidUrl(settings.url)) config.url = settings.url
     if (settings.gravatar) config.gravatar = true
@@ -105,6 +115,8 @@ function buildConfigJson(settings: DemoSettings): Record<string, string | boolea
 }
 
 let allLicenses: SpdxLicense[] = []
+let allFonts: GoogleFont[] = []
+let activeGoogleFontLink: HTMLLinkElement | null = null
 
 function getLicenseName(id: string): string {
     const match = allLicenses.find((l) => l.licenseId === id)
@@ -131,6 +143,42 @@ function populateDropdown(sorted: SpdxLicense[]): void {
         optgroup.appendChild(opt)
     }
     licenseSelect.appendChild(optgroup)
+}
+
+function populateFontDropdown(fonts: GoogleFont[]): void {
+    const fontSelect = $("font-select") as HTMLSelectElement
+    fontSelect.innerHTML = ""
+    const defaultOpt = document.createElement("option")
+    defaultOpt.value = ""
+    defaultOpt.textContent = "Default (from theme)"
+    defaultOpt.selected = true
+    fontSelect.appendChild(defaultOpt)
+    const optgroup = document.createElement("optgroup")
+    optgroup.label = "Google Fonts"
+    for (const font of fonts) {
+        const opt = document.createElement("option")
+        opt.value = font.family
+        opt.textContent = `${font.family} (${font.category})`
+        optgroup.appendChild(opt)
+    }
+    fontSelect.appendChild(optgroup)
+}
+
+function loadGoogleFont(family: string): void {
+    if (activeGoogleFontLink) {
+        activeGoogleFontLink.remove()
+        activeGoogleFontLink = null
+    }
+    if (family.length === 0) return
+    const font = allFonts.find((f) => f.family === family)
+    if (font == null) return
+    const url = getGoogleFontsUrl(font.family, font.variants)
+    if (url == null) return
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = url
+    document.head.appendChild(link)
+    activeGoogleFontLink = link
 }
 
 let loadingLicense = false
@@ -160,6 +208,10 @@ async function fetchAndRender(
 export async function initDemo(): Promise<void> {
     const themeSelect = $("theme-select") as HTMLSelectElement
     const fontSelect = $("font-select") as HTMLSelectElement
+    const fontSizeInput = $("font-size-input") as HTMLInputElement
+    const fontWeightInput = $("font-weight-input") as HTMLInputElement
+    const lineHeightInput = $("line-height-input") as HTMLInputElement
+    const letterSpacingInput = $("letter-spacing-input") as HTMLInputElement
     const licenseSelect = $("license-select") as HTMLSelectElement
     const copyrightInput = $("copyright-input") as HTMLInputElement
     const emailInput = $("email-input") as HTMLInputElement
@@ -194,6 +246,14 @@ export async function initDemo(): Promise<void> {
         licenseSelect.innerHTML = '<option value="" selected disabled>Failed to load licenses</option>'
     }
 
+    try {
+        allFonts = await fetchFontList()
+        allFonts.sort((a, b) => a.family.localeCompare(b.family))
+        populateFontDropdown(allFonts)
+    } catch {
+        fontSelect.innerHTML = '<option value="" selected disabled>Failed to load fonts</option>'
+    }
+
     function updateGravatarWarning(): void {
         const email = emailInput.value.trim()
         const show = gravatarToggle.checked && email.length === 0
@@ -215,7 +275,11 @@ export async function initDemo(): Promise<void> {
 
     function updatePreview(): void {
         const theme = themeSelect.value
-        const font = fontSelect.value
+        const fontFamily = fontSelect.value
+        const fontSize = fontSizeInput.value.trim()
+        const fontWeight = fontWeightInput.value.trim()
+        const lineHeight = lineHeightInput.value.trim()
+        const letterSpacing = letterSpacingInput.value.trim()
         const licenseId = licenseSelect.value
         const copyright = copyrightInput.value || "John Doe"
         const email = emailInput.value.trim()
@@ -227,10 +291,32 @@ export async function initDemo(): Promise<void> {
         previewTheme.href = `/themes/${theme}.css`
 
         const previewContent = $("preview-content")
-        if (font.length > 0) {
-            previewContent.style.setProperty("--lx-font-body", font)
+        if (fontFamily.length > 0) {
+            loadGoogleFont(fontFamily)
+            previewContent.style.setProperty("--lx-font-body", getFontFamily(fontFamily))
         } else {
+            loadGoogleFont("")
             previewContent.style.removeProperty("--lx-font-body")
+        }
+        if (fontSize.length > 0) {
+            previewContent.style.setProperty("--lx-font-size", fontSize)
+        } else {
+            previewContent.style.removeProperty("--lx-font-size")
+        }
+        if (fontWeight.length > 0) {
+            previewContent.style.setProperty("font-weight", fontWeight)
+        } else {
+            previewContent.style.removeProperty("font-weight")
+        }
+        if (lineHeight.length > 0) {
+            previewContent.style.setProperty("--lx-line-height", lineHeight)
+        } else {
+            previewContent.style.removeProperty("--lx-line-height")
+        }
+        if (letterSpacing.length > 0) {
+            previewContent.style.setProperty("letter-spacing", letterSpacing)
+        } else {
+            previewContent.style.removeProperty("letter-spacing")
         }
 
         updateDeprecatedWarning()
@@ -268,6 +354,10 @@ export async function initDemo(): Promise<void> {
         return {
             theme: themeSelect.value,
             font: fontSelect.value,
+            fontSize: fontSizeInput.value,
+            fontWeight: fontWeightInput.value,
+            lineHeight: lineHeightInput.value,
+            letterSpacing: letterSpacingInput.value,
             license: licenseSelect.value,
             copyright: copyrightInput.value,
             email: emailInput.value,
@@ -291,6 +381,10 @@ export async function initDemo(): Promise<void> {
         localStorage.removeItem("lixent-demo-mode")
         themeSelect.value = projectConfig.theme ?? "minimal"
         fontSelect.value = projectConfig.font ?? ""
+        fontSizeInput.value = projectConfig.fontSize ?? ""
+        fontWeightInput.value = projectConfig.fontWeight ?? ""
+        lineHeightInput.value = projectConfig.lineHeight ?? ""
+        letterSpacingInput.value = projectConfig.letterSpacing ?? ""
         licenseSelect.value = projectConfig.license ?? "MIT"
         copyrightInput.value = projectConfig.copyright ?? "Unknown"
         emailInput.value = projectConfig.email ?? ""
@@ -324,6 +418,10 @@ export async function initDemo(): Promise<void> {
 
     themeSelect.addEventListener("change", onControlChange)
     fontSelect.addEventListener("change", onControlChange)
+    fontSizeInput.addEventListener("input", onControlChange)
+    fontWeightInput.addEventListener("input", onControlChange)
+    lineHeightInput.addEventListener("input", onControlChange)
+    letterSpacingInput.addEventListener("input", onControlChange)
     licenseSelect.addEventListener("change", onControlChange)
     copyrightInput.addEventListener("input", onControlChange)
     emailInput.addEventListener("input", onControlChange)
@@ -383,6 +481,10 @@ export async function initDemo(): Promise<void> {
     themeSelect.value = saved.theme ?? projectConfig.theme ?? "minimal"
     if (saved.font) fontSelect.value = saved.font
     else if (projectConfig.font) fontSelect.value = projectConfig.font
+    fontSizeInput.value = saved.fontSize ?? projectConfig.fontSize ?? ""
+    fontWeightInput.value = saved.fontWeight ?? projectConfig.fontWeight ?? ""
+    lineHeightInput.value = saved.lineHeight ?? projectConfig.lineHeight ?? ""
+    letterSpacingInput.value = saved.letterSpacing ?? projectConfig.letterSpacing ?? ""
     licenseSelect.value = saved.license ?? projectConfig.license ?? "MIT"
     copyrightInput.value = saved.copyright ?? projectConfig.copyright ?? "Unknown"
     emailInput.value = saved.email ?? projectConfig.email ?? ""

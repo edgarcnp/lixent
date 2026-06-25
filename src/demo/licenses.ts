@@ -16,6 +16,10 @@ export interface ProjectConfig {
     license?: string
     theme?: string
     font?: string
+    fontSize?: string
+    fontWeight?: string
+    lineHeight?: string
+    letterSpacing?: string
     gravatar?: boolean
 }
 
