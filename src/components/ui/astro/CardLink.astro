@@ -1,0 +1,47 @@
+---
+import IconExternalLink from "./icons/IconExternalLink.astro"
+
+interface Props {
+    title: string
+    desc: string
+    href: string
+    class?: string
+}
+
+const { title, desc, href, class: className } = Astro.props;
+---
+
+<a
+    class:list={[
+        {
+            button: true,
+            card: true,
+            "card-link": true,
+        },
+        className,
+    ]}
+    {href}
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <div class="link-text">
+        <h4>{title}</h4>
+        <p>{desc}</p>
+    </div>
+    <IconExternalLink />
+</a>
+
+<style>
+    .card-link {
+        text-decoration: none;
+        align-items: flex-start;
+    }
+
+    .link-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        overflow: hidden;
+    }
+</style>
