@@ -1,6 +1,6 @@
 import { getGravatarUrl } from "./gravatar.ts"
 import { loadLicenses, loadLicenseText, loadProjectConfig, renderLicenseText } from "./licenses.ts"
-import { fetchFontList, getGoogleFontsUrl, getFontFamily } from "../lib/font.ts"
+import { getGoogleFontsUrl, getFontFamily } from "../lib/font.ts"
 import type { SpdxLicense } from "../lib/license.ts"
 import type { GoogleFont } from "../lib/font.ts"
 
@@ -251,7 +251,7 @@ export async function initDemo(): Promise<void> {
     }
 
     try {
-        allFonts = await fetchFontList()
+        allFonts = await fetch("/fonts.json").then((r) => r.json()) as GoogleFont[]
         allFonts.sort((a, b) => a.family.localeCompare(b.family))
         populateFontDropdown(allFonts)
     } catch {

@@ -1,0 +1,31 @@
+name: Update Font Catalog
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-fonts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Fetch Google Fonts catalog
+        run: |
+          mkdir -p dist
+          curl -sf "https://www.googleapis.com/webfonts/v1/webfonts?key=${{ secrets.LIXENT_GOOGLE_FONTS_API_KEY }}&sort=alpha" \
+            -o dist/fonts.json
+          echo "Fetched $(jq '.items | length' dist/fonts.json) fonts"
+
+      - name: Push to fonts-data branch
+        uses: peaceiris/actions-gh-pages@4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: fonts-data
+          publish_dir: dist
+          force_orphan: true
