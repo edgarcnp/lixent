@@ -251,7 +251,7 @@ export async function initDemo(): Promise<void> {
     }
 
     try {
-        allFonts = await fetch("/fonts.json").then((r) => r.json()) as GoogleFont[]
+        allFonts = ((await fetch("/fonts.json").then((r) => r.json())) as { items: GoogleFont[] }).items
         allFonts.sort((a, b) => a.family.localeCompare(b.family))
         populateFontDropdown(allFonts)
     } catch {
