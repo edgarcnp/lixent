@@ -485,7 +485,6 @@
 .preview-content .copyright {
     color: var(--lx-text-muted, #6b7280);
     font-size: 0.95rem;
-    margin-bottom: 2rem;
 }
 
 .preview-content .license-body p {
