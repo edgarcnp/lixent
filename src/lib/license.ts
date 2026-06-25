@@ -111,10 +111,12 @@ export function convertPlaceholders(text: string): string {
  * @returns Fully rendered license text ready for HTML output.
  */
 export function renderLicenseText(text: string, config: LixentConfig): string {
-    const year = config.year ?? new Date().getFullYear()
+    const yearStr = config.yearRange != null
+        ? `${config.yearRange.start}\u2013${config.yearRange.end}`
+        : String(config.year ?? new Date().getFullYear())
     const converted = convertPlaceholders(text)
     return converted
-        .replace(/\{\{year\}\}/g, String(year))
+        .replace(/\{\{year\}\}/g, yearStr)
         .replace(/\{\{name\}\}/g, config.copyright)
         .replace(/\{\{url\}\}/g, config.url ?? "")
         .replace(/\{\{email\}\}/g, config.email ?? "")
