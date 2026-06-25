@@ -1,6 +1,5 @@
 import {
     fetchLicenseList,
-    fetchLicenseText,
     convertPlaceholders,
     SPDX_LIST_URL,
     SPDX_TEXT_BASE,
@@ -27,8 +26,12 @@ export async function loadLicenses(): Promise<SpdxLicense[]> {
     return fetchLicenseList()
 }
 
-export async function loadLicenseText(id: string): Promise<string> {
-    return fetchLicenseText(id)
+export async function loadLicenseText(id: string, signal?: AbortSignal): Promise<string> {
+    const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, { signal })
+    if (!response.ok) {
+        throw new Error(`Failed to fetch license ${id}: ${response.statusText}`)
+    }
+    return response.text()
 }
 
 export async function loadProjectConfig(): Promise<ProjectConfig> {

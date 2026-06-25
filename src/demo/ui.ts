@@ -185,7 +185,7 @@ function loadGoogleFont(family: string): void {
     activeGoogleFontLink = link
 }
 
-let loadingLicense = false
+let licenseAbort: AbortController | null = null
 
 async function fetchAndRender(
     licenseId: string,
@@ -195,17 +195,17 @@ async function fetchAndRender(
     previewLicenseText: HTMLElement,
     previewTitle: HTMLElement,
 ): Promise<void> {
-    if (loadingLicense) return
-    loadingLicense = true
+    licenseAbort?.abort()
+    const controller = new AbortController()
+    licenseAbort = controller
     try {
-        const rawText = await loadLicenseText(licenseId)
+        const rawText = await loadLicenseText(licenseId, controller.signal)
         const rendered = renderLicenseText(rawText, escapeHtml(copyright), yearStart, yearEnd)
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
         previewLicenseText.innerHTML = formatParagraphs(rendered)
-    } catch {
+    } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return
         previewLicenseText.innerHTML = "<p>Failed to load license text.</p>"
-    } finally {
-        loadingLicense = false
     }
 }
 
