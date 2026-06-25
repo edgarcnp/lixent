@@ -1,178 +1,253 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { resolve } from "node:path"
 import {
-    assertTrustedSource,
-    assertValidPath,
-    assertValidLicenseId,
-    assertValidText,
-    convertPlaceholders,
-    TRUSTED_SPDX_BASE,
-    OUTPUT_DIR,
+    assertValidUrl,
+    assertValidEmail,
+    assertValidFont,
+    assertValidCopyright,
+    assertValidYear,
+    assertValidCustomName,
+    assertValidCustomText,
+    assertValidThemeOverrides,
 } from "../src/lib/validation.ts"
 
-describe("assertTrustedSource", () => {
-    it("accepts valid SPDX URL", () => {
-        assert.doesNotThrow(() => {
-            assertTrustedSource(`${TRUSTED_SPDX_BASE}/MIT.txt`)
-        })
+describe("assertValidUrl", () => {
+    it("accepts valid HTTPS URL", () => {
+        assert.doesNotThrow(() => assertValidUrl("https://example.com"))
     })
 
-    it("rejects untrusted URL", () => {
+    it("accepts valid HTTP URL", () => {
+        assert.doesNotThrow(() => assertValidUrl("http://example.com"))
+    })
+
+    it("accepts empty string", () => {
+        assert.doesNotThrow(() => assertValidUrl(""))
+    })
+
+    it("rejects javascript: URL", () => {
         assert.throws(
-            () => assertTrustedSource("https://evil.com/license.txt"),
-            /Untrusted source/,
+            () => assertValidUrl("javascript:alert(1)"),
+            /URL must use http: or https: protocol/,
         )
     })
 
-    it("rejects HTTP URL", () => {
+    it("rejects data: URL", () => {
         assert.throws(
-            () => assertTrustedSource("http://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt"),
-            /Untrusted source/,
+            () => assertValidUrl("data:text/html,<script>alert(1)</script>"),
+            /URL must use http: or https: protocol/,
         )
     })
 
-    it("rejects empty string", () => {
+    it("rejects invalid URL format", () => {
         assert.throws(
-            () => assertTrustedSource(""),
-            /Untrusted source/,
-        )
-    })
-})
-
-describe("assertValidPath", () => {
-    it("accepts path within OUTPUT_DIR", () => {
-        const validPath = resolve(OUTPUT_DIR, "MIT.json")
-        assert.doesNotThrow(() => {
-            assertValidPath(validPath)
-        })
-    })
-
-    it("rejects path traversal with ..", () => {
-        assert.throws(
-            () => assertValidPath("/tmp/../etc/passwd"),
-            /Path traversal/,
-        )
-    })
-
-    it("rejects absolute path outside OUTPUT_DIR", () => {
-        assert.throws(
-            () => assertValidPath("/tmp/malicious.json"),
-            /Path traversal/,
-        )
-    })
-
-    it("rejects homedir path", () => {
-        assert.throws(
-            () => assertValidPath("/home/user/file.json"),
-            /Path traversal/,
+            () => assertValidUrl("not a url"),
+            /Invalid URL/,
         )
     })
 })
 
-describe("assertValidLicenseId", () => {
-    it("accepts valid SPDX IDs", () => {
-        assert.doesNotThrow(() => assertValidLicenseId("MIT"))
-        assert.doesNotThrow(() => assertValidLicenseId("Apache-2.0"))
-        assert.doesNotThrow(() => assertValidLicenseId("BSD-2-Clause"))
-        assert.doesNotThrow(() => assertValidLicenseId("GPL-3.0-only"))
-        assert.doesNotThrow(() => assertValidLicenseId("0BSD"))
-        assert.doesNotThrow(() => assertValidLicenseId("CC0-1.0"))
-        assert.doesNotThrow(() => assertValidLicenseId("LGPL-2.1+"))
+describe("assertValidEmail", () => {
+    it("accepts valid email", () => {
+        assert.doesNotThrow(() => assertValidEmail("user@example.com"))
     })
 
-    it("rejects ID with special characters", () => {
+    it("accepts empty string", () => {
+        assert.doesNotThrow(() => assertValidEmail(""))
+    })
+
+    it("rejects email without @", () => {
         assert.throws(
-            () => assertValidLicenseId("MIT; rm -rf /"),
-            /Invalid license ID format/,
-        )
-        assert.throws(
-            () => assertValidLicenseId("MIT`whoami`"),
-            /Invalid license ID format/,
-        )
-        assert.throws(
-            () => assertValidLicenseId("MIT|cat /etc/passwd"),
-            /Invalid license ID format/,
+            () => assertValidEmail("userexample.com"),
+            /Invalid email/,
         )
     })
 
-    it("rejects empty string", () => {
+    it("rejects email without domain", () => {
         assert.throws(
-            () => assertValidLicenseId(""),
-            /Invalid license ID format/,
-        )
-    })
-
-    it("rejects spaces", () => {
-        assert.throws(
-            () => assertValidLicenseId("MIT License"),
-            /Invalid license ID format/,
+            () => assertValidEmail("user@"),
+            /Invalid email/,
         )
     })
 })
 
-describe("assertValidText", () => {
-    it("accepts valid license text", () => {
-        assert.doesNotThrow(() => {
-            assertValidText("MIT License\nCopyright (c) 2024", "MIT")
-        })
+describe("assertValidFont", () => {
+    it("accepts valid font name", () => {
+        assert.doesNotThrow(() => assertValidFont("Inter"))
+    })
+
+    it("accepts empty string", () => {
+        assert.doesNotThrow(() => assertValidFont(""))
+    })
+
+    it("rejects font with semicolon", () => {
+        assert.throws(
+            () => assertValidFont("Inter; color: red"),
+            /unsafe characters/,
+        )
+    })
+
+    it("rejects font with curly braces", () => {
+        assert.throws(
+            () => assertValidFont("Inter { color: red }"),
+            /unsafe characters/,
+        )
+    })
+
+    it("rejects font with url()", () => {
+        assert.throws(
+            () => assertValidFont("url(https://evil.com/font.css)"),
+            /unsafe characters/,
+        )
+    })
+
+    it("rejects font exceeding max length", () => {
+        assert.throws(
+            () => assertValidFont("x".repeat(129)),
+            /exceeds/,
+        )
+    })
+})
+
+describe("assertValidCopyright", () => {
+    it("accepts valid copyright", () => {
+        assert.doesNotThrow(() => assertValidCopyright("John Doe"))
+    })
+
+    it("rejects HTML tags", () => {
+        assert.throws(
+            () => assertValidCopyright("<script>alert(1)</script>"),
+            /HTML tags/,
+        )
+    })
+
+    it("rejects copyright exceeding max length", () => {
+        assert.throws(
+            () => assertValidCopyright("x".repeat(257)),
+            /exceeds/,
+        )
+    })
+})
+
+describe("assertValidYear", () => {
+    it("accepts valid year", () => {
+        assert.doesNotThrow(() => assertValidYear(2024))
+    })
+
+    it("accepts boundary years", () => {
+        assert.doesNotThrow(() => assertValidYear(1900))
+        assert.doesNotThrow(() => assertValidYear(2100))
+    })
+
+    it("rejects year below 1900", () => {
+        assert.throws(
+            () => assertValidYear(1899),
+            /between 1900 and 2100/,
+        )
+    })
+
+    it("rejects year above 2100", () => {
+        assert.throws(
+            () => assertValidYear(2101),
+            /between 1900 and 2100/,
+        )
+    })
+
+    it("rejects non-integer year", () => {
+        assert.throws(
+            () => assertValidYear(2024.5),
+            /integer/,
+        )
+    })
+
+    it("rejects NaN", () => {
+        assert.throws(
+            () => assertValidYear(NaN),
+            /finite number/,
+        )
+    })
+
+    it("rejects Infinity", () => {
+        assert.throws(
+            () => assertValidYear(Infinity),
+            /finite number/,
+        )
+    })
+})
+
+describe("assertValidCustomName", () => {
+    it("accepts valid name", () => {
+        assert.doesNotThrow(() => assertValidCustomName("My License"))
+    })
+
+    it("rejects empty name", () => {
+        assert.throws(
+            () => assertValidCustomName(""),
+            /cannot be empty/,
+        )
+    })
+
+    it("rejects HTML tags", () => {
+        assert.throws(
+            () => assertValidCustomName("<script>alert(1)</script>"),
+            /HTML tags/,
+        )
+    })
+
+    it("rejects name exceeding max length", () => {
+        assert.throws(
+            () => assertValidCustomName("x".repeat(257)),
+            /exceeds/,
+        )
+    })
+})
+
+describe("assertValidCustomText", () => {
+    it("accepts valid text", () => {
+        assert.doesNotThrow(() => assertValidCustomText("MIT License text"))
     })
 
     it("rejects empty text", () => {
         assert.throws(
-            () => assertValidText("", "MIT"),
-            /Empty license text/,
+            () => assertValidCustomText(""),
+            /cannot be empty/,
         )
     })
 
-    it("rejects oversized text", () => {
-        const oversized = "x".repeat((50 * 1024) + 1)
+    it("rejects text exceeding max length", () => {
         assert.throws(
-            () => assertValidText(oversized, "MIT"),
+            () => assertValidCustomText("x".repeat((50 * 1024) + 1)),
             /exceeds/,
         )
     })
-
-    it("accepts text at exact limit", () => {
-        const atLimit = "x".repeat(50 * 1024)
-        assert.doesNotThrow(() => {
-            assertValidText(atLimit, "MIT")
-        })
-    })
 })
 
-describe("convertPlaceholders", () => {
-    it("converts <year> placeholder", () => {
-        assert.equal(convertPlaceholders("Copyright <year>"), "Copyright {{year}}")
+describe("assertValidThemeOverrides", () => {
+    const allowed = ["--lx-bg", "--lx-text"]
+
+    it("accepts valid overrides", () => {
+        assert.doesNotThrow(() => {
+            assertValidThemeOverrides({ "--lx-bg": "#fff" }, allowed)
+        })
     })
 
-    it("converts <copyright holders> placeholder", () => {
-        assert.equal(convertPlaceholders("<copyright holders>"), "{{name}}")
+    it("rejects disallowed CSS variable", () => {
+        assert.throws(
+            () => assertValidThemeOverrides({ "--lx-evil": "red" }, allowed),
+            /Disallowed CSS variable/,
+        )
     })
 
-    it("converts <name of copyright holder> placeholder", () => {
-        assert.equal(convertPlaceholders("<name of copyright holder>"), "{{name}}")
+    it("rejects value with semicolon", () => {
+        assert.throws(
+            () => assertValidThemeOverrides({ "--lx-bg": "red; color: blue" }, allowed),
+            /Unsafe value/,
+        )
     })
 
-    it("converts [year] placeholder", () => {
-        assert.equal(convertPlaceholders("[year]"), "{{year}}")
-    })
-
-    it("converts [name of copyright holder] placeholder", () => {
-        assert.equal(convertPlaceholders("[name of copyright holder]"), "{{name}}")
-    })
-
-    it("converts [fullname] placeholder", () => {
-        assert.equal(convertPlaceholders("[fullname]"), "{{name}}")
-    })
-
-    it("converts multiple placeholders", () => {
-        const input = "Copyright [year] [fullname]"
-        const expected = "Copyright {{year}} {{name}}"
-        assert.equal(convertPlaceholders(input), expected)
-    })
-
-    it("leaves already converted placeholders unchanged", () => {
-        assert.equal(convertPlaceholders("{{year}} {{name}}"), "{{year}} {{name}}")
+    it("rejects value with url()", () => {
+        assert.throws(
+            () => assertValidThemeOverrides({ "--lx-bg": "url(https://evil.com)" }, allowed),
+            /Unsafe value/,
+        )
     })
 })

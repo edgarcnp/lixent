@@ -1,45 +1,92 @@
-import { resolve } from "node:path"
+const MAX_COPYRIGHT_BYTES = 256
+const MAX_FONT_BYTES = 128
+const MAX_CUSTOM_NAME_BYTES = 256
+const MAX_CUSTOM_TEXT_BYTES = 50 * 1024
+const ALLOWED_SCHEMES = ["http:", "https:"]
+const CSS_DANGEROUS_PATTERNS = /[;{}]|url\s*\(/i
 
-const MAX_LICENSE_BYTES = 50 * 1024
-const SPDX_ID_PATTERN = /^[A-Za-z0-9\-+.]+$/
-
-export const TRUSTED_SPDX_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
-export const OUTPUT_DIR = resolve(import.meta.dirname, "../src/data/licenses")
-
-export function assertTrustedSource(url: string): void {
-    if (!url.startsWith(TRUSTED_SPDX_BASE)) {
-        throw new Error(`Untrusted source: ${url}`)
+export function assertValidUrl(raw: string): void {
+    if (raw.length === 0) return
+    let parsed: URL
+    try {
+        parsed = new URL(raw)
+    } catch {
+        throw new Error(`Invalid URL: ${raw}`)
+    }
+    if (!ALLOWED_SCHEMES.includes(parsed.protocol)) {
+        throw new Error(`URL must use http: or https: protocol, got ${parsed.protocol}`)
     }
 }
 
-export function assertValidPath(filePath: string): void {
-    const resolved = resolve(filePath)
-    if (!resolved.startsWith(OUTPUT_DIR)) {
-        throw new Error(`Path traversal detected: ${filePath}`)
+export function assertValidEmail(raw: string): void {
+    if (raw.length === 0) return
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) {
+        throw new Error(`Invalid email: ${raw}`)
     }
 }
 
-export function assertValidLicenseId(id: string): void {
-    if (!SPDX_ID_PATTERN.test(id)) {
-        throw new Error(`Invalid license ID format: ${id}`)
+export function assertValidFont(raw: string): void {
+    if (raw.length === 0) return
+    if (raw.length > MAX_FONT_BYTES) {
+        throw new Error(`Font value exceeds ${MAX_FONT_BYTES} bytes`)
+    }
+    if (CSS_DANGEROUS_PATTERNS.test(raw)) {
+        throw new Error(`Font value contains unsafe characters: ${raw}`)
     }
 }
 
-export function assertValidText(text: string, licenseId: string): void {
-    if (text.length === 0) {
-        throw new Error(`Empty license text for ${licenseId}`)
+export function assertValidCopyright(raw: string): void {
+    if (raw.length > MAX_COPYRIGHT_BYTES) {
+        throw new Error(`Copyright exceeds ${MAX_COPYRIGHT_BYTES} bytes`)
     }
-    if (text.length > MAX_LICENSE_BYTES) {
-        throw new Error(`License text for ${licenseId} exceeds ${MAX_LICENSE_BYTES} bytes`)
+    if (/<[a-z/]/i.test(raw)) {
+        throw new Error(`Copyright contains HTML tags`)
     }
 }
 
-export function convertPlaceholders(text: string): string {
-    return text
-        .replace(/<year>/g, "{{year}}")
-        .replace(/<copyright holders>/g, "{{name}}")
-        .replace(/<name of copyright holder>/g, "{{name}}")
-        .replace(/\[year\]/g, "{{year}}")
-        .replace(/\[name of copyright holder\]/g, "{{name}}")
-        .replace(/\[fullname\]/g, "{{name}}")
+export function assertValidYear(raw: number): void {
+    if (!Number.isFinite(raw)) {
+        throw new Error(`Year must be a finite number, got ${raw}`)
+    }
+    if (raw !== Math.floor(raw)) {
+        throw new Error(`Year must be an integer, got ${raw}`)
+    }
+    if (raw < 1900 || raw > 2100) {
+        throw new Error(`Year must be between 1900 and 2100, got ${raw}`)
+    }
+}
+
+export function assertValidCustomName(raw: string): void {
+    if (raw.length === 0) {
+        throw new Error("Custom license name cannot be empty")
+    }
+    if (raw.length > MAX_CUSTOM_NAME_BYTES) {
+        throw new Error(`Custom license name exceeds ${MAX_CUSTOM_NAME_BYTES} bytes`)
+    }
+    if (/<[a-z/]/i.test(raw)) {
+        throw new Error(`Custom license name contains HTML tags`)
+    }
+}
+
+export function assertValidCustomText(raw: string): void {
+    if (raw.length === 0) {
+        throw new Error("Custom license text cannot be empty")
+    }
+    if (raw.length > MAX_CUSTOM_TEXT_BYTES) {
+        throw new Error(`Custom license text exceeds ${MAX_CUSTOM_TEXT_BYTES} bytes`)
+    }
+}
+
+export function assertValidThemeOverrides(
+    overrides: Record<string, string>,
+    allowedKeys: readonly string[],
+): void {
+    for (const [key, value] of Object.entries(overrides)) {
+        if (!allowedKeys.includes(key)) {
+            throw new Error(`Disallowed CSS variable in themeOverrides: ${key}`)
+        }
+        if (CSS_DANGEROUS_PATTERNS.test(value)) {
+            throw new Error(`Unsafe value in themeOverrides for ${key}: ${value}`)
+        }
+    }
 }

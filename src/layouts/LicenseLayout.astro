@@ -3,8 +3,11 @@ import { Image } from "astro:assets"
 import { loadConfig } from "../lib/config.ts"
 import { getGravatarUrl } from "../lib/gravatar.ts"
 import { formatYear, formatYearRange } from "../lib/year.ts"
-import { getTheme } from "../themes/index.ts"
+import { getTheme, themes } from "../themes/index.ts"
 import "../styles/base.css"
+
+const CSS_DANGEROUS = /[;{}]|url\s*\(/i
+const ALLOWED_KEYS = themes.flatMap((t) => t.variables)
 
 interface Props {
     title: string
@@ -20,15 +23,24 @@ const themePath
         ? `/themes/${config.theme}.css`
         : config.theme
 
+function sanitizeCssValue(v: string): string {
+    return v.replace(/[;{}]/g, "").replace(/url\s*\(/gi, "")
+}
+
 const themeOverrides
     = config.themeOverrides != null
         ? Object.entries(config.themeOverrides)
-            .map(([k, v]) => `${k}: ${v};`)
+            .filter(([k]) => ALLOWED_KEYS.includes(k))
+            .map(([k, v]) => CSS_DANGEROUS.test(v) ? "" : `${k}: ${sanitizeCssValue(v)};`)
             .join(" ")
         : ""
 
-const fontOverride = config.font != null && config.font.length > 0
-    ? `--lx-font-body: ${config.font};`
+const fontValue = config.font != null && config.font.length > 0 && !CSS_DANGEROUS.test(config.font)
+    ? sanitizeCssValue(config.font)
+    : ""
+
+const fontOverride = fontValue.length > 0
+    ? `--lx-font-body: ${fontValue};`
     : ""
 
 const name = copyright ?? config.copyright

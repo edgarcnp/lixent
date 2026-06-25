@@ -2,11 +2,27 @@
 import LicenseLayout from "../layouts/LicenseLayout.astro"
 import LicenseBody from "../components/LicenseBody.astro"
 import { loadConfig } from "../lib/config.ts"
-import { getLicenseText, getLicenseName } from "../licenses/index.ts"
+import { fetchLicenseList, fetchLicenseText, renderLicenseText } from "../lib/license.ts"
 
 const config = loadConfig()
-const renderedText = getLicenseText(config)
-const licenseName = getLicenseName(config);
+
+let renderedText: string
+let licenseName: string
+
+if (config.license === "custom" && config.customLicense) {
+    renderedText = renderLicenseText(config.customLicense.text, config)
+    licenseName = config.customLicense.name
+} else {
+    const licenses = await fetchLicenseList()
+    const match = licenses.find((l) => l.licenseId === config.license)
+    if (!match) {
+        throw new Error(`Unknown license "${config.license}". Check your lixent.config.json.`)
+    }
+
+    const rawText = await fetchLicenseText(config.license)
+    renderedText = renderLicenseText(rawText, config)
+    licenseName = match.name
+}
 ---
 
 <LicenseLayout title={`${licenseName} License`}>

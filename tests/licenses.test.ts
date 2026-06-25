@@ -1,13 +1,11 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import {
-    getLicense,
-    isValidLicense,
     renderLicenseText,
-    getLicenseText,
     getLicenseName,
-    CORE_LICENSE_IDS,
-} from "../src/licenses/index.ts"
+    SPDX_LIST_URL,
+    SPDX_TEXT_BASE,
+} from "../src/lib/license.ts"
 import type { LixentConfig } from "../src/lib/types.ts"
 
 const baseConfig: LixentConfig = {
@@ -16,29 +14,10 @@ const baseConfig: LixentConfig = {
     theme: "minimal",
 }
 
-describe("getLicense", () => {
-    it("returns MIT license", () => {
-        const license = getLicense("MIT")
-        assert.ok(license)
-        assert.equal(license.id, "MIT")
-        assert.equal(license.name, "MIT")
-        assert.ok(license.text.includes("MIT License"))
-    })
-
-    it("returns undefined for unknown license", () => {
-        assert.equal(getLicense("UNKNOWN"), undefined)
-    })
-})
-
-describe("isValidLicense", () => {
-    it("returns true for valid licenses", () => {
-        assert.ok(isValidLicense("MIT"))
-        assert.ok(isValidLicense("Apache-2.0"))
-        assert.ok(isValidLicense("GPL-3.0-only"))
-    })
-
-    it("returns false for invalid license", () => {
-        assert.equal(isValidLicense("NOT_A_LICENSE"), false)
+describe("SPDX URLs", () => {
+    it("points to raw GitHub content", () => {
+        assert.ok(SPDX_LIST_URL.startsWith("https://raw.githubusercontent.com/"))
+        assert.ok(SPDX_TEXT_BASE.startsWith("https://raw.githubusercontent.com/"))
     })
 })
 
@@ -52,8 +31,7 @@ describe("renderLicenseText", () => {
     })
 
     it("replaces name placeholder", () => {
-        const text = "{{name}}"
-        const result = renderLicenseText(text, baseConfig)
+        const result = renderLicenseText("{{name}}", baseConfig)
         assert.equal(result, "Test User")
     })
 
@@ -75,35 +53,8 @@ describe("renderLicenseText", () => {
     })
 })
 
-describe("getLicenseText", () => {
-    it("returns rendered MIT license", () => {
-        const text = getLicenseText(baseConfig)
-        assert.ok(text.includes("MIT License"))
-        assert.ok(text.includes("Test User"))
-    })
-
-    it("returns custom license text", () => {
-        const config: LixentConfig = {
-            ...baseConfig,
-            license: "custom",
-            customLicense: {
-                name: "Custom",
-                text: "Custom license for {{name}}",
-            },
-        }
-        const text = getLicenseText(config)
-        assert.equal(text, "Custom license for Test User")
-    })
-
-    it("returns error message for unknown license", () => {
-        const config = { ...baseConfig, license: "UNKNOWN" }
-        const text = getLicenseText(config)
-        assert.ok(text.includes("License not found"))
-    })
-})
-
 describe("getLicenseName", () => {
-    it("returns license name", () => {
+    it("returns license id for standard license", () => {
         assert.equal(getLicenseName(baseConfig), "MIT")
     })
 
@@ -114,15 +65,5 @@ describe("getLicenseName", () => {
             customLicense: { name: "My License", text: "text" },
         }
         assert.equal(getLicenseName(config), "My License")
-    })
-})
-
-describe("CORE_LICENSE_IDS", () => {
-    it("contains 15 licenses", () => {
-        assert.equal(CORE_LICENSE_IDS.length, 15)
-    })
-
-    it("includes MIT", () => {
-        assert.ok(CORE_LICENSE_IDS.includes("MIT"))
     })
 })
