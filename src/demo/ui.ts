@@ -65,6 +65,9 @@ function getPreferredMode(): "dark" | "light" {
     return "light"
 }
 
+const SUN_SVG = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'
+const MOON_SVG = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'
+
 function applyMode(mode: "dark" | "light"): void {
     if (mode === "dark") {
         document.documentElement.classList.add("dark")
@@ -77,12 +80,12 @@ function applyMode(mode: "dark" | "light"): void {
     const btn = modeIcon.closest("button")
     if (btn) {
         btn.classList.add("rotate")
+        setTimeout(() => {
+            modeIcon.innerHTML = mode === "dark" ? MOON_SVG : SUN_SVG
+        }, 200)
         setTimeout(() => btn.classList.remove("rotate"), 400)
-    }
-    if (mode === "dark") {
-        modeIcon.outerHTML = '<svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
     } else {
-        modeIcon.outerHTML = '<svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>'
+        modeIcon.innerHTML = mode === "dark" ? MOON_SVG : SUN_SVG
     }
 }
 
