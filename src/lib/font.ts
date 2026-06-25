@@ -51,6 +51,7 @@ export async function fetchFontList(): Promise<GoogleFont[]> {
  *
  * @param family   - Font family name (e.g. `"Inter"`).
  * @param variants - Available variants from the catalog (e.g. `["regular", "500", "700"]`).
+ *                   Defaults to `["regular"]`.
  * @returns A `https://fonts.googleapis.com/css2?...` URL, or `null` if family is empty.
  *
  * @example
@@ -59,7 +60,7 @@ export async function fetchFontList(): Promise<GoogleFont[]> {
  * // → "https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap"
  * ```
  */
-export function getGoogleFontsUrl(family: string, variants: string[]): string | null {
+export function getGoogleFontsUrl(family: string, variants: string[] = ["regular"]): string | null {
     if (family.length === 0) return null
     const weightParam = variants
         .filter((v) => v !== "italic" && v !== "regular")
