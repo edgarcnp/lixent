@@ -91,5 +91,6 @@ export function getGoogleFontsUrl(family: string, variants: string[] = ["regular
  * @returns CSS font-family string (e.g. `"Inter", sans-serif`).
  */
 export function getFontFamily(family: string): string {
-    return `"${family}", sans-serif`
+    const safe = family.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+    return `"${safe}", sans-serif`
 }
