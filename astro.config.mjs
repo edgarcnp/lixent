@@ -11,7 +11,7 @@ function lixentPublicAssets() {
   return {
     name: "lixent-public-assets",
     hooks: {
-      "astro:build:start": async () => {
+      "astro:config:done": async ({ logger }) => {
         fs.mkdirSync("public", { recursive: true });
 
         if (fs.existsSync("lixent.config.json")) {
@@ -19,7 +19,7 @@ function lixentPublicAssets() {
         }
 
         try {
-          const res = await fetch(fontsUrl);
+          const res = await fetch(fontsUrl, { signal: AbortSignal.timeout(30_000) });
           if (res.ok) {
             const data = await res.json();
             const items = Array.isArray(data?.items) ? data.items : [];
@@ -35,21 +35,25 @@ function lixentPublicAssets() {
                 "public/fonts.json",
                 JSON.stringify({ items: valid }),
               );
-              console.log(`Font catalog: ${valid.length} fonts`);
+              logger.info(`Font catalog: ${valid.length} fonts`);
             } else {
-              console.warn(
+              logger.warn(
                 "Font catalog: no valid fonts found, using existing public/fonts.json",
               );
             }
           } else {
-            console.warn(
+            logger.warn(
               `Font catalog fetch failed (${res.status}), using existing public/fonts.json`,
             );
           }
         } catch {
-          console.warn(
-            "Font catalog fetch failed, using existing public/fonts.json",
-          );
+          if (!fs.existsSync("public/fonts.json")) {
+            throw new Error(
+              "[lixent] Font catalog fetch failed and no existing public/fonts.json found. " +
+              "Commit a fonts.json to public/ or ensure the fonts-data branch is reachable.",
+            );
+          }
+          logger.warn("Font catalog fetch failed, using existing public/fonts.json");
         }
       },
     },
@@ -60,7 +64,7 @@ export default defineConfig({
   site: lixent.url,
   base: lixent.basePath,
   image: {
-    domains: ["gravatar.com"],
+    domains: ["www.gravatar.com", "secure.gravatar.com"],
   },
   integrations: [lixentPublicAssets()],
 });
