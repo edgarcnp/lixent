@@ -315,6 +315,10 @@ export async function initDemo(): Promise<void> {
     yearInput.addEventListener("input", onControlChange)
 
     gravatarToggle.addEventListener("change", onControlChange)
+    gravatarToggle.parentElement?.querySelector("span")?.addEventListener("click", () => {
+        gravatarToggle.checked = !gravatarToggle.checked
+        gravatarToggle.dispatchEvent(new Event("change"))
+    })
 
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
