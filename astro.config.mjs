@@ -17,6 +17,12 @@ export default defineConfig({
   },
   hooks: {
     "build:start": async () => {
+      fs.mkdirSync("public", { recursive: true });
+
+      if (fs.existsSync("lixent.config.json")) {
+        fs.copyFileSync("lixent.config.json", "public/lixent.config.json");
+      }
+
       try {
         const res = await fetch(fontsUrl);
         if (res.ok) {
@@ -26,7 +32,6 @@ export default defineConfig({
             (f) => f && typeof f.family === "string" && Array.isArray(f.variants) && typeof f.category === "string"
           );
           if (valid.length > 0) {
-            fs.mkdirSync("public", { recursive: true });
             fs.writeFileSync("public/fonts.json", JSON.stringify({ items: valid }));
             console.log(`Font catalog: ${valid.length} fonts`);
           } else {
