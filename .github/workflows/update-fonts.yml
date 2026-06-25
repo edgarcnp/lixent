@@ -39,3 +39,4 @@ jobs:
           publish_branch: fonts-data
           publish_dir: dist
           force_orphan: true
+          disable_nojekyll: true
