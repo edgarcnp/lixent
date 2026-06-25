@@ -37,11 +37,21 @@ function lixentPublicAssets() {
               );
               logger.info(`Font catalog: ${valid.length} fonts`);
             } else {
+              if (!fs.existsSync("public/fonts.json")) {
+                throw new Error(
+                  "[lixent] Font catalog returned no valid fonts and no existing public/fonts.json found.",
+                );
+              }
               logger.warn(
                 "Font catalog: no valid fonts found, using existing public/fonts.json",
               );
             }
           } else {
+            if (!fs.existsSync("public/fonts.json")) {
+              throw new Error(
+                `[lixent] Font catalog fetch failed (${res.status}) and no existing public/fonts.json found.`,
+              );
+            }
             logger.warn(
               `Font catalog fetch failed (${res.status}), using existing public/fonts.json`,
             );
