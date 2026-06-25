@@ -51,8 +51,8 @@ export function md5(str: string): string {
 
     const bytes = new TextEncoder().encode(str)
     let encoded = ""
-    for (let j = 0; j < bytes.length; j++) {
-        encoded += String.fromCharCode(bytes[j])
+    for (const byte of bytes) {
+        encoded += String.fromCharCode(byte)
     }
     const n = encoded.length
     const state = [1732584193, -271733879, -1732584194, 271733878]

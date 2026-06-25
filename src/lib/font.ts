@@ -28,11 +28,11 @@ export interface GoogleFont {
 
 /** Response shape from the Google Fonts Developer API. */
 interface GoogleFontsApiResponse {
-    items: Array<{
+    items: {
         family: string
         variants: string[]
         category: string
-    }>
+    }[]
 }
 
 /**
