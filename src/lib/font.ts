@@ -72,6 +72,7 @@ export async function fetchFontList(apiKey: string): Promise<GoogleFont[]> {
  */
 export function getGoogleFontsUrl(family: string, variants: string[] = ["regular"]): string | null {
     if (family.length === 0) return null
+    if (!/^[A-Za-z0-9 -]+$/.test(family)) return null
     const weightParam = variants
         .filter((v) => v !== "italic" && v !== "regular")
         .map((v) => `@${v}`)
