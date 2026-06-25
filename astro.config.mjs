@@ -1,4 +1,3 @@
-// @ts-check
 import { defineConfig } from "astro/config";
 import { loadConfig } from "./src/lib/config.ts";
 import fs from "node:fs";
@@ -15,7 +14,6 @@ export default defineConfig({
   image: {
     domains: ["gravatar.com"],
   },
-  // @ts-expect-error — hooks is valid at runtime but missing from Astro's config types
   hooks: {
     "build:start": async () => {
       fs.mkdirSync("public", { recursive: true });
@@ -30,7 +28,7 @@ export default defineConfig({
           const data = await res.json();
           const items = Array.isArray(data?.items) ? data.items : [];
           const valid = items.filter(
-            (f: { family?: unknown; variants?: unknown; category?: unknown }) => f && typeof f.family === "string" && Array.isArray(f.variants) && typeof f.category === "string"
+            (f) => f && typeof f.family === "string" && Array.isArray(f.variants) && typeof f.category === "string"
           );
           if (valid.length > 0) {
             fs.writeFileSync("public/fonts.json", JSON.stringify({ items: valid }));
