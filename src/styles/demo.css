@@ -238,6 +238,7 @@
     cursor: pointer;
     font-size: 0.875rem;
     color: var(--demo-text);
+    user-select: none;
 }
 
 .toggle-label input[type="checkbox"] {
