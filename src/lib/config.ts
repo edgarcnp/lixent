@@ -23,6 +23,10 @@ interface PackageJsonLixent {
     license?: string
     theme?: string
     font?: string
+    fontSize?: string
+    fontWeight?: string
+    lineHeight?: string
+    letterSpacing?: string
     gravatar?: boolean
     format?: "html" | "txt" | "json"
     basePath?: string
@@ -82,6 +86,10 @@ function loadFromPackageJson(root: string): LixentConfig | null {
         license: pkg.lixent.license ?? "MIT",
         theme: pkg.lixent.theme ?? "minimal",
         font: pkg.lixent.font,
+        fontSize: pkg.lixent.fontSize,
+        fontWeight: pkg.lixent.fontWeight,
+        lineHeight: pkg.lixent.lineHeight,
+        letterSpacing: pkg.lixent.letterSpacing,
         gravatar: pkg.lixent.gravatar,
         format: pkg.lixent.format,
         basePath: pkg.lixent.basePath,
