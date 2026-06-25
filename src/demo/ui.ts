@@ -200,9 +200,9 @@ async function fetchAndRender(
     licenseAbort = controller
     try {
         const rawText = await loadLicenseText(licenseId, controller.signal)
-        const rendered = renderLicenseText(rawText, escapeHtml(copyright), yearStart, yearEnd)
+        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd)
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
-        previewLicenseText.innerHTML = formatParagraphs(rendered)
+        previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return
         previewLicenseText.innerHTML = "<p>Failed to load license text.</p>"
