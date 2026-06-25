@@ -21,9 +21,17 @@ export default defineConfig({
         const res = await fetch(fontsUrl);
         if (res.ok) {
           const data = await res.json();
-          fs.mkdirSync("public", { recursive: true });
-          fs.writeFileSync("public/fonts.json", JSON.stringify(data));
-          console.log(`Font catalog: ${data.items?.length ?? 0} fonts`);
+          const items = Array.isArray(data?.items) ? data.items : [];
+          const valid = items.filter(
+            (f) => f && typeof f.family === "string" && Array.isArray(f.variants) && typeof f.category === "string"
+          );
+          if (valid.length > 0) {
+            fs.mkdirSync("public", { recursive: true });
+            fs.writeFileSync("public/fonts.json", JSON.stringify({ items: valid }));
+            console.log(`Font catalog: ${valid.length} fonts`);
+          } else {
+            console.warn("Font catalog: no valid fonts found, using existing public/fonts.json");
+          }
         } else {
           console.warn(`Font catalog fetch failed (${res.status}), using existing public/fonts.json`);
         }
