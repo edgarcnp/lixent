@@ -314,11 +314,12 @@
 
 .util-actions-label {
     font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--demo-text-muted);
+    font-weight: 700;
+    color: var(--demo-accent);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.25rem;
+    text-align: center;
 }
 
 .util-actions-row {
