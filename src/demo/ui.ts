@@ -60,8 +60,7 @@ function loadSettings(): Partial<DemoSettings> {
 function getPreferredMode(): "dark" | "light" {
     const saved = localStorage.getItem("lixent-demo-mode")
     if (saved === "dark" || saved === "light") return saved
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"
-    return "light"
+    return "dark"
 }
 
 function applyMode(mode: "dark" | "light"): void {
@@ -274,15 +273,15 @@ export async function initDemo(): Promise<void> {
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo")
         localStorage.removeItem("lixent-demo-mode")
-        themeSelect.value = "minimal"
+        themeSelect.value = "minimal-dark"
         fontSelect.value = ""
         licenseSelect.value = "MIT"
         copyrightInput.value = "John Doe"
-        emailInput.value = ""
-        urlInput.value = ""
+        emailInput.value = "john@example.com"
+        urlInput.value = "https://example.com"
         yearInput.value = String(currentYear)
-        gravatarToggle.checked = false
-        applyMode(getPreferredMode())
+        gravatarToggle.checked = true
+        applyMode("dark")
         onControlChange()
     }
 
@@ -347,14 +346,21 @@ export async function initDemo(): Promise<void> {
 
     const saved = loadSettings()
     if (saved.theme) themeSelect.value = saved.theme
+    else themeSelect.value = "minimal-dark"
     if (saved.font) fontSelect.value = saved.font
     if (saved.license) licenseSelect.value = saved.license
+    else licenseSelect.value = "MIT"
     if (saved.copyright) copyrightInput.value = saved.copyright
+    else copyrightInput.value = "John Doe"
     if (saved.email) emailInput.value = saved.email
+    else emailInput.value = "john@example.com"
     if (saved.url) urlInput.value = saved.url
+    else urlInput.value = "https://example.com"
     yearInput.value = saved.year && saved.year.length > 0 ? saved.year : String(currentYear)
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
+    else gravatarToggle.checked = true
 
-    applyMode(getPreferredMode())
+    const savedMode = getPreferredMode()
+    applyMode(savedMode)
     onControlChange()
 }
