@@ -79,6 +79,8 @@ function applyMode(mode: "dark" | "light"): void {
     const modeIcon = $("mode-icon")
     const btn = modeIcon.closest("button")
     if (btn) {
+        btn.classList.remove("rotate")
+        void btn.offsetWidth
         btn.classList.add("rotate")
         setTimeout(() => {
             modeIcon.innerHTML = mode === "dark" ? MOON_SVG : SUN_SVG

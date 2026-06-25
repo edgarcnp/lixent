@@ -93,12 +93,17 @@
     background: var(--demo-surface-2);
 }
 
+@keyframes spin-once {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 .mode-toggle-btn svg {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.3s;
 }
 
 .mode-toggle-btn.rotate svg {
-    transform: rotate(360deg);
+    animation: spin-once 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .util-header .util-toggle {
