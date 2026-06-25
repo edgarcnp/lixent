@@ -1,5 +1,5 @@
 pages:
-  image: node:22
+  image: node:24
   script:
     - corepack enable
     - pnpm install
