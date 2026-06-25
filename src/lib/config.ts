@@ -51,7 +51,7 @@ function validateConfig(config: LixentConfig): void {
     if (!isValidTheme(config.theme)) {
         console.warn(
             `[lixent] Warning: Unknown theme "${config.theme}". `
-          + "Using default theme.",
+            + "Using default theme.",
         )
     }
     if (config.font != null) assertValidFont(config.font)
