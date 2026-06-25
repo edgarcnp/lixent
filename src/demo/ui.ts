@@ -314,10 +314,7 @@ export async function initDemo(): Promise<void> {
     urlInput.addEventListener("input", onControlChange)
     yearInput.addEventListener("input", onControlChange)
 
-    gravatarToggle.addEventListener("click", (e) => {
-        e.stopPropagation()
-        queueMicrotask(() => onControlChange())
-    })
+    gravatarToggle.addEventListener("change", onControlChange)
 
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
