@@ -15,10 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
+      - name: Validate API key
+        run: |
+          if [ -z "${{ secrets.LIXENT_GOOGLE_FONTS_API_KEY }}" ]; then
+            echo "::error::LIXENT_GOOGLE_FONTS_API_KEY secret is not set or empty."
+            echo "Set it in Settings → Secrets and variables → Actions → Repository secrets."
+            exit 1
+          fi
+
       - name: Fetch Google Fonts catalog
         run: |
           mkdir -p dist
-          curl -sf "https://www.googleapis.com/webfonts/v1/webfonts?key=${{ secrets.LIXENT_GOOGLE_FONTS_API_KEY }}&sort=alpha" \
+          curl -sf --retry 2 --retry-delay 5 \
+            "https://www.googleapis.com/webfonts/v1/webfonts?key=${{ secrets.LIXENT_GOOGLE_FONTS_API_KEY }}&sort=alpha" \
             -o dist/fonts.json
           echo "Fetched $(jq '.items | length' dist/fonts.json) fonts"
 
