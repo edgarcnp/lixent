@@ -28,7 +28,6 @@
         }
     },
     "osvVulnerabilityAlerts": true,
-    "postUpdateOptions": [],
     "pruneBranchAfterAutomerge": true,
     "reviewers": [
         "edgarcnp"
