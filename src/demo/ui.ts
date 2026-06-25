@@ -323,8 +323,22 @@ export async function initDemo(): Promise<void> {
     copyrightInput.addEventListener("input", onControlChange)
     emailInput.addEventListener("input", onControlChange)
     urlInput.addEventListener("input", onControlChange)
-    yearStartInput.addEventListener("input", onControlChange)
-    yearEndInput.addEventListener("input", onControlChange)
+    yearStartInput.addEventListener("input", () => {
+        const start = parseInt(yearStartInput.value)
+        const end = parseInt(yearEndInput.value)
+        if (!isNaN(start) && !isNaN(end) && start > end) {
+            yearEndInput.value = yearStartInput.value
+        }
+        onControlChange()
+    })
+    yearEndInput.addEventListener("input", () => {
+        const start = parseInt(yearStartInput.value)
+        const end = parseInt(yearEndInput.value)
+        if (!isNaN(start) && !isNaN(end) && end < start) {
+            yearStartInput.value = yearEndInput.value
+        }
+        onControlChange()
+    })
 
     gravatarToggle.addEventListener("change", onControlChange)
     gravatarToggle.parentElement?.querySelector("span")?.addEventListener("click", () => {
