@@ -27,8 +27,12 @@ function $(id: string): HTMLElement {
     return el
 }
 
+function escapeHtml(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+}
+
 function isValidEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && !/[<>"]/.test(value)
 }
 
 function isValidUrl(value: string): boolean {
@@ -195,7 +199,7 @@ async function fetchAndRender(
     loadingLicense = true
     try {
         const rawText = await loadLicenseText(licenseId)
-        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd)
+        const rendered = renderLicenseText(rawText, escapeHtml(copyright), yearStart, yearEnd)
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
         previewLicenseText.innerHTML = formatParagraphs(rendered)
     } catch {
@@ -325,11 +329,13 @@ export async function initDemo(): Promise<void> {
 
         const hasUrl = url.length > 0 && isValidUrl(url)
         const hasEmail = email.length > 0 && isValidEmail(email)
+        const safeCopyright = escapeHtml(copyright)
+        const safeEmail = escapeHtml(email)
         const nameHtml = hasUrl
-            ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${copyright}</a>`
-            : copyright
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${safeCopyright}</a>`
+            : safeCopyright
         const emailHtml = hasEmail
-            ? ` &lt;<a href="mailto:${email}">${email}</a>&gt;`
+            ? ` &lt;<a href="mailto:${safeEmail}">${safeEmail}</a>&gt;`
             : ""
         const yearDisplay = yearStart !== yearEnd
             ? `${yearStart}\u2013${yearEnd}`
