@@ -49,8 +49,11 @@ export function md5(str: string): string {
         return rhex(x[0]) + rhex(x[1]) + rhex(x[2]) + rhex(x[3])
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- Required for MD5 byte string conversion
-    const encoded = unescape(encodeURIComponent(str))
+    const bytes = new TextEncoder().encode(str)
+    let encoded = ""
+    for (let j = 0; j < bytes.length; j++) {
+        encoded += String.fromCharCode(bytes[j])
+    }
     const n = encoded.length
     const state = [1732584193, -271733879, -1732584194, 271733878]
     let i
