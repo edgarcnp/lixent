@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "description": "A modern, self-hosted license page generator",
     "scripts": {
+        "cq": "bun run lint && bun run typecheck && bun run test",
         "dev": "astro dev",
         "build": "astro build",
         "preview": "astro preview",
@@ -11,8 +12,7 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "bun test",
-        "typecheck": "bunx tsc --noEmit",
-        "cq": "bun run lint && bun run typecheck && bun run test"
+        "typecheck": "bunx tsc --noEmit"
     },
     "dependencies": {
         "astro": "^7.0.2",
