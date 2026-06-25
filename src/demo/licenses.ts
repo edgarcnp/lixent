@@ -27,6 +27,9 @@ export async function loadLicenses(): Promise<SpdxLicense[]> {
 }
 
 export async function loadLicenseText(id: string, signal?: AbortSignal): Promise<string> {
+    if (!/^[A-Za-z0-9._-]+$/.test(id)) {
+        throw new Error(`Invalid license ID: ${id}`)
+    }
     const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, { signal })
     if (!response.ok) {
         throw new Error(`Failed to fetch license ${id}: ${response.statusText}`)
