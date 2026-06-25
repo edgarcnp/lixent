@@ -1,5 +1,5 @@
 import { getGravatarUrl } from "./gravatar.ts"
-import { loadLicenses, loadLicenseText, renderLicenseText } from "./licenses.ts"
+import { loadLicenses, loadLicenseText, loadProjectConfig, renderLicenseText } from "./licenses.ts"
 import type { SpdxLicense } from "../lib/license.ts"
 
 interface DemoSettings {
@@ -60,7 +60,8 @@ function loadSettings(): Partial<DemoSettings> {
 function getPreferredMode(): "dark" | "light" {
     const saved = localStorage.getItem("lixent-demo-mode")
     if (saved === "dark" || saved === "light") return saved
-    return "dark"
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"
+    return "light"
 }
 
 function applyMode(mode: "dark" | "light"): void {
@@ -273,15 +274,15 @@ export async function initDemo(): Promise<void> {
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo")
         localStorage.removeItem("lixent-demo-mode")
-        themeSelect.value = "minimal-dark"
-        fontSelect.value = ""
-        licenseSelect.value = "MIT"
-        copyrightInput.value = "John Doe"
-        emailInput.value = "john@example.com"
-        urlInput.value = "https://example.com"
+        themeSelect.value = projectConfig.theme ?? "minimal"
+        fontSelect.value = projectConfig.font ?? ""
+        licenseSelect.value = projectConfig.license ?? "MIT"
+        copyrightInput.value = projectConfig.copyright ?? "Unknown"
+        emailInput.value = projectConfig.email ?? ""
+        urlInput.value = projectConfig.url ?? ""
         yearInput.value = String(currentYear)
-        gravatarToggle.checked = true
-        applyMode("dark")
+        gravatarToggle.checked = projectConfig.gravatar ?? false
+        applyMode(getPreferredMode())
         onControlChange()
     }
 
@@ -344,21 +345,20 @@ export async function initDemo(): Promise<void> {
 
     utilDownload.addEventListener("click", downloadConfig)
 
+    const projectConfig = await loadProjectConfig()
+
     const saved = loadSettings()
-    if (saved.theme) themeSelect.value = saved.theme
-    else themeSelect.value = "minimal-dark"
+    themeSelect.value = saved.theme ?? projectConfig.theme ?? "minimal"
     if (saved.font) fontSelect.value = saved.font
-    if (saved.license) licenseSelect.value = saved.license
-    else licenseSelect.value = "MIT"
-    if (saved.copyright) copyrightInput.value = saved.copyright
-    else copyrightInput.value = "John Doe"
-    if (saved.email) emailInput.value = saved.email
-    else emailInput.value = "john@example.com"
-    if (saved.url) urlInput.value = saved.url
-    else urlInput.value = "https://example.com"
+    else if (projectConfig.font) fontSelect.value = projectConfig.font
+    licenseSelect.value = saved.license ?? projectConfig.license ?? "MIT"
+    copyrightInput.value = saved.copyright ?? projectConfig.copyright ?? "Unknown"
+    emailInput.value = saved.email ?? projectConfig.email ?? ""
+    urlInput.value = saved.url ?? projectConfig.url ?? ""
     yearInput.value = saved.year && saved.year.length > 0 ? saved.year : String(currentYear)
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
-    else gravatarToggle.checked = true
+    else if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
+    else gravatarToggle.checked = false
 
     const savedMode = getPreferredMode()
     applyMode(savedMode)
