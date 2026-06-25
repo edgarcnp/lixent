@@ -1,4 +1,4 @@
-import { md5 } from "./md5.ts"
+import md5 from "md5"
 
 export function getGravatarUrl(
     email: string,
