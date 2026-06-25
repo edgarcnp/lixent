@@ -4,10 +4,10 @@ import { loadConfig } from "./src/lib/config.ts";
 
 const lixent = loadConfig();
 
-export default defineConfig(({ command }) => ({
-  site: command === "build" ? lixent.url : undefined,
-  base: command === "build" ? lixent.basePath : undefined,
+export default defineConfig({
+  site: lixent.url,
+  base: lixent.basePath,
   image: {
     domains: ["gravatar.com"],
   },
-}));
+});

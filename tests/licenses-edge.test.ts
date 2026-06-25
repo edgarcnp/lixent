@@ -1,12 +1,9 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import {
-    getLicense,
-    isValidLicense,
     renderLicenseText,
-    getLicenseText,
     getLicenseName,
-    CORE_LICENSE_IDS,
+    convertPlaceholders,
 } from "../src/lib/license.ts"
 import type { LixentConfig } from "../src/lib/types.ts"
 
@@ -15,45 +12,6 @@ const baseConfig: LixentConfig = {
     license: "MIT",
     theme: "minimal",
 }
-
-describe("getLicense edge cases", () => {
-    it("all core licenses are retrievable", () => {
-        for (const id of CORE_LICENSE_IDS) {
-            const license = getLicense(id)
-            assert.ok(license, `License ${id} not found`)
-            assert.equal(license.id, id)
-            assert.ok(license.name.length > 0, `License ${id} has empty name`)
-            assert.ok(license.text.length > 0, `License ${id} has empty text`)
-        }
-    })
-
-    it("returns undefined for empty string", () => {
-        assert.equal(getLicense(""), undefined)
-    })
-
-    it("returns undefined for case-sensitive mismatch", () => {
-        assert.equal(getLicense("mit"), undefined)
-        assert.equal(getLicense("MIT LICENSE"), undefined)
-    })
-})
-
-describe("isValidLicense edge cases", () => {
-    it("all core licenses are valid", () => {
-        for (const id of CORE_LICENSE_IDS) {
-            assert.ok(isValidLicense(id), `License ${id} should be valid`)
-        }
-    })
-
-    it("returns false for partial match", () => {
-        assert.equal(isValidLicense("MIT-LICENSE"), false)
-        assert.equal(isValidLicense("LICENSE-MIT"), false)
-    })
-
-    it("returns false for whitespace", () => {
-        assert.equal(isValidLicense(" "), false)
-        assert.equal(isValidLicense("\t"), false)
-    })
-})
 
 describe("renderLicenseText edge cases", () => {
     it("replaces all placeholders in one pass", () => {
@@ -72,8 +30,7 @@ describe("renderLicenseText edge cases", () => {
     })
 
     it("handles text with no placeholders", () => {
-        const text = "No placeholders here"
-        assert.equal(renderLicenseText(text, baseConfig), text)
+        assert.equal(renderLicenseText("No placeholders here", baseConfig), "No placeholders here")
     })
 
     it("handles empty text", () => {
@@ -82,60 +39,27 @@ describe("renderLicenseText edge cases", () => {
 
     it("uses custom year when provided", () => {
         const config = { ...baseConfig, year: 1999 }
-        const result = renderLicenseText("{{year}}", config)
-        assert.equal(result, "1999")
+        assert.equal(renderLicenseText("{{year}}", config), "1999")
     })
 
     it("escapes special regex characters in copyright name", () => {
         const config = { ...baseConfig, copyright: "User (Inc.)" }
-        const result = renderLicenseText("{{name}}", config)
-        assert.equal(result, "User (Inc.)")
-    })
-})
-
-describe("getLicenseText edge cases", () => {
-    it("renders all core licenses without errors", () => {
-        for (const id of CORE_LICENSE_IDS) {
-            const config = { ...baseConfig, license: id }
-            const text = getLicenseText(config)
-            assert.ok(text.length > 0, `License ${id} produced empty text`)
-            assert.ok(!text.includes("{{"), `License ${id} has unreplaced placeholders`)
-        }
-    })
-
-    it("custom license with all placeholders", () => {
-        const config: LixentConfig = {
-            ...baseConfig,
-            license: "custom",
-            customLicense: {
-                name: "Test",
-                text: "{{year}} {{name}} {{url}} {{email}}",
-            },
-            url: "https://example.com",
-            email: "test@example.com",
-        }
-        const text = getLicenseText(config)
-        const year = String(new Date().getFullYear())
-        assert.equal(text, `${year} Test User https://example.com test@example.com`)
-    })
-
-    it("custom license without customLicense object returns error", () => {
-        const config: LixentConfig = {
-            ...baseConfig,
-            license: "custom",
-        }
-        const text = getLicenseText(config)
-        assert.ok(text.includes("License not found"))
+        assert.equal(renderLicenseText("{{name}}", config), "User (Inc.)")
     })
 })
 
 describe("getLicenseName edge cases", () => {
-    it("returns correct name for all core licenses", () => {
-        for (const id of CORE_LICENSE_IDS) {
-            const config = { ...baseConfig, license: id }
-            const name = getLicenseName(config)
-            assert.ok(name.length > 0, `License ${id} has empty name`)
+    it("returns license id for standard license", () => {
+        assert.equal(getLicenseName(baseConfig), "MIT")
+    })
+
+    it("returns custom license name", () => {
+        const config: LixentConfig = {
+            ...baseConfig,
+            license: "custom",
+            customLicense: { name: "Custom", text: "text" },
         }
+        assert.equal(getLicenseName(config), "Custom")
     })
 
     it("returns license id for unknown license", () => {
@@ -144,21 +68,160 @@ describe("getLicenseName edge cases", () => {
     })
 })
 
-describe("CORE_LICENSE_IDS", () => {
-    it("contains all original core licenses", () => {
-        const core = [
-            "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC",
-            "MPL-2.0", "GPL-2.0-only", "GPL-3.0-only", "LGPL-2.1-only",
-            "LGPL-3.0-only", "AGPL-3.0-only", "Unlicense", "CC0-1.0",
-            "WTFPL", "0BSD",
-        ]
-        for (const id of core) {
-            assert.ok(CORE_LICENSE_IDS.includes(id), `Missing core license: ${id}`)
-        }
+describe("convertPlaceholders", () => {
+    it("converts <year> to {{year}}", () => {
+        assert.equal(convertPlaceholders("<year>"), "{{year}}")
     })
 
-    it("is sorted alphabetically", () => {
-        const sorted = [...CORE_LICENSE_IDS].sort()
-        assert.deepEqual(CORE_LICENSE_IDS, sorted)
+    it("converts <copyright holders> to {{name}}", () => {
+        assert.equal(convertPlaceholders("<copyright holders>"), "{{name}}")
+    })
+
+    it("converts <owner> to {{name}}", () => {
+        assert.equal(convertPlaceholders("<owner>"), "{{name}}")
+    })
+
+    it("converts [yyyy] to {{year}}", () => {
+        assert.equal(convertPlaceholders("[yyyy]"), "{{year}}")
+    })
+
+    it("converts [name of copyright owner] to {{name}}", () => {
+        assert.equal(convertPlaceholders("[name of copyright owner]"), "{{name}}")
+    })
+
+    it("converts [fullname] to {{name}}", () => {
+        assert.equal(convertPlaceholders("[fullname]"), "{{name}}")
+    })
+
+    it("converts [year] to {{year}}", () => {
+        assert.equal(convertPlaceholders("[year]"), "{{year}}")
+    })
+
+    it("converts <name of copyright holder> to {{name}}", () => {
+        assert.equal(convertPlaceholders("<name of copyright holder>"), "{{name}}")
+    })
+
+    it("converts <YEAR> to {{year}} (MIT-0)", () => {
+        assert.equal(convertPlaceholders("<YEAR>"), "{{year}}")
+    })
+
+    it("converts <COPYRIGHT HOLDER> to {{name}} (MIT-0)", () => {
+        assert.equal(convertPlaceholders("<COPYRIGHT HOLDER>"), "{{name}}")
+    })
+
+    it("converts <name of author> to {{name}} (GPL-3.0)", () => {
+        assert.equal(convertPlaceholders("<name of author>"), "{{name}}")
+    })
+
+    it("converts <program> to {{name}} (GPL-3.0)", () => {
+        assert.equal(convertPlaceholders("<program>"), "{{name}}")
+    })
+
+    it("converts <copyright holder> to {{name}}", () => {
+        assert.equal(convertPlaceholders("<copyright holder>"), "{{name}}")
+    })
+
+    it("converts [copyright holders] to {{name}} (UPL-1.0)", () => {
+        assert.equal(convertPlaceholders("[copyright holders]"), "{{name}}")
+    })
+
+    it("handles mixed text around placeholders", () => {
+        assert.equal(
+            convertPlaceholders("Copyright (c) <year> <owner>"),
+            "Copyright (c) {{year}} {{name}}",
+        )
+    })
+
+    it("does not touch unrelated angle brackets", () => {
+        assert.equal(
+            convertPlaceholders("Use of < operator or > operator"),
+            "Use of < operator or > operator",
+        )
+    })
+
+    it("does not touch unrelated square brackets", () => {
+        assert.equal(
+            convertPlaceholders("See section [1] for details"),
+            "See section [1] for details",
+        )
+    })
+
+    it("preserves text without any placeholders", () => {
+        assert.equal(convertPlaceholders("MIT License"), "MIT License")
+    })
+
+    it("handles multiple placeholders in one line", () => {
+        assert.equal(
+            convertPlaceholders("Copyright <year> <owner>"),
+            "Copyright {{year}} {{name}}",
+        )
+    })
+})
+
+describe("renderLicenseText with SPDX placeholders", () => {
+    it("converts and renders MIT-style placeholders", () => {
+        const text = "Copyright (c) <year> <copyright holders>"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright (c) ${year} Test User`)
+    })
+
+    it("converts and renders BSD-style placeholders", () => {
+        const text = "Copyright (c) <year> <owner>"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright (c) ${year} Test User`)
+    })
+
+    it("converts and renders Apache-style placeholders", () => {
+        const text = "Copyright [yyyy] [name of copyright owner]"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright ${year} Test User`)
+    })
+
+    it("preserves unrelated angle brackets in license body", () => {
+        const text = "The < operator shall not be replaced"
+        const result = renderLicenseText(text, baseConfig)
+        assert.equal(result, "The < operator shall not be replaced")
+    })
+
+    it("preserves unrelated square brackets in license body", () => {
+        const text = "See section [1] for details"
+        const result = renderLicenseText(text, baseConfig)
+        assert.equal(result, "See section [1] for details")
+    })
+
+    it("preserves URLs in angle brackets (GPL-style)", () => {
+        const text = "see <https://www.gnu.org/licenses/>"
+        const result = renderLicenseText(text, baseConfig)
+        assert.equal(result, "see <https://www.gnu.org/licenses/>")
+    })
+
+    it("preserves email addresses in angle brackets (WTFPL)", () => {
+        const text = "contact <sam@hocevar.net>"
+        const result = renderLicenseText(text, baseConfig)
+        assert.equal(result, "contact <sam@hocevar.net>")
+    })
+
+    it("renders GPL-3.0 placeholder pattern", () => {
+        const text = "Copyright (C) <year> <name of author>"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright (C) ${year} Test User`)
+    })
+
+    it("renders MIT-0 placeholder pattern", () => {
+        const text = "Copyright (c) <YEAR> <COPYRIGHT HOLDER>"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright (c) ${year} Test User`)
+    })
+
+    it("renders UPL-1.0 placeholder pattern", () => {
+        const text = "Copyright (c) [year] [copyright holders]"
+        const result = renderLicenseText(text, baseConfig)
+        const year = String(new Date().getFullYear())
+        assert.equal(result, `Copyright (c) ${year} Test User`)
     })
 })
