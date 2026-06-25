@@ -1,3 +1,22 @@
+/**
+ * Configuration loading and validation.
+ *
+ * Reads `lixent.config.json` (preferred) or the `"lixent"` field in
+ * `package.json`, applies defaults, and runs security validation.
+ *
+ * ## Config priority
+ * 1. `lixent.config.json` in the project root
+ * 2. `"lixent"` field in `package.json`
+ * 3. Hardcoded defaults (`copyright: "Unknown"`, `license: "MIT"`, `theme: "minimal"`)
+ *
+ * ## Security
+ * All user-provided values are validated at load time. URL, email, font,
+ * copyright, year, custom license fields, and theme overrides are checked
+ * for length, format, and dangerous patterns (CSS injection, HTML tags).
+ *
+ * @module
+ */
+
 import { readFileSync, existsSync } from "node:fs"
 import { resolve } from "node:path"
 import type { LixentConfig } from "./types.ts"
@@ -16,6 +35,11 @@ import {
 
 const CONFIG_FILE = "lixent.config.json"
 
+/**
+ * Shape of the `"lixent"` field inside `package.json`.
+ * Mirrors {@link LixentConfig} but with all fields optional since
+ * `package.json` is a fallback, not the primary config source.
+ */
 interface PackageJsonLixent {
     copyright?: string
     url?: string
@@ -38,6 +62,10 @@ interface PackageJson {
     lixent?: PackageJsonLixent
 }
 
+/**
+ * Validates a config object against security constraints.
+ * Throws on invalid values, warns on non-critical issues (unknown theme, missing custom text).
+ */
 function validateConfig(config: LixentConfig): void {
     if (config.license === "custom" && !config.customLicense?.text) {
         console.warn(
@@ -51,7 +79,7 @@ function validateConfig(config: LixentConfig): void {
     if (!isValidTheme(config.theme)) {
         console.warn(
             `[lixent] Warning: Unknown theme "${config.theme}". `
-            + "Using default theme.",
+          + "Using default theme.",
         )
     }
     if (config.font != null) assertValidFont(config.font)
@@ -71,6 +99,10 @@ function validateConfig(config: LixentConfig): void {
     }
 }
 
+/**
+ * Attempts to load config from the `"lixent"` field in `package.json`.
+ * Returns `null` if no `package.json` exists or it has no `lixent` field.
+ */
 function loadFromPackageJson(root: string): LixentConfig | null {
     const pkgPath = resolve(root, "package.json")
     if (!existsSync(pkgPath)) return null
@@ -100,6 +132,17 @@ function loadFromPackageJson(root: string): LixentConfig | null {
     return config
 }
 
+/**
+ * Load and validate the Lixent configuration.
+ *
+ * Tries `lixent.config.json` first, then `package.json`, then returns defaults.
+ * All loaded configs are validated before being returned.
+ *
+ * @param root - Project root directory. Defaults to `process.cwd()`.
+ * @returns A fully resolved, validated {@link LixentConfig}.
+ * @throws {SyntaxError} If the config file contains invalid JSON.
+ * @throws {Error} If any validation check fails.
+ */
 export function loadConfig(root: string = process.cwd()): LixentConfig {
     const configPath = resolve(root, CONFIG_FILE)
 
