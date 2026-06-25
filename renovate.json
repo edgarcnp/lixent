@@ -28,9 +28,7 @@
         }
     },
     "osvVulnerabilityAlerts": true,
-    "postUpdateOptions": [
-        "pnpmDedupe"
-    ],
+    "postUpdateOptions": [],
     "pruneBranchAfterAutomerge": true,
     "reviewers": [
         "edgarcnp"
