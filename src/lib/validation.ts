@@ -90,3 +90,18 @@ export function assertValidThemeOverrides(
         }
     }
 }
+
+const CSS_VALUE_PATTERN = /^[a-zA-Z0-9 .%,+\-/()]+$/
+
+export function assertValidCssValue(value: string, field: string): void {
+    if (value.length === 0) return
+    if (value.length > 64) {
+        throw new Error(`${field} exceeds 64 characters`)
+    }
+    if (CSS_DANGEROUS_PATTERN.test(value)) {
+        throw new Error(`${field} contains unsafe characters`)
+    }
+    if (!CSS_VALUE_PATTERN.test(value)) {
+        throw new Error(`${field} contains invalid characters`)
+    }
+}
