@@ -8,11 +8,11 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 2. Clone your fork
 3. Install dependencies:
    ```bash
-   pnpm install
+   bun install
    ```
 4. Start the dev server:
    ```bash
-   pnpm dev
+   bun dev
    ```
 
 ## Development
@@ -22,49 +22,34 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 ```
 ├── src/
 │   ├── components/     # Astro components
-│   ├── data/          # License JSON files (generated)
 │   ├── layouts/       # Page layouts
-│   ├── lib/           # Core utilities (config, types, gravatar, year)
-│   ├── licenses/      # License registry
+│   ├── lib/           # Core utilities (config, types, license, gravatar, year)
 │   ├── pages/         # Route pages
 │   ├── styles/        # CSS files
-│   └── themes/        # Theme CSS files and registry
-├── public/            # Static assets
-├── scripts/           # Build scripts
+│   └── themes/        # Theme registry
+├── public/            # Static assets (theme CSS files, favicons)
+├── tests/             # Test files
 └── dist/              # Build output
 ```
 
 ### Commands
 
 ```bash
-pnpm dev        # Start dev server at localhost:4321
-pnpm build      # Build for production
-pnpm preview    # Preview build locally
-pnpm lint       # Run ESLint
-pnpm lint:fix   # Auto-fix lint issues
+bun dev        # Start dev server at localhost:4321
+bun run build  # Build for production
+bun run preview # Preview build locally
+bun run lint   # Run ESLint
+bun run lint:fix # Auto-fix lint issues
+bun test       # Run tests
+bunx tsc --noEmit  # Type check
 ```
 
 ### Adding a Theme
 
-1. Create a new CSS file in `src/themes/` (e.g., `my-theme.css`)
-2. Define all required CSS custom properties (see `src/themes/minimal.css` for reference)
+1. Create a new CSS file in `public/themes/` (e.g., `my-theme.css`)
+2. Define all 8 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-border`, `--lx-surface`, `--lx-font-body`, `--lx-font-mono`)
 3. Add the theme to `src/themes/index.ts`
-4. Copy the CSS file to `public/themes/`
-5. Test with `"theme": "my-theme"` in your config
-
-### Adding a License
-
-1. Add the license text to `src/data/licenses/` as a JSON file
-2. Update `src/licenses/index.ts` to import and register the license
-3. Use `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}` as placeholders
-
-### Updating License Data
-
-Run the SPDX fetch script to update all license texts:
-
-```bash
-npx tsx scripts/fetch-spdx.ts
-```
+4. Test with `"theme": "my-theme"` in your config
 
 ## Code Style
 
@@ -73,12 +58,13 @@ npx tsx scripts/fetch-spdx.ts
 - No Tailwind CSS — use CSS custom properties
 - No semicolons
 - Double quotes
+- 4-space indent
 
 ## Pull Requests
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run `pnpm lint` and `pnpm build` to verify
+3. Run `bun run lint` and `bun run build` to verify
 4. Submit a pull request
 
 ### PR Guidelines
@@ -92,7 +78,7 @@ npx tsx scripts/fetch-spdx.ts
 
 - Use GitHub Issues for bug reports and feature requests
 - Include steps to reproduce for bugs
-- Specify your Node.js version and package manager
+- Specify your Bun version
 
 ## License
 

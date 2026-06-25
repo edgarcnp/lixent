@@ -145,7 +145,7 @@ The included `.gitlab-ci.yml` will handle the build.
 ### Cloudflare Pages
 
 1. Connect your repo to Cloudflare Pages
-2. Set build command: `pnpm build`
+2. Set build command: `bun run build`
 3. Set build output directory: `dist`
 
 ### Netlify / Vercel
@@ -156,7 +156,7 @@ The included `.gitlab-ci.yml` will handle the build.
 ### Custom Server
 
 ```bash
-pnpm build
+bun run build
 scp -r dist/* user@server:/var/www/license/
 ```
 
@@ -177,21 +177,15 @@ server {
 
 ## Output Formats
 
-Lixent generates three outputs:
-
-| Route | Format | Content-Type |
-|-------|--------|--------------|
-| `/` | HTML | `text/html` |
-| `/license.txt` | Plain text | `text/plain` |
-| `/license.json` | JSON | `application/json` |
+Lixent generates a single HTML page at the root route `/`.
 
 ## Development
 
 ```bash
-pnpm install
-pnpm dev        # Start dev server
-pnpm build      # Build for production
-pnpm lint       # Run ESLint
+bun install
+bun dev        # Start dev server
+bun run build  # Build for production
+bun run lint   # Run ESLint
 ```
 
 ## Tech Stack

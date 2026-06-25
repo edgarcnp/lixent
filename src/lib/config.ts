@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs"
 import { resolve } from "node:path"
 import type { LixentConfig } from "./types.ts"
-import { isValidTheme, themes } from "../themes/index.ts"
+import { isValidTheme, THEME_VARIABLES } from "../themes/index.ts"
 import {
     assertValidUrl,
     assertValidEmail,
@@ -14,7 +14,6 @@ import {
 } from "./validation.ts"
 
 const CONFIG_FILE = "lixent.config.json"
-const THEME_OVERRIDES_ALLOWED_KEYS = themes.flatMap((t) => t.variables)
 
 interface PackageJsonLixent {
     copyright?: string
@@ -59,7 +58,7 @@ function validateConfig(config: LixentConfig): void {
     if (config.customLicense?.name != null) assertValidCustomName(config.customLicense.name)
     if (config.customLicense?.text != null) assertValidCustomText(config.customLicense.text)
     if (config.themeOverrides != null) {
-        assertValidThemeOverrides(config.themeOverrides, THEME_OVERRIDES_ALLOWED_KEYS)
+        assertValidThemeOverrides(config.themeOverrides, THEME_VARIABLES)
     }
 }
 

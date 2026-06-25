@@ -3,7 +3,7 @@ const MAX_FONT_BYTES = 128
 const MAX_CUSTOM_NAME_BYTES = 256
 const MAX_CUSTOM_TEXT_BYTES = 50 * 1024
 const ALLOWED_SCHEMES = ["http:", "https:"]
-const CSS_DANGEROUS_PATTERNS = /[;{}]|url\s*\(/i
+export const CSS_DANGEROUS_PATTERN = /[;{}]|url\s*\(/i
 
 export function assertValidUrl(raw: string): void {
     if (raw.length === 0) return
@@ -30,7 +30,7 @@ export function assertValidFont(raw: string): void {
     if (raw.length > MAX_FONT_BYTES) {
         throw new Error(`Font value exceeds ${MAX_FONT_BYTES} bytes`)
     }
-    if (CSS_DANGEROUS_PATTERNS.test(raw)) {
+    if (CSS_DANGEROUS_PATTERN.test(raw)) {
         throw new Error(`Font value contains unsafe characters: ${raw}`)
     }
 }
@@ -85,7 +85,7 @@ export function assertValidThemeOverrides(
         if (!allowedKeys.includes(key)) {
             throw new Error(`Disallowed CSS variable in themeOverrides: ${key}`)
         }
-        if (CSS_DANGEROUS_PATTERNS.test(value)) {
+        if (CSS_DANGEROUS_PATTERN.test(value)) {
             throw new Error(`Unsafe value in themeOverrides for ${key}: ${value}`)
         }
     }
