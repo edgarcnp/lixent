@@ -11,6 +11,7 @@ import {
     assertValidCustomName,
     assertValidCustomText,
     assertValidThemeOverrides,
+    assertValidCssValue,
 } from "./validation.ts"
 
 const CONFIG_FILE = "lixent.config.json"
@@ -50,6 +51,10 @@ function validateConfig(config: LixentConfig): void {
         )
     }
     if (config.font != null) assertValidFont(config.font)
+    if (config.fontSize != null) assertValidCssValue(config.fontSize, "fontSize")
+    if (config.fontWeight != null) assertValidCssValue(config.fontWeight, "fontWeight")
+    if (config.lineHeight != null) assertValidCssValue(config.lineHeight, "lineHeight")
+    if (config.letterSpacing != null) assertValidCssValue(config.letterSpacing, "letterSpacing")
     if (config.year != null) assertValidYear(config.year)
     if (config.yearRange != null) {
         assertValidYear(config.yearRange.start)

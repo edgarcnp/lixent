@@ -10,6 +10,10 @@ export interface LixentConfig {
     theme: string
     themeOverrides?: Record<string, string>
     font?: string
+    fontSize?: string
+    fontWeight?: string
+    lineHeight?: string
+    letterSpacing?: string
     gravatar?: boolean
     format?: "html" | "txt" | "json"
     basePath?: string

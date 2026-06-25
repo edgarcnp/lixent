@@ -3,6 +3,7 @@ import { Image } from "astro:assets"
 import { getGravatarUrl } from "../lib/gravatar.ts"
 import { formatYear, formatYearRange } from "../lib/year.ts"
 import { CSS_DANGEROUS_PATTERN } from "../lib/validation.ts"
+import { getGoogleFontsUrl } from "../lib/font.ts"
 import { getTheme, THEME_VARIABLES } from "../themes/index.ts"
 import type { LixentConfig } from "../lib/types.ts"
 import "../styles/base.css"
@@ -33,13 +34,32 @@ const themeOverrides
             .join(" ")
         : ""
 
-const fontValue = config.font != null && config.font.length > 0 && !CSS_DANGEROUS_PATTERN.test(config.font)
-    ? sanitizeCssValue(config.font)
+const rawFont = config.font
+const fontValue = rawFont != null && rawFont.length > 0 && !CSS_DANGEROUS_PATTERN.test(rawFont)
+    ? sanitizeCssValue(rawFont)
     : ""
 
-const fontOverride = fontValue.length > 0
-    ? `--lx-font-body: ${fontValue};`
+const fontOverrideParts: string[] = []
+if (fontValue.length > 0) {
+    fontOverrideParts.push(`--lx-font-body: ${fontValue};`)
+}
+if (config.fontSize != null && config.fontSize.length > 0) {
+    fontOverrideParts.push(`--lx-font-size: ${config.fontSize};`)
+}
+if (config.fontWeight != null && config.fontWeight.length > 0) {
+    fontOverrideParts.push(`font-weight: ${config.fontWeight};`)
+}
+if (config.lineHeight != null && config.lineHeight.length > 0) {
+    fontOverrideParts.push(`--lx-line-height: ${config.lineHeight};`)
+}
+if (config.letterSpacing != null && config.letterSpacing.length > 0) {
+    fontOverrideParts.push(`letter-spacing: ${config.letterSpacing};`)
+}
+const fontOverride = fontOverrideParts.length > 0
+    ? fontOverrideParts.join(" ")
     : ""
+
+const googleFontsUrl = rawFont != null && rawFont.length > 0 ? getGoogleFontsUrl(rawFont) : null
 
 const name = copyright ?? config.copyright
 
@@ -70,11 +90,14 @@ const gravatarUrl
         <link rel="icon" href="/favicon.ico" />
         <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
+        {googleFontsUrl && <link rel="preconnect" href="https://fonts.googleapis.com" />}
+        {googleFontsUrl && <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />}
+        {googleFontsUrl && <link rel="stylesheet" href={googleFontsUrl} />}
         <link rel="stylesheet" href={themePath} />
         {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled theme overrides are safe */}
         {themeOverrides && <style set:html={`:root { ${themeOverrides} }`} />}
-        {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled font override is safe */}
-        {fontOverride && <style set:html={`:root { ${fontOverride} }`} />}
+        {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled font overrides are safe */}
+        {fontOverride && <style set:html={`body { ${fontOverride} }`} />}
     </head>
     <body>
         <main>
