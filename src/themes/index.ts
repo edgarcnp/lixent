@@ -6,7 +6,7 @@ export interface ThemeMeta {
     variables: string[]
 }
 
-const THEME_VARIABLES = [
+export const THEME_VARIABLES = [
     "--lx-bg",
     "--lx-text",
     "--lx-text-muted",

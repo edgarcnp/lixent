@@ -16,7 +16,6 @@
         "eslint": "^10.5.0",
         "eslint-plugin-astro": "^2.0.0",
         "globals": "^17.7.0",
-        "tsx": "^4.22.4",
         "typescript-eslint": "^8.62.0",
       },
     },
