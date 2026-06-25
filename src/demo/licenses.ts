@@ -47,11 +47,15 @@ export async function loadProjectConfig(): Promise<ProjectConfig> {
 export function renderLicenseText(
     text: string,
     copyright: string,
-    year: number,
+    yearStart: number,
+    yearEnd: number,
 ): string {
+    const yearStr = yearStart !== yearEnd
+        ? `${yearStart}\u2013${yearEnd}`
+        : String(yearStart)
     const converted = convertPlaceholders(text)
     return converted
-        .replace(/\{\{year\}\}/g, String(year))
+        .replace(/\{\{year\}\}/g, yearStr)
         .replace(/\{\{name\}\}/g, copyright)
 }
 

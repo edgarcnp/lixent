@@ -34,23 +34,18 @@ const themeList = themes
         <div class="demo-layout">
             <aside class="util-menu" id="util-menu">
                 <div class="util-header">
-                    <h2>Lixent Demo</h2>
+                    <div class="util-header-left">
+                        <h2>Lixent Demo</h2>
+                        <button class="mode-toggle-btn" id="mode-toggle" type="button" aria-label="Toggle dark mode">
+                            <svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        </button>
+                    </div>
                     <button class="util-toggle" id="util-toggle" aria-label="Close menu">
                         <IconX />
                     </button>
                 </div>
 
                 <div class="util-scroll">
-                    <div class="util-section">
-                        <label>Appearance</label>
-                        <button class="mode-toggle" id="mode-toggle" type="button">
-                            <span class="mode-toggle-icon" id="mode-icon">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                            </span>
-                            <span id="mode-label">Dark Mode</span>
-                        </button>
-                    </div>
-
                     <div class="util-section">
                         <label for="theme-select">Theme</label>
                         <select id="theme-select">
@@ -114,8 +109,12 @@ const themeList = themes
                     </div>
 
                     <div class="util-section">
-                        <label for="year-input">Year</label>
-                        <input type="number" id="year-input" min="1900" max="2100" />
+                        <label>Year Range</label>
+                        <div class="year-range-row">
+                            <input type="number" id="year-start-input" min="1900" max="2100" placeholder="Start" />
+                            <span class="year-range-sep">–</span>
+                            <input type="number" id="year-end-input" min="1900" max="2100" placeholder="End" />
+                        </div>
                     </div>
 
                     <div class="util-section">
@@ -127,6 +126,7 @@ const themeList = themes
                 </div>
 
                 <div class="util-actions">
+                    <span class="util-actions-label">Config</span>
                     <Button id="util-reset" transparent>Reset to Defaults</Button>
                     <div class="util-actions-row">
                         <Button id="util-copy" primary>

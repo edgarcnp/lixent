@@ -9,7 +9,8 @@ interface DemoSettings {
     copyright: string
     email: string
     url: string
-    year: string
+    yearStart: string
+    yearEnd: string
     gravatar: boolean
     mode: string
 }
@@ -72,14 +73,16 @@ function applyMode(mode: "dark" | "light"): void {
     }
     localStorage.setItem("lixent-demo-mode", mode)
 
-    const modeLabel = $("mode-label")
     const modeIcon = $("mode-icon")
+    const btn = modeIcon.closest("button")
+    if (btn) {
+        btn.classList.add("rotate")
+        setTimeout(() => btn.classList.remove("rotate"), 400)
+    }
     if (mode === "dark") {
-        modeLabel.textContent = "Dark Mode"
-        modeIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>'
+        modeIcon.outerHTML = '<svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
     } else {
-        modeLabel.textContent = "Light Mode"
-        modeIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+        modeIcon.outerHTML = '<svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>'
     }
 }
 
@@ -130,7 +133,8 @@ let loadingLicense = false
 async function fetchAndRender(
     licenseId: string,
     copyright: string,
-    year: number,
+    yearStart: number,
+    yearEnd: number,
     previewLicenseText: HTMLElement,
     previewTitle: HTMLElement,
 ): Promise<void> {
@@ -138,7 +142,7 @@ async function fetchAndRender(
     loadingLicense = true
     try {
         const rawText = await loadLicenseText(licenseId)
-        const rendered = renderLicenseText(rawText, copyright, year)
+        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd)
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
         previewLicenseText.innerHTML = formatParagraphs(rendered)
     } catch {
@@ -155,7 +159,8 @@ export async function initDemo(): Promise<void> {
     const copyrightInput = $("copyright-input") as HTMLInputElement
     const emailInput = $("email-input") as HTMLInputElement
     const urlInput = $("url-input") as HTMLInputElement
-    const yearInput = $("year-input") as HTMLInputElement
+    const yearStartInput = $("year-start-input") as HTMLInputElement
+    const yearEndInput = $("year-end-input") as HTMLInputElement
     const gravatarToggle = $("gravatar-toggle") as HTMLInputElement
     const previewTheme = $("preview-theme") as HTMLLinkElement
     const previewTitle = $("preview-title")
@@ -178,7 +183,7 @@ export async function initDemo(): Promise<void> {
 
     try {
         allLicenses = await loadLicenses()
-        allLicenses.sort((a, b) => a.licenseId.localeCompare(b.licenseId))
+        allLicenses.sort((a, b) => a.name.localeCompare(b.name))
         populateDropdown(allLicenses)
     } catch {
         licenseSelect.innerHTML = '<option value="" selected disabled>Failed to load licenses</option>'
@@ -210,7 +215,8 @@ export async function initDemo(): Promise<void> {
         const copyright = copyrightInput.value || "John Doe"
         const email = emailInput.value.trim()
         const url = urlInput.value.trim()
-        const year = yearInput.value.length > 0 ? parseInt(yearInput.value) : currentYear
+        const yearStart = yearStartInput.value.length > 0 ? parseInt(yearStartInput.value) : currentYear
+        const yearEnd = yearEndInput.value.length > 0 ? parseInt(yearEndInput.value) : currentYear
         const showGravatar = gravatarToggle.checked
 
         previewTheme.href = `/themes/${theme}.css`
@@ -224,7 +230,7 @@ export async function initDemo(): Promise<void> {
 
         updateDeprecatedWarning()
 
-        void fetchAndRender(licenseId, copyright, year, previewLicenseText, previewTitle)
+        void fetchAndRender(licenseId, copyright, yearStart, yearEnd, previewLicenseText, previewTitle)
 
         const hasUrl = url.length > 0 && isValidUrl(url)
         const hasEmail = email.length > 0 && isValidEmail(email)
@@ -234,7 +240,10 @@ export async function initDemo(): Promise<void> {
         const emailHtml = hasEmail
             ? ` &lt;<a href="mailto:${email}">${email}</a>&gt;`
             : ""
-        previewCopyright.innerHTML = `Copyright &copy; ${year} ${nameHtml}${emailHtml}`
+        const yearDisplay = yearStart !== yearEnd
+            ? `${yearStart}\u2013${yearEnd}`
+            : String(yearStart)
+        previewCopyright.innerHTML = `Copyright &copy; ${yearDisplay} ${nameHtml}${emailHtml}`
 
         if (showGravatar && hasEmail) {
             const newSrc = getGravatarUrl(email, 64)
@@ -258,7 +267,8 @@ export async function initDemo(): Promise<void> {
             copyright: copyrightInput.value,
             email: emailInput.value,
             url: urlInput.value,
-            year: yearInput.value,
+            yearStart: yearStartInput.value,
+            yearEnd: yearEndInput.value,
             gravatar: gravatarToggle.checked,
             mode: getPreferredMode(),
         }
@@ -280,7 +290,8 @@ export async function initDemo(): Promise<void> {
         copyrightInput.value = projectConfig.copyright ?? "Unknown"
         emailInput.value = projectConfig.email ?? ""
         urlInput.value = projectConfig.url ?? ""
-        yearInput.value = String(currentYear)
+        yearStartInput.value = String(currentYear)
+        yearEndInput.value = String(currentYear)
         gravatarToggle.checked = projectConfig.gravatar ?? false
         applyMode(getPreferredMode())
         onControlChange()
@@ -312,7 +323,8 @@ export async function initDemo(): Promise<void> {
     copyrightInput.addEventListener("input", onControlChange)
     emailInput.addEventListener("input", onControlChange)
     urlInput.addEventListener("input", onControlChange)
-    yearInput.addEventListener("input", onControlChange)
+    yearStartInput.addEventListener("input", onControlChange)
+    yearEndInput.addEventListener("input", onControlChange)
 
     gravatarToggle.addEventListener("change", onControlChange)
     gravatarToggle.parentElement?.querySelector("span")?.addEventListener("click", () => {
@@ -356,7 +368,8 @@ export async function initDemo(): Promise<void> {
     copyrightInput.value = saved.copyright ?? projectConfig.copyright ?? "Unknown"
     emailInput.value = saved.email ?? projectConfig.email ?? ""
     urlInput.value = saved.url ?? projectConfig.url ?? ""
-    yearInput.value = saved.year && saved.year.length > 0 ? saved.year : String(currentYear)
+    yearStartInput.value = saved.yearStart && saved.yearStart.length > 0 ? saved.yearStart : String(currentYear)
+    yearEndInput.value = saved.yearEnd && saved.yearEnd.length > 0 ? saved.yearEnd : String(currentYear)
     if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
     else if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
     else gravatarToggle.checked = false

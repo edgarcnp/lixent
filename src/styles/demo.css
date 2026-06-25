@@ -2,13 +2,13 @@
 
 /* Light mode (default) */
 .demo-layout {
-    --demo-bg: #f8f9fa;
+    --demo-bg: #e9ecef;
     --demo-surface: #ffffff;
-    --demo-surface-2: #f1f3f5;
-    --demo-border: #dee2e6;
-    --demo-border-hover: #ced4da;
+    --demo-surface-2: #e2e6ea;
+    --demo-border: #ced4da;
+    --demo-border-hover: #adb5bd;
     --demo-text: #212529;
-    --demo-text-muted: #6c757d;
+    --demo-text-muted: #495057;
     --demo-accent: #2563eb;
     --demo-accent-hover: #1d4ed8;
     --demo-success: #22c55e;
@@ -58,11 +58,47 @@
     flex-shrink: 0;
 }
 
+.util-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .util-header h2 {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--demo-text);
     letter-spacing: -0.01em;
+}
+
+.mode-toggle-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--demo-text-muted);
+    background: none;
+    border: 1px solid var(--demo-border);
+    border-radius: var(--demo-radius);
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.15s, background 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.mode-toggle-btn:hover {
+    color: var(--demo-text);
+    border-color: var(--demo-border-hover);
+    background: var(--demo-surface-2);
+}
+
+.mode-toggle-btn svg {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-toggle-btn.rotate svg {
+    transform: rotate(360deg);
 }
 
 .util-header .util-toggle {
@@ -248,29 +284,21 @@
     cursor: pointer;
 }
 
-/* Dark/Light Mode Toggle */
-.mode-toggle {
+.year-range-row {
     display: flex;
-    align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--demo-bg);
-    border: 1px solid var(--demo-border);
-    border-radius: var(--demo-radius);
-    cursor: pointer;
+    align-items: center;
+}
+
+.year-range-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.year-range-sep {
+    color: var(--demo-text-muted);
     font-size: 0.875rem;
-    color: var(--demo-text);
-    font-family: inherit;
-    transition: border-color 0.15s;
-    width: 100%;
-}
-
-.mode-toggle:hover {
-    border-color: var(--demo-border-hover);
-}
-
-.mode-toggle-icon {
-    font-size: 1rem;
+    flex-shrink: 0;
 }
 
 /* Actions - sticky at bottom */
@@ -282,6 +310,15 @@
     border-top: 1px solid var(--demo-border);
     flex-shrink: 0;
     background: var(--demo-surface);
+}
+
+.util-actions-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--demo-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
 }
 
 .util-actions-row {
