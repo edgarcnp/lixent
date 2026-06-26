@@ -193,11 +193,30 @@ function createDropdown(config: DropdownConfig): DropdownInstance {
         config.onSelect(value)
     }
 
+    function positionPanel(): void {
+        const rect = trigger.getBoundingClientRect()
+        const panelHeight = Math.min(320, optionsList.scrollHeight + 52)
+        const spaceBelow = window.innerHeight - rect.bottom
+        const spaceAbove = rect.top
+        const openUp = spaceBelow < panelHeight && spaceAbove > spaceBelow
+
+        panel.style.width = `${rect.width}px`
+        panel.style.left = `${rect.left}px`
+        if (openUp) {
+            panel.style.top = "auto"
+            panel.style.bottom = `${window.innerHeight - rect.top + 4}px`
+        } else {
+            panel.style.top = `${rect.bottom + 4}px`
+            panel.style.bottom = "auto"
+        }
+    }
+
     function open(): void {
         isOpen = true
         wrapper.classList.add("open")
         searchInput.value = ""
         renderOptions()
+        positionPanel()
         requestAnimationFrame(() => searchInput.focus())
         document.addEventListener("click", onOutsideClick)
         document.addEventListener("keydown", onKeyDown)
