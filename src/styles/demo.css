@@ -525,7 +525,8 @@
     font-style: italic;
 }
 
-.util-section label {
+.util-section label,
+.util-section .util-label {
     font-size: 0.6875rem;
     font-weight: 600;
     color: var(--demo-text-muted);
