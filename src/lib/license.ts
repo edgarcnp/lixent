@@ -60,11 +60,17 @@ export async function fetchLicenseList(): Promise<SpdxLicense[]> {
 /**
  * Fetch the raw text of a specific license by its SPDX ID.
  *
- * @param id - SPDX license identifier (e.g. `"MIT"`, `"GPL-3.0-only"`).
+ * @param id     - SPDX license identifier (e.g. `"MIT"`, `"GPL-3.0-only"`).
+ * @param signal - Optional AbortSignal. Defaults to a 15-second timeout.
  * @returns The raw license text with original placeholders intact.
  */
-export async function fetchLicenseText(id: string): Promise<string> {
-    const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, { signal: AbortSignal.timeout(15_000) })
+export async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
+    if (!/^[A-Za-z0-9._-]+$/.test(id)) {
+        throw new Error(`Invalid license ID: ${id}`)
+    }
+    const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, {
+        signal: signal ?? AbortSignal.timeout(15_000),
+    })
     if (!response.ok) {
         throw new Error(`Failed to fetch license ${id}: ${response.statusText}`)
     }
@@ -102,24 +108,24 @@ export function convertPlaceholders(text: string): string {
 }
 
 /**
- * Render a license text by converting SPDX placeholders and substituting config values.
+ * Render a license text by converting SPDX placeholders and substituting values.
  *
  * Pipeline: raw SPDX text → {@link convertPlaceholders} → replace `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}`.
  *
  * @param text   - Raw license text (or custom license text).
- * @param config - User configuration providing values for placeholders.
+ * @param values - Replacement values for the canonical placeholders.
  * @returns Fully rendered license text ready for HTML output.
  */
-export function renderLicenseText(text: string, config: LixentConfig): string {
-    const yearStr = config.yearRange != null
-        ? `${config.yearRange.start}\u2013${config.yearRange.end}`
-        : String(config.year ?? new Date().getFullYear())
+export function renderLicenseText(
+    text: string,
+    values: { year: string, name: string, url?: string, email?: string },
+): string {
     const converted = convertPlaceholders(text)
     return converted
-        .replace(/\{\{year\}\}/g, yearStr)
-        .replace(/\{\{name\}\}/g, config.copyright)
-        .replace(/\{\{url\}\}/g, config.url ?? "")
-        .replace(/\{\{email\}\}/g, config.email ?? "")
+        .replace(/\{\{year\}\}/g, values.year)
+        .replace(/\{\{name\}\}/g, values.name)
+        .replace(/\{\{url\}\}/g, values.url ?? "")
+        .replace(/\{\{email\}\}/g, values.email ?? "")
 }
 
 /**

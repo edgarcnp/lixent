@@ -13,38 +13,32 @@ const baseConfig: LixentConfig = {
     theme: "minimal",
 }
 
+const baseValues = { year: "2026", name: "Test User" }
+
 describe("renderLicenseText edge cases", () => {
     it("replaces all placeholders in one pass", () => {
-        const text = "Copyright {{year}} {{name}} ({{email}})"
-        const config = { ...baseConfig, email: "test@example.com" }
-        const result = renderLicenseText(text, config)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright ${year} Test User (test@example.com)`)
+        const values = { ...baseValues, email: "test@example.com" }
+        assert.equal(renderLicenseText("Copyright {{year}} {{name}} ({{email}})", values), "Copyright 2026 Test User (test@example.com)")
     })
 
     it("handles multiple {{year}} occurrences", () => {
-        const text = "{{year}} to {{year}}"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `${year} to ${year}`)
+        assert.equal(renderLicenseText("{{year}} to {{year}}", baseValues), "2026 to 2026")
     })
 
     it("handles text with no placeholders", () => {
-        assert.equal(renderLicenseText("No placeholders here", baseConfig), "No placeholders here")
+        assert.equal(renderLicenseText("No placeholders here", baseValues), "No placeholders here")
     })
 
     it("handles empty text", () => {
-        assert.equal(renderLicenseText("", baseConfig), "")
+        assert.equal(renderLicenseText("", baseValues), "")
     })
 
     it("uses custom year when provided", () => {
-        const config = { ...baseConfig, year: 1999 }
-        assert.equal(renderLicenseText("{{year}}", config), "1999")
+        assert.equal(renderLicenseText("{{year}}", { ...baseValues, year: "1999" }), "1999")
     })
 
     it("escapes special regex characters in copyright name", () => {
-        const config = { ...baseConfig, copyright: "User (Inc.)" }
-        assert.equal(renderLicenseText("{{name}}", config), "User (Inc.)")
+        assert.equal(renderLicenseText("{{name}}", { ...baseValues, name: "User (Inc.)" }), "User (Inc.)")
     })
 })
 
@@ -160,68 +154,72 @@ describe("convertPlaceholders", () => {
 
 describe("renderLicenseText with SPDX placeholders", () => {
     it("converts and renders MIT-style placeholders", () => {
-        const text = "Copyright (c) <year> <copyright holders>"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright (c) ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright (c) <year> <copyright holders>", baseValues),
+            "Copyright (c) 2026 Test User",
+        )
     })
 
     it("converts and renders BSD-style placeholders", () => {
-        const text = "Copyright (c) <year> <owner>"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright (c) ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright (c) <year> <owner>", baseValues),
+            "Copyright (c) 2026 Test User",
+        )
     })
 
     it("converts and renders Apache-style placeholders", () => {
-        const text = "Copyright [yyyy] [name of copyright owner]"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright [yyyy] [name of copyright owner]", baseValues),
+            "Copyright 2026 Test User",
+        )
     })
 
     it("preserves unrelated angle brackets in license body", () => {
-        const text = "The < operator shall not be replaced"
-        const result = renderLicenseText(text, baseConfig)
-        assert.equal(result, "The < operator shall not be replaced")
+        assert.equal(
+            renderLicenseText("The < operator shall not be replaced", baseValues),
+            "The < operator shall not be replaced",
+        )
     })
 
     it("preserves unrelated square brackets in license body", () => {
-        const text = "See section [1] for details"
-        const result = renderLicenseText(text, baseConfig)
-        assert.equal(result, "See section [1] for details")
+        assert.equal(
+            renderLicenseText("See section [1] for details", baseValues),
+            "See section [1] for details",
+        )
     })
 
     it("preserves URLs in angle brackets (GPL-style)", () => {
-        const text = "see <https://www.gnu.org/licenses/>"
-        const result = renderLicenseText(text, baseConfig)
-        assert.equal(result, "see <https://www.gnu.org/licenses/>")
+        assert.equal(
+            renderLicenseText("see <https://www.gnu.org/licenses/>", baseValues),
+            "see <https://www.gnu.org/licenses/>",
+        )
     })
 
     it("preserves email addresses in angle brackets (WTFPL)", () => {
-        const text = "contact <sam@hocevar.net>"
-        const result = renderLicenseText(text, baseConfig)
-        assert.equal(result, "contact <sam@hocevar.net>")
+        assert.equal(
+            renderLicenseText("contact <sam@hocevar.net>", baseValues),
+            "contact <sam@hocevar.net>",
+        )
     })
 
     it("renders GPL-3.0 placeholder pattern", () => {
-        const text = "Copyright (C) <year> <name of author>"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright (C) ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright (C) <year> <name of author>", baseValues),
+            "Copyright (C) 2026 Test User",
+        )
     })
 
     it("renders MIT-0 placeholder pattern", () => {
-        const text = "Copyright (c) <YEAR> <COPYRIGHT HOLDER>"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright (c) ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright (c) <YEAR> <COPYRIGHT HOLDER>", baseValues),
+            "Copyright (c) 2026 Test User",
+        )
     })
 
     it("renders UPL-1.0 placeholder pattern", () => {
-        const text = "Copyright (c) [year] [copyright holders]"
-        const result = renderLicenseText(text, baseConfig)
-        const year = String(new Date().getFullYear())
-        assert.equal(result, `Copyright (c) ${year} Test User`)
+        assert.equal(
+            renderLicenseText("Copyright (c) [year] [copyright holders]", baseValues),
+            "Copyright (c) 2026 Test User",
+        )
     })
 })
