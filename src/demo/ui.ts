@@ -222,6 +222,7 @@ export async function initDemo(): Promise<void> {
         const res = await fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
         if (!res.ok) throw new Error(`fonts.json: ${res.status}`)
         const fonts = ((await res.json()) as { items: GoogleFont[] }).items
+            .filter((f) => f.family !== "Inter")
         fonts.sort((a, b) => a.family.localeCompare(b.family))
         setAllFonts(fonts)
         fontDropdown.setOptions([
