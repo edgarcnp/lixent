@@ -10,7 +10,7 @@ import type { LixentConfig } from "../src/lib/types.ts"
 const baseConfig: LixentConfig = {
     copyright: "Test User",
     license: "MIT",
-    theme: "minimal",
+    theme: "minimal-dark",
 }
 
 const baseValues = { year: "2026", name: "Test User" }

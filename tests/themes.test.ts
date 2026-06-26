@@ -3,17 +3,20 @@ import assert from "node:assert/strict"
 import { themes, getTheme, isValidTheme } from "../src/themes/index.ts"
 
 describe("themes", () => {
-    it("contains 10 themes", () => {
-        assert.equal(themes.length, 10)
+    it("contains 16 themes", () => {
+        assert.equal(themes.length, 16)
     })
 
     it("each theme has required fields", () => {
         for (const theme of themes) {
             assert.ok(theme.id, `Theme missing id`)
             assert.ok(theme.name, `Theme ${theme.id} missing name`)
-            assert.ok(theme.description, `Theme ${theme.id} missing description`)
             assert.equal(typeof theme.dark, "boolean", `Theme ${theme.id} dark is not boolean`)
+            assert.ok(theme.base, `Theme ${theme.id} missing base`)
             assert.ok(Array.isArray(theme.variables), `Theme ${theme.id} variables is not array`)
+            assert.ok(theme.preview.bg, `Theme ${theme.id} missing preview.bg`)
+            assert.ok(theme.preview.accent, `Theme ${theme.id} missing preview.accent`)
+            assert.ok(theme.preview.text, `Theme ${theme.id} missing preview.text`)
         }
     })
 
@@ -26,17 +29,17 @@ describe("themes", () => {
 
 describe("getTheme", () => {
     it("returns theme by id", () => {
-        const theme = getTheme("minimal")
+        const theme = getTheme("minimal-dark")
         assert.ok(theme)
-        assert.equal(theme.id, "minimal")
+        assert.equal(theme.id, "minimal-dark")
         assert.equal(theme.name, "Minimal")
-        assert.equal(theme.dark, false)
+        assert.equal(theme.dark, true)
     })
 
-    it("returns dark theme", () => {
-        const theme = getTheme("terminal")
+    it("returns light theme", () => {
+        const theme = getTheme("terminal-light")
         assert.ok(theme)
-        assert.equal(theme.dark, true)
+        assert.equal(theme.dark, false)
     })
 
     it("returns undefined for unknown theme", () => {
@@ -46,10 +49,10 @@ describe("getTheme", () => {
 
 describe("isValidTheme", () => {
     it("returns true for valid themes", () => {
-        assert.ok(isValidTheme("minimal"))
-        assert.ok(isValidTheme("github"))
-        assert.ok(isValidTheme("terminal"))
-        assert.ok(isValidTheme("sans"))
+        assert.ok(isValidTheme("minimal-dark"))
+        assert.ok(isValidTheme("github-light"))
+        assert.ok(isValidTheme("terminal-dark"))
+        assert.ok(isValidTheme("sans-light"))
     })
 
     it("returns false for invalid theme", () => {

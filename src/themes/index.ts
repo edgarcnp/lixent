@@ -2,14 +2,13 @@
  * Theme registry and metadata.
  *
  * Themes are CSS files in `public/themes/` that define the 8 `--lx-*` CSS
- * custom properties. This module provides the metadata (id, name, description,
- * dark mode flag) used by the demo dropdown and config validation.
+ * custom properties. Each base theme has a dark and light variant.
  *
  * ## Adding a theme
  *
- * 1. Create `public/themes/my-theme.css` defining all 8 variables.
- * 2. Add an entry to the {@link themes} array here.
- * 3. Reference it as `"theme": "my-theme"` in `lixent.config.json`.
+ * 1. Create `public/themes/{base}-dark.css` and `public/themes/{base}-light.css`
+ *    defining all 8 variables.
+ * 2. That's it — the registry is built automatically from the filesystem.
  *
  * ## CSS variables
  *
@@ -29,18 +28,23 @@
  * @module
  */
 
+import { readdirSync, readFileSync } from "node:fs"
+import { join, basename } from "node:path"
+
 /** Metadata for a single theme. */
 export interface ThemeMeta {
-    /** Unique identifier used in `lixent.config.json` (e.g. `"minimal"`, `"github-dark"`). */
+    /** Unique identifier used in `lixent.config.json` (e.g. `"minimal-dark"`, `"github-light"`). */
     id: string
-    /** Human-readable display name. */
+    /** Base theme name (e.g. `"minimal"`, `"github"`). */
+    base: string
+    /** Human-readable display name derived from the base. */
     name: string
-    /** Short description for the theme picker. */
-    description: string
-    /** Whether this is a dark theme (used for UI hints in the demo). */
+    /** Whether this is a dark theme. */
     dark: boolean
     /** CSS variable names this theme defines. Always {@link THEME_VARIABLES}. */
     variables: string[]
+    /** Preview colors parsed from the CSS file. */
+    preview: { bg: string, accent: string, text: string }
 }
 
 /**
@@ -58,87 +62,52 @@ export const THEME_VARIABLES = [
     "--lx-font-mono",
 ]
 
+const THEMES_DIR = join(import.meta.dirname, "../../public/themes")
+
+function parseCssVar(css: string, variable: string): string {
+    const match = new RegExp(`${variable}:\\s*([^;]+)`).exec(css)
+    return match?.[1]?.trim() ?? ""
+}
+
+function buildThemes(): ThemeMeta[] {
+    const files = readdirSync(THEMES_DIR).filter((f) => f.endsWith(".css"))
+
+    return files
+        .map((file) => {
+            const id = basename(file, ".css")
+            const parts = id.split("-")
+            const mode = parts.pop()
+            if (mode !== "dark" && mode !== "light") return null
+
+            const base = parts.join("-")
+            const css = readFileSync(join(THEMES_DIR, file), "utf-8")
+
+            return {
+                id,
+                base,
+                name: base.charAt(0).toUpperCase() + base.slice(1),
+                dark: mode === "dark",
+                variables: THEME_VARIABLES,
+                preview: {
+                    bg: parseCssVar(css, "--lx-bg"),
+                    accent: parseCssVar(css, "--lx-accent"),
+                    text: parseCssVar(css, "--lx-text"),
+                },
+            }
+        })
+        .filter((t): t is ThemeMeta => t !== null)
+        .sort((a, b) => a.base.localeCompare(b.base) || (a.dark ? 1 : 0) - (b.dark ? 1 : 0))
+}
+
 /**
- * Registry of all built-in themes.
- * Each entry maps to a CSS file in `public/themes/{id}.css`.
+ * Registry of all built-in themes, auto-generated from `public/themes/*.css`.
  */
-export const themes: ThemeMeta[] = [
-    {
-        id: "minimal",
-        name: "Minimal",
-        description: "Clean serif theme with generous spacing",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "minimal-dark",
-        name: "Minimal Dark",
-        description: "Same as minimal, dark background",
-        dark: true,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "github",
-        name: "GitHub",
-        description: "GitHub README aesthetic",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "github-dark",
-        name: "GitHub Dark",
-        description: "GitHub dark README",
-        dark: true,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "terminal",
-        name: "Terminal",
-        description: "Retro terminal, green-on-black",
-        dark: true,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "newspaper",
-        name: "Newspaper",
-        description: "NYT/journalism style",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "elegant",
-        name: "Elegant",
-        description: "High-contrast, refined",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "mono",
-        name: "Mono",
-        description: "Pure monospace, no decoration",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "serif",
-        name: "Serif",
-        description: "Traditional book-like",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-    {
-        id: "sans",
-        name: "Sans",
-        description: "Modern sans-serif",
-        dark: false,
-        variables: THEME_VARIABLES,
-    },
-]
+export const themes: ThemeMeta[] = buildThemes()
 
 /**
  * Find a theme by its ID.
  *
- * @param id - Theme identifier (e.g. `"minimal"`, `"github-dark"`).
+ * @param id - Theme identifier (e.g. `"minimal-dark"`, `"github-light"`).
  * @returns The theme metadata, or `undefined` if not found.
  */
 export function getTheme(id: string): ThemeMeta | undefined {
@@ -153,4 +122,33 @@ export function getTheme(id: string): ThemeMeta | undefined {
  */
 export function isValidTheme(id: string): boolean {
     return themes.some((t) => t.id === id)
+}
+
+/**
+ * Get all unique base themes.
+ *
+ * @returns Array of base theme names.
+ */
+export function getBaseThemes(): string[] {
+    return [...new Set(themes.map((t) => t.base))]
+}
+
+/**
+ * Get the dark variant of a base theme.
+ *
+ * @param base - Base theme name (e.g. `"minimal"`).
+ * @returns The dark theme metadata, or `undefined` if not found.
+ */
+export function getDarkTheme(base: string): ThemeMeta | undefined {
+    return themes.find((t) => t.base === base && t.dark)
+}
+
+/**
+ * Get the light variant of a base theme.
+ *
+ * @param base - Base theme name (e.g. `"minimal"`).
+ * @returns The light theme metadata, or `undefined` if not found.
+ */
+export function getLightTheme(base: string): ThemeMeta | undefined {
+    return themes.find((t) => t.base === base && !t.dark)
 }

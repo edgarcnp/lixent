@@ -58,8 +58,7 @@ function formatParagraphs(text: string): string {
 function getPreferredMode(): "dark" | "light" {
     const saved = localStorage.getItem("lixent-demo-mode")
     if (saved === "dark" || saved === "light") return saved
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"
-    return "light"
+    return "dark"
 }
 
 function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): T {
@@ -441,6 +440,7 @@ async function fetchAndRender(
 
 export async function initDemo(): Promise<void> {
     const themeGallery = $("theme-gallery")
+    const themeModeToggle = document.getElementById("theme-mode-toggle")
     const fontSizeInput = $("font-size-input") as HTMLInputElement
     const fontWeightInput = $("font-weight-input") as HTMLInputElement
     const lineHeightInput = $("line-height-input") as HTMLInputElement
@@ -516,12 +516,18 @@ export async function initDemo(): Promise<void> {
 
     function getSelectedTheme(): string {
         const active = themeGallery.querySelector(".theme-card.selected")
-        return (active as HTMLElement | null)?.dataset.theme ?? "minimal"
+        return (active as HTMLElement | null)?.dataset.theme ?? "minimal-dark"
     }
 
     function setSelectedTheme(id: string): void {
         themeGallery.querySelectorAll(".theme-card").forEach((card) => {
             card.classList.toggle("selected", (card as HTMLElement).dataset.theme === id)
+        })
+
+        const mode = id.endsWith("-light") ? "light" : "dark"
+        themeGallery.dataset.mode = mode
+        themeModeToggle?.querySelectorAll(".theme-mode-btn").forEach((btn) => {
+            btn.classList.toggle("active", (btn as HTMLElement).dataset.mode === mode)
         })
     }
 
@@ -667,6 +673,9 @@ export async function initDemo(): Promise<void> {
         const summaryLicense = $("summary-license")
         const summaryIdentity = $("summary-identity")
         summaryTheme.textContent = theme
+            .replace(/-(?:dark|light)$/, "")
+            .replace(/^\w/, (c) => c.toUpperCase())
+            + (theme.endsWith("-light") ? " Light" : "")
         const parts: string[] = []
         if (fontLabel !== "Default") parts.push(fontLabel)
         if (fontSize.length > 0) parts.push(fontSize)
@@ -702,7 +711,7 @@ export async function initDemo(): Promise<void> {
 
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo-mode")
-        setSelectedTheme(projectConfig.theme ?? "minimal")
+        setSelectedTheme(projectConfig.theme ?? "minimal-dark")
         fontDropdown.setValue(projectConfig.font ?? "")
         fontSizeInput.value = projectConfig.fontSize ?? ""
         fontWeightInput.value = projectConfig.fontWeight ?? ""
@@ -747,6 +756,29 @@ export async function initDemo(): Promise<void> {
             onControlChange()
         }
     })
+
+    if (themeModeToggle) {
+        themeModeToggle.addEventListener("click", (e) => {
+            const btn = (e.target as HTMLElement).closest(".theme-mode-btn")
+            if (!(btn instanceof HTMLElement) || !btn.dataset.mode) return
+
+            themeModeToggle.querySelectorAll(".theme-mode-btn").forEach((b) => b.classList.remove("active"))
+            btn.classList.add("active")
+
+            const mode = btn.dataset.mode
+            themeGallery.dataset.mode = mode
+
+            const currentId = document.querySelector<HTMLElement>(".theme-card.selected")?.dataset.theme
+            const currentBase = currentId?.replace(/-dark$|-light$/, "") ?? "minimal"
+            const targetId = `${currentBase}-${mode}`
+
+            const targetCard = themeGallery.querySelector<HTMLElement>(`[data-theme="${targetId}"]`)
+            if (targetCard) {
+                setSelectedTheme(targetId)
+                onControlChange()
+            }
+        })
+    }
 
     fontSizeInput.addEventListener("input", debouncedChange)
     fontWeightInput.addEventListener("input", debouncedChange)
@@ -817,7 +849,7 @@ export async function initDemo(): Promise<void> {
 
     const projectConfig = await loadProjectConfig()
 
-    setSelectedTheme(projectConfig.theme ?? "minimal")
+    setSelectedTheme(projectConfig.theme ?? "minimal-dark")
     if (projectConfig.font) fontDropdown.setValue(projectConfig.font)
     fontSizeInput.value = projectConfig.fontSize ?? ""
     fontWeightInput.value = projectConfig.fontWeight ?? ""

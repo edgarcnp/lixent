@@ -1,0 +1,10 @@
+:root {
+  --lx-bg: #f8f8f8;
+  --lx-text: #1a3a1a;
+  --lx-text-muted: #2d6b2d;
+  --lx-accent: #1a6b1a;
+  --lx-border: #c4d4c4;
+  --lx-surface: #e8f0e8;
+  --lx-font-body: "IBM Plex Mono", "Courier New", monospace;
+  --lx-font-mono: "IBM Plex Mono", "Courier New", monospace;
+}

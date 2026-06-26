@@ -1,0 +1,10 @@
+:root {
+  --lx-bg: #1c1917;
+  --lx-text: #e7e5e4;
+  --lx-text-muted: #a8a29e;
+  --lx-accent: #f59e0b;
+  --lx-border: #44403c;
+  --lx-surface: #292524;
+  --lx-font-body: "Garamond", "Georgia", "Times New Roman", serif;
+  --lx-font-mono: "Menlo", "Consolas", monospace;
+}

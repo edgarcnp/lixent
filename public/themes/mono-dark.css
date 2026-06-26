@@ -1,0 +1,10 @@
+:root {
+  --lx-bg: #0a0a0a;
+  --lx-text: #e5e5e5;
+  --lx-text-muted: #a3a3a3;
+  --lx-accent: #a3a3a3;
+  --lx-border: #262626;
+  --lx-surface: #171717;
+  --lx-font-body: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --lx-font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}

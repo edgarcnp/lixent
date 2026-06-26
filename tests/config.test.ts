@@ -24,13 +24,13 @@ describe("loadConfig", () => {
         const config = {
             copyright: "Jane Doe",
             license: "MIT",
-            theme: "github",
+            theme: "github-dark",
         }
         writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "Jane Doe")
         assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "github")
+        assert.equal(loaded.theme, "github-dark")
     })
 
     it("falls back to package.json lixent field", () => {
@@ -39,14 +39,14 @@ describe("loadConfig", () => {
             lixent: {
                 copyright: "From Package",
                 license: "ISC",
-                theme: "terminal",
+                theme: "terminal-dark",
             },
         }
         writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "From Package")
         assert.equal(loaded.license, "ISC")
-        assert.equal(loaded.theme, "terminal")
+        assert.equal(loaded.theme, "terminal-dark")
     })
 
     it("uses package name as copyright fallback", () => {
@@ -65,11 +65,11 @@ describe("loadConfig", () => {
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "Unknown")
         assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal")
+        assert.equal(loaded.theme, "minimal-dark")
     })
 
     it("prefers lixent.config.json over package.json", () => {
-        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "serif" }
+        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "serif-dark" }
         const pkg = { name: "pkg", lixent: { copyright: "From Package" } }
         writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
         writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
@@ -90,7 +90,7 @@ describe("loadConfig", () => {
                 name: "My Custom License",
                 text: "Custom text for {{name}}",
             },
-            theme: "minimal",
+            theme: "minimal-dark",
         }
         writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
         const loaded = loadConfig(TMP_DIR)
@@ -114,6 +114,6 @@ describe("loadConfig edge cases", () => {
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "empty-lixent")
         assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal")
+        assert.equal(loaded.theme, "minimal-dark")
     })
 })

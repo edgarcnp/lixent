@@ -1,10 +1,10 @@
 ---
+import "../styles/base.css"
+import "../styles/demo.css"
 import { themes } from "../themes/index.ts"
 import Button from "../components/ui/astro/Button.astro"
 import IconX from "../components/ui/astro/icons/IconX.astro"
 import IconCheck from "../components/ui/astro/icons/IconCheck.astro"
-import "../styles/base.css"
-import "../styles/demo.css"
 
 const themeList = themes
 ---
@@ -16,15 +16,13 @@ const themeList = themes
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
         <title>Lixent Demo</title>
-        <link rel="stylesheet" href={`${import.meta.env.BASE_URL}themes/minimal.css`} id="preview-theme" />
+        <link rel="stylesheet" href={`${import.meta.env.BASE_URL}themes/minimal-dark.css`} id="preview-theme" />
         <script is:inline>
             (function() {
                 var saved = localStorage.getItem("lixent-demo-mode");
-                if (saved === "dark") {
-                    document.documentElement.classList.add("dark");
-                } else if (saved === "light") {
+                if (saved === "light") {
                     document.documentElement.classList.remove("dark");
-                } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                } else {
                     document.documentElement.classList.add("dark");
                 }
             })();
@@ -57,22 +55,27 @@ const themeList = themes
                         </button>
                         <div class="accordion-body">
                             <div class="accordion-body-inner">
+                                <div class="theme-mode-toggle" id="theme-mode-toggle">
+                                    <button class="theme-mode-btn active" data-mode="dark" type="button">Dark</button>
+                                    <button class="theme-mode-btn" data-mode="light" type="button">Light</button>
+                                </div>
                                 <div class="util-section">
-                                    <div class="theme-gallery" id="theme-gallery">
+                                    <div class="theme-gallery" id="theme-gallery" data-mode="dark">
                                         {themeList.map((t) => (
                                             <button
-                                                class:list={["theme-card", { selected: t.id === "minimal" }]}
+                                                class:list={["theme-card", { selected: t.id === "minimal-dark" }]}
                                                 data-theme={t.id}
+                                                data-base={t.base}
+                                                data-mode={t.dark ? "dark" : "light"}
                                                 type="button"
-                                                aria-label={`Select ${t.name} theme`}
+                                                aria-label={`Select ${t.name} ${t.dark ? "dark" : "light"} theme`}
                                             >
                                                 <div class="theme-color-strip">
-                                                    <span style={`background: ${t.id === "minimal" ? "#faf9f7" : t.id === "minimal-dark" ? "#1a1a1a" : t.id === "github" ? "#ffffff" : t.id === "github-dark" ? "#0d1117" : t.id === "terminal" ? "#0a0a0a" : t.id === "newspaper" ? "#ffffff" : t.id === "elegant" ? "#fafaf9" : t.id === "mono" ? "#ffffff" : t.id === "serif" ? "#fffbf5" : "#ffffff"}`}></span>
-                                                    <span style={`background: ${t.id === "minimal" ? "#2563eb" : t.id === "minimal-dark" ? "#60a5fa" : t.id === "github" ? "#0969da" : t.id === "github-dark" ? "#58a6ff" : t.id === "terminal" ? "#33ff33" : t.id === "newspaper" ? "#1a1a1a" : t.id === "elegant" ? "#b45309" : t.id === "mono" ? "#171717" : t.id === "serif" ? "#92400e" : "#2563eb"}`}></span>
-                                                    <span style={`background: ${t.id === "minimal" ? "#374151" : t.id === "minimal-dark" ? "#e5e5e5" : t.id === "github" ? "#1f2328" : t.id === "github-dark" ? "#e6edf3" : t.id === "terminal" ? "#33ff33" : t.id === "newspaper" ? "#1a1a1a" : t.id === "elegant" ? "#1c1917" : t.id === "mono" ? "#171717" : t.id === "serif" ? "#292524" : "#1a1a1a"}`}></span>
+                                                    <span style={`background: ${t.preview.bg}`}></span>
+                                                    <span style={`background: ${t.preview.accent}`}></span>
+                                                    <span style={`background: ${t.preview.text}`}></span>
                                                 </div>
                                                 <span class="theme-card-name">{t.name}</span>
-                                                {t.dark && <span class="theme-card-badge">dark</span>}
                                                 <span class="theme-check"><IconCheck /></span>
                                             </button>
                                         ))}

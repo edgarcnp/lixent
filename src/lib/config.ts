@@ -145,7 +145,7 @@ function loadFromPackageJson(root: string): LixentConfig | null {
         url: pkg.lixent.url,
         email: pkg.lixent.email,
         license: pkg.lixent.license ?? "MIT",
-        theme: pkg.lixent.theme ?? "minimal",
+        theme: pkg.lixent.theme ?? "minimal-dark",
         font: pkg.lixent.font,
         fontSize: pkg.lixent.fontSize,
         fontWeight: pkg.lixent.fontWeight,
@@ -189,6 +189,6 @@ export function loadConfig(root: string = process.cwd()): LixentConfig {
     return {
         copyright: "Unknown",
         license: "MIT",
-        theme: "minimal",
+        theme: "minimal-dark",
     }
 }
