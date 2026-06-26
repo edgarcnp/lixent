@@ -73,15 +73,21 @@ export async function fetchFontList(apiKey: string): Promise<GoogleFont[]> {
 export function getGoogleFontsUrl(family: string, variants: string[] = ["regular"]): string | null {
     if (family.length === 0) return null
     if (!/^[A-Za-z0-9 -]+$/.test(family)) return null
-    const weightParam = variants
-        .filter((v) => v !== "italic" && v !== "regular")
-        .map((v) => `@${v}`)
-        .join(";")
-    const hasRegular = variants.includes("regular")
-    const familyParam = hasRegular
-        ? `${family.replace(/ /g, "+")}:wght${weightParam.length > 0 ? weightParam : ""}`
-        : `${family.replace(/ /g, "+")}:wght@${variants[0] ?? "400"}`
-    return `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`
+
+    const familyName = family.replace(/ /g, "+")
+
+    const weights = [
+        ...new Set([
+            ...(variants.includes("regular") ? ["400"] : []),
+            ...variants.filter((v) => v !== "regular" && v !== "italic"),
+        ]),
+    ].sort((a, b) => Number(a) - Number(b))
+
+    if (weights.length === 0) {
+        return `https://fonts.googleapis.com/css2?family=${familyName}&display=swap`
+    }
+
+    return `https://fonts.googleapis.com/css2?family=${familyName}:wght@${weights.join(";")}&display=swap`
 }
 
 /**
