@@ -10,14 +10,15 @@ export { renderLicenseText } from "../lib/license.ts"
 export { SPDX_LIST_URL, SPDX_TEXT_BASE } from "../lib/license.ts"
 
 export async function loadProjectConfig(): Promise<ProjectConfig> {
+    const base = import.meta.env.BASE_URL
     try {
-        const response = await fetch("/lixent.config.json")
+        const response = await fetch(`${base}lixent.config.json`)
         if (response.ok) {
             return await response.json() as ProjectConfig
         }
     } catch { /* config file may not exist */ }
     try {
-        const response = await fetch("/package.json")
+        const response = await fetch(`${base}package.json`)
         if (response.ok) {
             const pkg = await response.json() as { lixent?: ProjectConfig }
             if (pkg.lixent) return pkg.lixent

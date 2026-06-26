@@ -55,20 +55,6 @@ function formatParagraphs(text: string): string {
         .join("")
 }
 
-function saveSettings(settings: DemoSettings): void {
-    localStorage.setItem("lixent-demo", JSON.stringify(settings))
-}
-
-function loadSettings(): Partial<DemoSettings> {
-    const saved = localStorage.getItem("lixent-demo")
-    if (!saved) return {}
-    try {
-        return JSON.parse(saved) as Partial<DemoSettings>
-    } catch {
-        return {}
-    }
-}
-
 function getPreferredMode(): "dark" | "light" {
     const saved = localStorage.getItem("lixent-demo-mode")
     if (saved === "dark" || saved === "light") return saved
@@ -403,11 +389,9 @@ export async function initDemo(): Promise<void> {
         updateGravatarWarning()
         updateUrlWarning()
         updatePreview()
-        saveSettings(getCurrentSettings())
     }
 
     function resetSettings(): void {
-        localStorage.removeItem("lixent-demo")
         localStorage.removeItem("lixent-demo-mode")
         themeSelect.value = projectConfig.theme ?? "minimal"
         fontSelect.value = projectConfig.font ?? ""
@@ -430,7 +414,6 @@ export async function initDemo(): Promise<void> {
         const current = getPreferredMode()
         const next = current === "dark" ? "light" : "dark"
         applyMode(next)
-        saveSettings(getCurrentSettings())
     }
 
     function downloadConfig(): void {
@@ -509,22 +492,19 @@ export async function initDemo(): Promise<void> {
 
     const projectConfig = await loadProjectConfig()
 
-    const saved = loadSettings()
-    themeSelect.value = saved.theme ?? projectConfig.theme ?? "minimal"
-    if (saved.font) fontSelect.value = saved.font
-    else if (projectConfig.font) fontSelect.value = projectConfig.font
-    fontSizeInput.value = saved.fontSize ?? projectConfig.fontSize ?? ""
-    fontWeightInput.value = saved.fontWeight ?? projectConfig.fontWeight ?? ""
-    lineHeightInput.value = saved.lineHeight ?? projectConfig.lineHeight ?? ""
-    letterSpacingInput.value = saved.letterSpacing ?? projectConfig.letterSpacing ?? ""
-    licenseSelect.value = saved.license ?? projectConfig.license ?? "MIT"
-    copyrightInput.value = saved.copyright ?? projectConfig.copyright ?? "Unknown"
-    emailInput.value = saved.email ?? projectConfig.email ?? ""
-    urlInput.value = saved.url ?? projectConfig.url ?? ""
-    yearStartInput.value = saved.yearStart && saved.yearStart.length > 0 ? saved.yearStart : String(currentYear)
-    yearEndInput.value = saved.yearEnd && saved.yearEnd.length > 0 ? saved.yearEnd : String(currentYear)
-    if (saved.gravatar != null) gravatarToggle.checked = saved.gravatar
-    else if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
+    themeSelect.value = projectConfig.theme ?? "minimal"
+    if (projectConfig.font) fontSelect.value = projectConfig.font
+    fontSizeInput.value = projectConfig.fontSize ?? ""
+    fontWeightInput.value = projectConfig.fontWeight ?? ""
+    lineHeightInput.value = projectConfig.lineHeight ?? ""
+    letterSpacingInput.value = projectConfig.letterSpacing ?? ""
+    licenseSelect.value = projectConfig.license ?? "MIT"
+    copyrightInput.value = projectConfig.copyright ?? "Unknown"
+    emailInput.value = projectConfig.email ?? ""
+    urlInput.value = projectConfig.url ?? ""
+    yearStartInput.value = String(currentYear)
+    yearEndInput.value = String(currentYear)
+    if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
     else gravatarToggle.checked = false
 
     const savedMode = getPreferredMode()
