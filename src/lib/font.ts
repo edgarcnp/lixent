@@ -67,7 +67,7 @@ export async function fetchFontList(apiKey: string): Promise<GoogleFont[]> {
  * @example
  * ```ts
  * getGoogleFontsUrl("Inter", ["regular", "500", "700"])
- * // → "https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap"
+ * // → "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
  * ```
  */
 export function getGoogleFontsUrl(family: string, variants: string[] = ["regular"]): string | null {
