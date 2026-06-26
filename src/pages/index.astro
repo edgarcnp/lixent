@@ -175,8 +175,15 @@ const themeList = themes
                                     </div>
                                 </div>
                                 <div class="util-section">
-                                    <label for="year-start-input" class="sr-only">Year Range</label>
-                                    <div class="year-range-row">
+                                    <label for="year-start-input">Year</label>
+                                    <div class="year-mode-toggle">
+                                        <button class="year-mode-btn active" data-mode="single" type="button">Single</button>
+                                        <button class="year-mode-btn" data-mode="range" type="button">Range</button>
+                                    </div>
+                                    <div class="year-range-row" id="year-single-row">
+                                        <input type="number" id="year-input" min="1900" max="2100" placeholder={new Date().getFullYear().toString()} />
+                                    </div>
+                                    <div class="year-range-row" id="year-range-row" style="display:none;">
                                         <input type="number" id="year-start-input" min="1900" max="2100" placeholder="Start" />
                                         <span class="year-range-sep">–</span>
                                         <input type="number" id="year-end-input" min="1900" max="2100" placeholder="End" />

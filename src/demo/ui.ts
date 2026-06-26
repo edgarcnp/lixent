@@ -59,8 +59,12 @@ export async function initDemo(): Promise<void> {
     const copyrightInput = $("copyright-input") as HTMLInputElement
     const emailInput = $("email-input") as HTMLInputElement
     const urlInput = $("url-input") as HTMLInputElement
+    const yearInput = $("year-input") as HTMLInputElement
     const yearStartInput = $("year-start-input") as HTMLInputElement
     const yearEndInput = $("year-end-input") as HTMLInputElement
+    const yearModeToggle = $("year-mode-toggle")
+    const yearSingleRow = $("year-single-row")
+    const yearRangeRow = $("year-range-row")
     const gravatarToggle = $("gravatar-toggle") as HTMLInputElement
     const utilOpen = $("util-open")
     const utilToggle = $("util-toggle")
@@ -131,6 +135,8 @@ export async function initDemo(): Promise<void> {
     })
 
     function runUpdatePreview(): void {
+        const raw = yearModeToggle.querySelector<HTMLElement>(".year-mode-btn.active")?.dataset.mode
+        const yearMode: "single" | "range" = raw === "range" ? "range" : "single"
         updatePreview({
             getSelectedTheme,
             fontDropdown,
@@ -142,8 +148,10 @@ export async function initDemo(): Promise<void> {
             copyrightInput,
             emailInput,
             urlInput,
+            yearInput,
             yearStartInput,
             yearEndInput,
+            yearMode,
             gravatarToggle,
             currentYear,
         })
@@ -156,6 +164,8 @@ export async function initDemo(): Promise<void> {
     }
 
     function getCurrentSettings() {
+        const raw = yearModeToggle.querySelector<HTMLElement>(".year-mode-btn.active")?.dataset.mode
+        const yearMode: "single" | "range" = raw === "range" ? "range" : "single"
         return {
             theme: getSelectedTheme(),
             font: fontDropdown.getValue(),
@@ -167,8 +177,10 @@ export async function initDemo(): Promise<void> {
             copyright: copyrightInput.value,
             email: emailInput.value,
             url: urlInput.value,
+            yearInput: yearInput.value,
             yearStart: yearStartInput.value,
             yearEnd: yearEndInput.value,
+            yearMode,
             gravatar: gravatarToggle.checked,
         }
     }
@@ -204,8 +216,25 @@ export async function initDemo(): Promise<void> {
         copyrightInput.value = projectConfig.copyright ?? ""
         emailInput.value = projectConfig.email ?? ""
         urlInput.value = projectConfig.url ?? ""
-        yearStartInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : "")
-        yearEndInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : "")
+
+        const isYearRange = projectConfig.yearRange != null
+        const yearMode = isYearRange ? "range" : "single"
+        yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => {
+            b.classList.toggle("active", (b as HTMLElement).dataset.mode === yearMode)
+        })
+        yearSingleRow.style.display = yearMode === "single" ? "flex" : "none"
+        yearRangeRow.style.display = yearMode === "range" ? "flex" : "none"
+
+        if (isYearRange) {
+            yearInput.value = ""
+            yearStartInput.value = projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : ""
+            yearEndInput.value = projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : ""
+        } else {
+            yearInput.value = projectConfig.year != null ? String(projectConfig.year) : ""
+            yearStartInput.value = ""
+            yearEndInput.value = ""
+        }
+
         gravatarToggle.checked = projectConfig.gravatar ?? false
         applyMode(getPreferredMode())
         onControlChange()
@@ -270,6 +299,7 @@ export async function initDemo(): Promise<void> {
     letterSpacingInput.addEventListener("input", debouncedChange)
 
     copyrightInput.addEventListener("input", debouncedChange)
+    yearInput.addEventListener("input", debouncedChange)
     const debouncedGravatarCheck = debounce(() => void updateGravatarProfileWarning(), 500)
     emailInput.addEventListener("input", () => {
         debouncedChange()
@@ -291,6 +321,17 @@ export async function initDemo(): Promise<void> {
             yearStartInput.value = yearEndInput.value
         }
         debouncedChange()
+    })
+
+    yearModeToggle.addEventListener("click", (e) => {
+        const btn = (e.target as HTMLElement).closest(".year-mode-btn")
+        if (!(btn instanceof HTMLElement) || !btn.dataset.mode) return
+        yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => b.classList.remove("active"))
+        btn.classList.add("active")
+        const mode = btn.dataset.mode
+        yearSingleRow.style.display = mode === "single" ? "flex" : "none"
+        yearRangeRow.style.display = mode === "range" ? "flex" : "none"
+        onControlChange()
     })
 
     gravatarToggle.addEventListener("change", () => {
@@ -350,8 +391,25 @@ export async function initDemo(): Promise<void> {
     copyrightInput.value = projectConfig.copyright ?? ""
     emailInput.value = projectConfig.email ?? ""
     urlInput.value = projectConfig.url ?? ""
-    yearStartInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : "")
-    yearEndInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : "")
+
+    const isYearRange = projectConfig.yearRange != null
+    const yearMode = isYearRange ? "range" : "single"
+    yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => {
+        b.classList.toggle("active", (b as HTMLElement).dataset.mode === yearMode)
+    })
+    yearSingleRow.style.display = yearMode === "single" ? "flex" : "none"
+    yearRangeRow.style.display = yearMode === "range" ? "flex" : "none"
+
+    if (isYearRange) {
+        yearInput.value = ""
+        yearStartInput.value = projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : ""
+        yearEndInput.value = projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : ""
+    } else {
+        yearInput.value = projectConfig.year != null ? String(projectConfig.year) : ""
+        yearStartInput.value = ""
+        yearEndInput.value = ""
+    }
+
     if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
     else gravatarToggle.checked = false
 

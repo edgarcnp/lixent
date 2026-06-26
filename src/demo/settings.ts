@@ -11,8 +11,10 @@ export interface DemoSettings {
     copyright: string
     email: string
     url: string
+    yearInput: string
     yearStart: string
     yearEnd: string
+    yearMode: "single" | "range"
     gravatar: boolean
 }
 
@@ -30,13 +32,20 @@ export function buildConfigJson(settings: DemoSettings): Record<string, unknown>
     if (settings.email.length > 0) config.email = settings.email
     if (settings.url.length > 0 && isValidUrl(settings.url)) config.url = settings.url
     if (settings.gravatar) config.gravatar = true
-    const start = parseInt(settings.yearStart)
-    const end = parseInt(settings.yearEnd)
-    if (!isNaN(start) && !isNaN(end)) {
-        if (start !== end) {
-            config.yearRange = { start, end }
-        } else if (start !== new Date().getFullYear()) {
-            config.year = start
+    if (settings.yearMode === "single") {
+        const year = parseInt(settings.yearInput)
+        if (!isNaN(year) && year !== new Date().getFullYear()) {
+            config.year = year
+        }
+    } else {
+        const start = parseInt(settings.yearStart)
+        const end = parseInt(settings.yearEnd)
+        if (!isNaN(start) && !isNaN(end)) {
+            if (start !== end) {
+                config.yearRange = { start, end }
+            } else if (start !== new Date().getFullYear()) {
+                config.year = start
+            }
         }
     }
     return config

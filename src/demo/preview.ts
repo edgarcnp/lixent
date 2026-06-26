@@ -120,15 +120,17 @@ export function updatePreview(state: {
     copyrightInput: HTMLInputElement
     emailInput: HTMLInputElement
     urlInput: HTMLInputElement
+    yearInput: HTMLInputElement
     yearStartInput: HTMLInputElement
     yearEndInput: HTMLInputElement
+    yearMode: "single" | "range"
     gravatarToggle: HTMLInputElement
     currentYear: number
 }): void {
     const {
         getSelectedTheme, fontDropdown, fontSizeInput, fontWeightInput,
         lineHeightInput, letterSpacingInput, licenseDropdown, copyrightInput,
-        emailInput, urlInput, yearStartInput, yearEndInput, gravatarToggle, currentYear,
+        emailInput, urlInput, yearInput, yearStartInput, yearEndInput, yearMode, gravatarToggle, currentYear,
     } = state
 
     const theme = getSelectedTheme()
@@ -141,8 +143,12 @@ export function updatePreview(state: {
     const copyright = copyrightInput.value || "John Doe"
     const email = emailInput.value.trim()
     const url = urlInput.value.trim()
-    const yearStart = yearStartInput.value.length > 0 ? parseInt(yearStartInput.value) : currentYear
-    const yearEnd = yearEndInput.value.length > 0 ? parseInt(yearEndInput.value) : currentYear
+    const yearStart = yearMode === "single"
+        ? (yearInput.value.length > 0 ? parseInt(yearInput.value) : currentYear)
+        : (yearStartInput.value.length > 0 ? parseInt(yearStartInput.value) : currentYear)
+    const yearEnd = yearMode === "single"
+        ? yearStart
+        : (yearEndInput.value.length > 0 ? parseInt(yearEndInput.value) : currentYear)
     const showGravatar = gravatarToggle.checked
 
     const previewTheme = $("preview-theme") as HTMLLinkElement
