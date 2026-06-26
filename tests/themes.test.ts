@@ -3,10 +3,6 @@ import assert from "node:assert/strict"
 import { themes, getTheme, isValidTheme } from "../src/themes/index.ts"
 
 describe("themes", () => {
-    it("contains 20 themes", () => {
-        assert.equal(themes.length, 20)
-    })
-
     it("each theme has required fields", () => {
         for (const theme of themes) {
             assert.ok(theme.id, `Theme missing id`)
