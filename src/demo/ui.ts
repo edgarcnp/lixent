@@ -202,7 +202,10 @@ async function fetchAndRender(
     licenseAbort = controller
     try {
         const rawText = await loadLicenseText(licenseId, controller.signal)
-        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd, url, email)
+        const yearStr = yearStart !== yearEnd
+            ? `${yearStart}\u2013${yearEnd}`
+            : String(yearStart)
+        const rendered = renderLicenseText(rawText, { year: yearStr, name: copyright, url, email })
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
         previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {

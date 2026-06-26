@@ -14,6 +14,8 @@ const baseConfig: LixentConfig = {
     theme: "minimal",
 }
 
+const baseValues = { year: "2026", name: "Test User" }
+
 describe("SPDX URLs", () => {
     it("points to raw GitHub content", () => {
         assert.ok(SPDX_LIST_URL.startsWith("https://raw.githubusercontent.com/"))
@@ -23,33 +25,25 @@ describe("SPDX URLs", () => {
 
 describe("renderLicenseText", () => {
     it("replaces year placeholder", () => {
-        const text = "Copyright (c) {{year}} {{name}}"
-        const result = renderLicenseText(text, baseConfig)
-        const currentYear = new Date().getFullYear()
-        assert.ok(result.includes(String(currentYear)))
+        const result = renderLicenseText("Copyright (c) {{year}} {{name}}", baseValues)
+        assert.ok(result.includes("2026"))
         assert.ok(result.includes("Test User"))
     })
 
     it("replaces name placeholder", () => {
-        const result = renderLicenseText("{{name}}", baseConfig)
-        assert.equal(result, "Test User")
+        assert.equal(renderLicenseText("{{name}}", baseValues), "Test User")
     })
 
     it("replaces url placeholder", () => {
-        const config = { ...baseConfig, url: "https://example.com" }
-        const result = renderLicenseText("{{url}}", config)
-        assert.equal(result, "https://example.com")
+        assert.equal(renderLicenseText("{{url}}", { ...baseValues, url: "https://example.com" }), "https://example.com")
     })
 
     it("replaces email placeholder", () => {
-        const config = { ...baseConfig, email: "test@example.com" }
-        const result = renderLicenseText("{{email}}", config)
-        assert.equal(result, "test@example.com")
+        assert.equal(renderLicenseText("{{email}}", { ...baseValues, email: "test@example.com" }), "test@example.com")
     })
 
     it("handles missing optional fields", () => {
-        const result = renderLicenseText("{{url}} {{email}}", baseConfig)
-        assert.equal(result, " ")
+        assert.equal(renderLicenseText("{{url}} {{email}}", baseValues), " ")
     })
 })
 
