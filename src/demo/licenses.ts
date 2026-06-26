@@ -1,5 +1,4 @@
 import {
-    fetchLicenseList,
     convertPlaceholders,
     SPDX_LIST_URL,
     SPDX_TEXT_BASE,
@@ -22,9 +21,7 @@ export interface ProjectConfig {
     gravatar?: boolean
 }
 
-export async function loadLicenses(): Promise<SpdxLicense[]> {
-    return fetchLicenseList()
-}
+export { fetchLicenseList as loadLicenses } from "../lib/license.ts"
 
 export async function loadLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {

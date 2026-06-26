@@ -1,20 +1,13 @@
 /**
  * Google Fonts integration.
  *
- * Fetches the font catalog from the Google Fonts Developer API
- * ({@link https://developers.google.com/fonts/docs/developer_api | webfonts/v1}).
- * Requires an API key passed via `fetchFontList`.
- *
- * At build time: the catalog is fetched from the `fonts-data` branch
- * and written to `public/fonts.json`.
+ * The font catalog is fetched at build time from the `fonts-data` branch
+ * and written to `public/fonts.json` by the Astro integration.
  *
  * At runtime (demo): the catalog is fetched client-side from `/fonts.json`.
  *
  * @module
  */
-
-/** Base URL for the Google Fonts Developer API. */
-export const GOOGLE_FONTS_API_URL = "https://www.googleapis.com/webfonts/v1/webfonts"
 
 /** A single font family from the Google Fonts catalog. */
 export interface GoogleFont {
@@ -24,36 +17,6 @@ export interface GoogleFont {
     variants: string[]
     /** CSS category (e.g. `"sans-serif"`, `"serif"`, `"monospace"`, `"display"`, `"handwriting"`). */
     category: string
-}
-
-/** Response shape from the Google Fonts Developer API. */
-interface GoogleFontsApiResponse {
-    items: {
-        family: string
-        variants: string[]
-        category: string
-    }[]
-}
-
-/**
- * Fetch the full list of Google Fonts from the official API.
- *
- * @param apiKey - Google Fonts Developer API key.
- * @returns Sorted list of font families with their variants and categories.
- * @throws If the network request fails or the API returns an error.
- */
-export async function fetchFontList(apiKey: string): Promise<GoogleFont[]> {
-    const url = `${GOOGLE_FONTS_API_URL}?key=${apiKey}&sort=alpha`
-    const response = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-    if (!response.ok) {
-        throw new Error(`Failed to fetch Google Fonts catalog: ${response.statusText}`)
-    }
-    const data = await response.json() as GoogleFontsApiResponse
-    return data.items.map((item) => ({
-        family: item.family,
-        variants: item.variants,
-        category: item.category,
-    }))
 }
 
 /**
