@@ -18,12 +18,12 @@ export interface DemoSettings {
 
 export function buildConfigJson(settings: DemoSettings): Record<string, unknown> {
     const config: Record<string, unknown> = {
-        copyright: settings.copyright || "John Doe",
         license: settings.license,
         theme: settings.theme,
     }
+    if (settings.copyright.length > 0) config.copyright = settings.copyright
     if (settings.font.length > 0 && settings.font !== "Inter") config.font = settings.font
-    if (settings.fontSize.length > 0 && settings.fontSize !== "18px") config.fontSize = settings.fontSize
+    if (settings.fontSize.length > 0) config.fontSize = settings.fontSize
     if (settings.fontWeight.length > 0) config.fontWeight = settings.fontWeight
     if (settings.lineHeight.length > 0) config.lineHeight = settings.lineHeight
     if (settings.letterSpacing.length > 0) config.letterSpacing = settings.letterSpacing

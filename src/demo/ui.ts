@@ -196,16 +196,16 @@ export async function initDemo(): Promise<void> {
         localStorage.removeItem("lixent-demo-mode")
         setSelectedTheme(projectConfig.theme ?? "minimal-dark")
         fontDropdown.setValue(projectConfig.font ?? "Inter")
-        fontSizeInput.value = projectConfig.fontSize ?? "18px"
+        fontSizeInput.value = projectConfig.fontSize ?? ""
         fontWeightInput.value = projectConfig.fontWeight ?? ""
         lineHeightInput.value = projectConfig.lineHeight ?? ""
         letterSpacingInput.value = projectConfig.letterSpacing ?? ""
         licenseDropdown.setValue(projectConfig.license ?? "MIT")
-        copyrightInput.value = projectConfig.copyright ?? "Unknown"
+        copyrightInput.value = projectConfig.copyright ?? ""
         emailInput.value = projectConfig.email ?? ""
         urlInput.value = projectConfig.url ?? ""
-        yearStartInput.value = String(currentYear)
-        yearEndInput.value = String(currentYear)
+        yearStartInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : "")
+        yearEndInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : "")
         gravatarToggle.checked = projectConfig.gravatar ?? false
         applyMode(getPreferredMode())
         onControlChange()
@@ -342,16 +342,16 @@ export async function initDemo(): Promise<void> {
 
     setSelectedTheme(projectConfig.theme ?? "minimal-dark")
     fontDropdown.setValue(projectConfig.font ?? "Inter")
-    fontSizeInput.value = projectConfig.fontSize ?? "18px"
+    fontSizeInput.value = projectConfig.fontSize ?? ""
     fontWeightInput.value = projectConfig.fontWeight ?? ""
     lineHeightInput.value = projectConfig.lineHeight ?? ""
     letterSpacingInput.value = projectConfig.letterSpacing ?? ""
     licenseDropdown.setValue(projectConfig.license ?? "MIT")
-    copyrightInput.value = projectConfig.copyright ?? "Unknown"
+    copyrightInput.value = projectConfig.copyright ?? ""
     emailInput.value = projectConfig.email ?? ""
     urlInput.value = projectConfig.url ?? ""
-    yearStartInput.value = String(currentYear)
-    yearEndInput.value = String(currentYear)
+    yearStartInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.start != null ? String(projectConfig.yearRange.start) : "")
+    yearEndInput.value = projectConfig.year != null ? String(projectConfig.year) : (projectConfig.yearRange?.end != null ? String(projectConfig.yearRange.end) : "")
     if (projectConfig.gravatar != null) gravatarToggle.checked = projectConfig.gravatar
     else gravatarToggle.checked = false
 

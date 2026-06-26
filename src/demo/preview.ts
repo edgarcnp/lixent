@@ -275,5 +275,5 @@ export function updatePreview(state: {
     if (fontSize.length > 0) parts.push(fontSize)
     summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Inter"
     summaryLicense.textContent = licenseName
-    summaryIdentity.textContent = copyright + (hasEmail ? ` · ${email.split("@")[1]}` : "")
+    summaryIdentity.textContent = (copyright || "John Doe") + (hasEmail ? ` · ${email.split("@")[1]}` : "")
 }
