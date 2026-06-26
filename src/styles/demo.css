@@ -497,6 +497,27 @@
     margin-right: auto;
 }
 
+.gravatar-warning {
+    display: block;
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: #f59e0b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.gravatar-warning a {
+    color: #f59e0b;
+    text-decoration: underline;
+}
+
+.dark .gravatar-warning {
+    color: #fbbf24;
+}
+
+.dark .gravatar-warning a {
+    color: #fbbf24;
+}
+
 .preview-content .islands {
     display: flex;
     flex-direction: column;

@@ -248,6 +248,7 @@ export async function initDemo(): Promise<void> {
     const emailWarning = $("email-warning")
     const urlWarning = $("url-warning")
     const deprecatedWarning = $("deprecated-warning")
+    const gravatarWarning = $("gravatar-warning")
 
     const currentYear = new Date().getFullYear()
 
@@ -274,6 +275,25 @@ export async function initDemo(): Promise<void> {
         const show = gravatarToggle.checked && email.length === 0
         emailWarning.style.display = show ? "flex" : "none"
         emailInput.classList.toggle("warn", show)
+    }
+
+    function checkGravatarProfile(email: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            const img = new Image()
+            img.onload = () => resolve(true)
+            img.onerror = () => resolve(false)
+            img.src = getGravatarUrl(email, 1, "404")
+        })
+    }
+
+    async function updateGravatarProfileWarning(): Promise<void> {
+        const email = emailInput.value.trim()
+        if (!gravatarToggle.checked || !isValidEmail(email)) {
+            gravatarWarning.style.display = "none"
+            return
+        }
+        const exists = await checkGravatarProfile(email)
+        gravatarWarning.style.display = exists ? "none" : "block"
     }
 
     function updateUrlWarning(): void {
@@ -389,6 +409,7 @@ export async function initDemo(): Promise<void> {
         updateGravatarWarning()
         updateUrlWarning()
         updatePreview()
+        void updateGravatarProfileWarning()
     }
 
     function resetSettings(): void {
