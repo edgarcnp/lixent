@@ -785,9 +785,10 @@ export async function initDemo(): Promise<void> {
     letterSpacingInput.addEventListener("input", debouncedChange)
 
     copyrightInput.addEventListener("input", debouncedChange)
+    const debouncedGravatarCheck = debounce(() => void updateGravatarProfileWarning(), 500)
     emailInput.addEventListener("input", () => {
         debouncedChange()
-        void updateGravatarProfileWarning()
+        debouncedGravatarCheck()
     })
     urlInput.addEventListener("input", debouncedChange)
     yearStartInput.addEventListener("input", () => {
