@@ -70,6 +70,227 @@ function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): T 
     }) as unknown as T
 }
 
+interface DropdownOption {
+    value: string
+    label: string
+    meta?: string
+    fontPreview?: string
+}
+
+interface DropdownConfig {
+    container: HTMLElement
+    options: DropdownOption[]
+    placeholder?: string
+    searchPlaceholder?: string
+    onSelect: (value: string) => void
+}
+
+interface DropdownInstance {
+    setValue: (value: string) => void
+    getValue: () => string
+    setOptions: (options: DropdownOption[]) => void
+}
+
+function createDropdown(config: DropdownConfig): DropdownInstance {
+    let currentValue = ""
+    let isOpen = false
+    let focusedIndex = -1
+
+    const wrapper = document.createElement("div")
+    wrapper.className = "custom-dropdown"
+
+    const trigger = document.createElement("button")
+    trigger.type = "button"
+    trigger.className = "custom-dropdown-trigger"
+    trigger.innerHTML = `<span class="trigger-label placeholder">${escapeHtml(config.placeholder ?? "Select...")}</span><svg class="trigger-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`
+
+    const panel = document.createElement("div")
+    panel.className = "custom-dropdown-panel"
+
+    const searchWrap = document.createElement("div")
+    searchWrap.className = "custom-dropdown-search"
+    const searchInput = document.createElement("input")
+    searchInput.type = "text"
+    searchInput.placeholder = config.searchPlaceholder ?? "Search..."
+    searchWrap.appendChild(searchInput)
+
+    const optionsList = document.createElement("div")
+    optionsList.className = "custom-dropdown-options"
+
+    panel.appendChild(searchWrap)
+    panel.appendChild(optionsList)
+    wrapper.appendChild(trigger)
+    wrapper.appendChild(panel)
+    config.container.appendChild(wrapper)
+
+    let currentOptions = [...config.options]
+
+    function renderOptions(filter = ""): void {
+        optionsList.innerHTML = ""
+        const lower = filter.toLowerCase()
+        const filtered = lower.length > 0
+            ? currentOptions.filter((o) => o.label.toLowerCase().includes(lower) || (o.meta?.toLowerCase().includes(lower) ?? false))
+            : currentOptions
+
+        if (filtered.length === 0) {
+            const empty = document.createElement("div")
+            empty.className = "custom-dropdown-empty"
+            empty.textContent = "No results found"
+            optionsList.appendChild(empty)
+            return
+        }
+
+        focusedIndex = -1
+        for (const opt of filtered) {
+            const el = document.createElement("div")
+            el.className = "custom-dropdown-option"
+            if (opt.value === currentValue) el.classList.add("selected")
+            el.dataset.value = opt.value
+
+            if (opt.fontPreview) {
+                const preview = document.createElement("span")
+                preview.className = "option-font-preview"
+                preview.textContent = opt.label
+                preview.style.fontFamily = opt.fontPreview
+                el.appendChild(preview)
+            } else {
+                const label = document.createElement("span")
+                label.className = "option-label"
+                label.textContent = opt.label
+                el.appendChild(label)
+            }
+
+            if (opt.meta) {
+                const meta = document.createElement("span")
+                meta.className = "option-meta"
+                meta.textContent = opt.meta
+                el.appendChild(meta)
+            }
+
+            el.addEventListener("click", () => {
+                selectOption(opt.value)
+            })
+
+            optionsList.appendChild(el)
+        }
+    }
+
+    function selectOption(value: string): void {
+        currentValue = value
+        const opt = currentOptions.find((o) => o.value === value)
+        const label = trigger.querySelector<HTMLElement>(".trigger-label")
+        if (!label) return
+        if (opt) {
+            label.textContent = opt.label
+            label.classList.remove("placeholder")
+            label.style.fontFamily = opt.fontPreview ?? ""
+        } else {
+            label.textContent = config.placeholder ?? "Select..."
+            label.classList.add("placeholder")
+            label.style.fontFamily = ""
+        }
+        close()
+        config.onSelect(value)
+    }
+
+    function open(): void {
+        isOpen = true
+        wrapper.classList.add("open")
+        searchInput.value = ""
+        renderOptions()
+        requestAnimationFrame(() => searchInput.focus())
+        document.addEventListener("click", onOutsideClick)
+        document.addEventListener("keydown", onKeyDown)
+    }
+
+    function close(): void {
+        isOpen = false
+        wrapper.classList.remove("open")
+        document.removeEventListener("click", onOutsideClick)
+        document.removeEventListener("keydown", onKeyDown)
+    }
+
+    function toggle(): void {
+        if (isOpen) close()
+        else open()
+    }
+
+    function onOutsideClick(e: MouseEvent): void {
+        if (!wrapper.contains(e.target as Node)) {
+            close()
+        }
+    }
+
+    function onKeyDown(e: KeyboardEvent): void {
+        const items = optionsList.querySelectorAll(".custom-dropdown-option")
+        if (e.key === "Escape") {
+            close()
+            return
+        }
+        if (e.key === "ArrowDown") {
+            e.preventDefault()
+            focusedIndex = Math.min(focusedIndex + 1, items.length - 1)
+            updateFocus(items)
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault()
+            focusedIndex = Math.max(focusedIndex - 1, 0)
+            updateFocus(items)
+        } else if (e.key === "Enter" && focusedIndex >= 0) {
+            e.preventDefault()
+            const focused = items[focusedIndex] as HTMLElement | undefined
+            if (focused?.dataset.value) {
+                selectOption(focused.dataset.value)
+            }
+        }
+    }
+
+    function updateFocus(items: NodeListOf<Element>): void {
+        items.forEach((el, i) => {
+            el.classList.toggle("focused", i === focusedIndex)
+        })
+        const focused = items[focusedIndex] as HTMLElement | undefined
+        if (focused) focused.scrollIntoView({ block: "nearest" })
+    }
+
+    trigger.addEventListener("click", (e) => {
+        e.stopPropagation()
+        toggle()
+    })
+
+    searchInput.addEventListener("input", () => {
+        renderOptions(searchInput.value)
+    })
+
+    searchInput.addEventListener("click", (e) => {
+        e.stopPropagation()
+    })
+
+    renderOptions()
+
+    return {
+        setValue: (value: string) => {
+            currentValue = value
+            const opt = currentOptions.find((o) => o.value === value)
+            const label = trigger.querySelector<HTMLElement>(".trigger-label")
+            if (!label) return
+            if (opt) {
+                label.textContent = opt.label
+                label.classList.remove("placeholder")
+                label.style.fontFamily = opt.fontPreview ?? ""
+            } else {
+                label.textContent = config.placeholder ?? "Select..."
+                label.classList.add("placeholder")
+                label.style.fontFamily = ""
+            }
+        },
+        getValue: () => currentValue,
+        setOptions: (options: DropdownOption[]) => {
+            currentOptions = [...options]
+            renderOptions()
+        },
+    }
+}
+
 const SUN_SVG = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'
 const MOON_SVG = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'
 
@@ -136,40 +357,21 @@ function isDeprecated(id: string): boolean {
     return match?.isDeprecatedLicenseId === true
 }
 
-function populateDropdown(sorted: SpdxLicense[]): void {
-    const licenseSelect = $("license-select") as HTMLSelectElement
-    licenseSelect.innerHTML = ""
-    const optgroup = document.createElement("optgroup")
-    optgroup.label = "Licenses"
-    for (const lic of sorted) {
-        const opt = document.createElement("option")
-        opt.value = lic.licenseId
-        const label = lic.isDeprecatedLicenseId
-            ? `${lic.name} (deprecated)`
-            : lic.name
-        opt.textContent = label
-        optgroup.appendChild(opt)
+function licenseToOption(lic: SpdxLicense): DropdownOption {
+    return {
+        value: lic.licenseId,
+        label: lic.isDeprecatedLicenseId ? `${lic.name} (deprecated)` : lic.name,
     }
-    licenseSelect.appendChild(optgroup)
 }
 
-function populateFontDropdown(fonts: GoogleFont[]): void {
-    const fontSelect = $("font-select") as HTMLSelectElement
-    fontSelect.innerHTML = ""
-    const defaultOpt = document.createElement("option")
-    defaultOpt.value = ""
-    defaultOpt.textContent = "Default (from theme)"
-    defaultOpt.selected = true
-    fontSelect.appendChild(defaultOpt)
-    const optgroup = document.createElement("optgroup")
-    optgroup.label = "Google Fonts"
-    for (const font of fonts) {
-        const opt = document.createElement("option")
-        opt.value = font.family
-        opt.textContent = `${font.family} (${font.category})`
-        optgroup.appendChild(opt)
+function fontToOption(font: GoogleFont): DropdownOption {
+    const fontCss = getFontFamily(font.family)
+    return {
+        value: font.family,
+        label: font.family,
+        meta: font.category,
+        fontPreview: fontCss,
     }
-    fontSelect.appendChild(optgroup)
 }
 
 function loadGoogleFont(family: string): void {
@@ -220,12 +422,10 @@ async function fetchAndRender(
 
 export async function initDemo(): Promise<void> {
     const themeGallery = $("theme-gallery")
-    const fontSelect = $("font-select") as HTMLSelectElement
     const fontSizeInput = $("font-size-input") as HTMLInputElement
     const fontWeightInput = $("font-weight-input") as HTMLInputElement
     const lineHeightInput = $("line-height-input") as HTMLInputElement
     const letterSpacingInput = $("letter-spacing-input") as HTMLInputElement
-    const licenseSelect = $("license-select") as HTMLSelectElement
     const copyrightInput = $("copyright-input") as HTMLInputElement
     const emailInput = $("email-input") as HTMLInputElement
     const urlInput = $("url-input") as HTMLInputElement
@@ -252,12 +452,34 @@ export async function initDemo(): Promise<void> {
 
     const currentYear = new Date().getFullYear()
 
+    const licenseDropdown = createDropdown({
+        container: $("license-dropdown"),
+        options: [],
+        placeholder: "Select license...",
+        searchPlaceholder: "Search licenses...",
+        onSelect: (value) => {
+            void value
+            onControlChange()
+        },
+    })
+
+    const fontDropdown = createDropdown({
+        container: $("font-dropdown"),
+        options: [{ value: "", label: "Default (from theme)" }],
+        placeholder: "Select font...",
+        searchPlaceholder: "Search fonts...",
+        onSelect: (value) => {
+            void value
+            onControlChange()
+        },
+    })
+
     try {
         allLicenses = await loadLicenses()
         allLicenses.sort((a, b) => a.name.localeCompare(b.name))
-        populateDropdown(allLicenses)
+        licenseDropdown.setOptions(allLicenses.map(licenseToOption))
     } catch {
-        licenseSelect.innerHTML = '<option value="" selected disabled>Failed to load licenses</option>'
+        licenseDropdown.setOptions([{ value: "", label: "Failed to load licenses" }])
     }
 
     try {
@@ -265,9 +487,12 @@ export async function initDemo(): Promise<void> {
         if (!res.ok) throw new Error(`fonts.json: ${res.status}`)
         allFonts = ((await res.json()) as { items: GoogleFont[] }).items
         allFonts.sort((a, b) => a.family.localeCompare(b.family))
-        populateFontDropdown(allFonts)
+        fontDropdown.setOptions([
+            { value: "", label: "Default (from theme)" },
+            ...allFonts.map(fontToOption),
+        ])
     } catch {
-        fontSelect.innerHTML = '<option value="" selected disabled>Failed to load fonts</option>'
+        fontDropdown.setOptions([{ value: "", label: "Failed to load fonts" }])
     }
 
     function getSelectedTheme(): string {
@@ -315,18 +540,18 @@ export async function initDemo(): Promise<void> {
     }
 
     function updateDeprecatedWarning(): void {
-        const show = isDeprecated(licenseSelect.value)
+        const show = isDeprecated(licenseDropdown.getValue())
         deprecatedWarning.style.display = show ? "inline-flex" : "none"
     }
 
     function updatePreview(): void {
         const theme = getSelectedTheme()
-        const fontFamily = fontSelect.value
+        const fontFamily = fontDropdown.getValue()
         const fontSize = fontSizeInput.value.trim()
         const fontWeight = fontWeightInput.value.trim()
         const lineHeight = lineHeightInput.value.trim()
         const letterSpacing = letterSpacingInput.value.trim()
-        const licenseId = licenseSelect.value
+        const licenseId = licenseDropdown.getValue()
         const copyright = copyrightInput.value || "John Doe"
         const email = emailInput.value.trim()
         const url = urlInput.value.trim()
@@ -416,7 +641,7 @@ export async function initDemo(): Promise<void> {
         previewUrl.textContent = `${theme} / ${licenseId}`
 
         const licenseName = getLicenseName(licenseId)
-        const fontLabel = fontSelect.value || "Default"
+        const fontLabel = fontDropdown.getValue() || "Default"
 
         const summaryTheme = $("summary-theme")
         const summaryFontStyling = $("summary-font-styling")
@@ -434,12 +659,12 @@ export async function initDemo(): Promise<void> {
     function getCurrentSettings(): DemoSettings {
         return {
             theme: getSelectedTheme(),
-            font: fontSelect.value,
+            font: fontDropdown.getValue(),
             fontSize: fontSizeInput.value,
             fontWeight: fontWeightInput.value,
             lineHeight: lineHeightInput.value,
             letterSpacing: letterSpacingInput.value,
-            license: licenseSelect.value,
+            license: licenseDropdown.getValue(),
             copyright: copyrightInput.value,
             email: emailInput.value,
             url: urlInput.value,
@@ -459,12 +684,12 @@ export async function initDemo(): Promise<void> {
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo-mode")
         setSelectedTheme(projectConfig.theme ?? "minimal")
-        fontSelect.value = projectConfig.font ?? ""
+        fontDropdown.setValue(projectConfig.font ?? "")
         fontSizeInput.value = projectConfig.fontSize ?? ""
         fontWeightInput.value = projectConfig.fontWeight ?? ""
         lineHeightInput.value = projectConfig.lineHeight ?? ""
         letterSpacingInput.value = projectConfig.letterSpacing ?? ""
-        licenseSelect.value = projectConfig.license ?? "MIT"
+        licenseDropdown.setValue(projectConfig.license ?? "MIT")
         copyrightInput.value = projectConfig.copyright ?? "Unknown"
         emailInput.value = projectConfig.email ?? ""
         urlInput.value = projectConfig.url ?? ""
@@ -503,12 +728,12 @@ export async function initDemo(): Promise<void> {
             onControlChange()
         }
     })
-    fontSelect.addEventListener("change", onControlChange)
+
     fontSizeInput.addEventListener("input", debouncedChange)
     fontWeightInput.addEventListener("input", debouncedChange)
     lineHeightInput.addEventListener("input", debouncedChange)
     letterSpacingInput.addEventListener("input", debouncedChange)
-    licenseSelect.addEventListener("change", onControlChange)
+
     copyrightInput.addEventListener("input", debouncedChange)
     emailInput.addEventListener("input", debouncedChange)
     urlInput.addEventListener("input", debouncedChange)
@@ -574,12 +799,12 @@ export async function initDemo(): Promise<void> {
     const projectConfig = await loadProjectConfig()
 
     setSelectedTheme(projectConfig.theme ?? "minimal")
-    if (projectConfig.font) fontSelect.value = projectConfig.font
+    if (projectConfig.font) fontDropdown.setValue(projectConfig.font)
     fontSizeInput.value = projectConfig.fontSize ?? ""
     fontWeightInput.value = projectConfig.fontWeight ?? ""
     lineHeightInput.value = projectConfig.lineHeight ?? ""
     letterSpacingInput.value = projectConfig.letterSpacing ?? ""
-    licenseSelect.value = projectConfig.license ?? "MIT"
+    licenseDropdown.setValue(projectConfig.license ?? "MIT")
     copyrightInput.value = projectConfig.copyright ?? "Unknown"
     emailInput.value = projectConfig.email ?? ""
     urlInput.value = projectConfig.url ?? ""

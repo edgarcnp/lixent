@@ -91,10 +91,8 @@ const themeList = themes
                         <div class="accordion-body">
                             <div class="accordion-body-inner">
                                 <div class="util-section">
-                                    <label for="font-select">Font</label>
-                                    <select id="font-select">
-                                        <option value="" selected>Loading fonts...</option>
-                                    </select>
+                                    <label>Font</label>
+                                    <div id="font-dropdown"></div>
                                 </div>
                                 <div class="font-preview-card" id="font-preview">
                                     <span class="font-preview-pangram">The quick brown fox jumps over the lazy dog.</span>
@@ -133,10 +131,8 @@ const themeList = themes
                         <div class="accordion-body">
                             <div class="accordion-body-inner">
                                 <div class="util-section">
-                                    <label for="license-select">License</label>
-                                    <select id="license-select">
-                                        <option value="" selected disabled>Loading licenses...</option>
-                                    </select>
+                                    <label>License</label>
+                                    <div id="license-dropdown"></div>
                                     <span class="util-warn-icon" id="deprecated-warning" style="display:none;" data-tip="This license is deprecated">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
                                     </span>
