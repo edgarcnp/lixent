@@ -7,6 +7,7 @@
 }
 
 :root {
+  --lx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --lx-font-size: clamp(1rem, 0.9375rem + 0.25vw, 1.125rem);
   --lx-line-height: 1.7;
   --lx-max-width: clamp(320px, 92vw, 960px);

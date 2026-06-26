@@ -12,7 +12,7 @@
  *
  * ## CSS variables
  *
- * Every theme must define these 8 variables (see {@link THEME_VARIABLES}):
+ * Every theme must define these 6 variables (see {@link THEME_VARIABLES}):
  *
  * | Variable | Purpose |
  * |----------|---------|
@@ -22,8 +22,6 @@
  * | `--lx-accent` | Links, highlights |
  * | `--lx-border` | Borders, dividers |
  * | `--lx-surface` | Card/panel backgrounds |
- * | `--lx-font-body` | Body font family |
- * | `--lx-font-mono` | Monospace font family |
  *
  * @module
  */
@@ -48,7 +46,7 @@ export interface ThemeMeta {
 }
 
 /**
- * The 8 CSS custom properties every theme must define.
+ * The 6 CSS custom properties every theme must define.
  * Used as the allowlist for `themeOverrides` validation.
  */
 export const THEME_VARIABLES = [
@@ -58,8 +56,6 @@ export const THEME_VARIABLES = [
     "--lx-accent",
     "--lx-border",
     "--lx-surface",
-    "--lx-font-body",
-    "--lx-font-mono",
 ]
 
 const THEMES_DIR = join(import.meta.dirname, "../../public/themes")
