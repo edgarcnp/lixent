@@ -75,6 +75,14 @@ function getPreferredMode(): "dark" | "light" {
     return "light"
 }
 
+function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): T {
+    let timer: ReturnType<typeof setTimeout>
+    return ((...args: unknown[]) => {
+        clearTimeout(timer)
+        timer = setTimeout(() => fn(...(args as never[])), wait)
+    }) as unknown as T
+}
+
 const SUN_SVG = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'
 const MOON_SVG = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'
 
@@ -429,23 +437,25 @@ export async function initDemo(): Promise<void> {
         URL.revokeObjectURL(url)
     }
 
+    const debouncedChange = debounce(onControlChange, 300)
+
     themeSelect.addEventListener("change", onControlChange)
     fontSelect.addEventListener("change", onControlChange)
-    fontSizeInput.addEventListener("input", onControlChange)
-    fontWeightInput.addEventListener("input", onControlChange)
-    lineHeightInput.addEventListener("input", onControlChange)
-    letterSpacingInput.addEventListener("input", onControlChange)
+    fontSizeInput.addEventListener("input", debouncedChange)
+    fontWeightInput.addEventListener("input", debouncedChange)
+    lineHeightInput.addEventListener("input", debouncedChange)
+    letterSpacingInput.addEventListener("input", debouncedChange)
     licenseSelect.addEventListener("change", onControlChange)
-    copyrightInput.addEventListener("input", onControlChange)
-    emailInput.addEventListener("input", onControlChange)
-    urlInput.addEventListener("input", onControlChange)
+    copyrightInput.addEventListener("input", debouncedChange)
+    emailInput.addEventListener("input", debouncedChange)
+    urlInput.addEventListener("input", debouncedChange)
     yearStartInput.addEventListener("input", () => {
         const start = parseInt(yearStartInput.value)
         const end = parseInt(yearEndInput.value)
         if (!isNaN(start) && !isNaN(end) && start > end) {
             yearEndInput.value = yearStartInput.value
         }
-        onControlChange()
+        debouncedChange()
     })
     yearEndInput.addEventListener("input", () => {
         const start = parseInt(yearStartInput.value)
@@ -453,7 +463,7 @@ export async function initDemo(): Promise<void> {
         if (!isNaN(start) && !isNaN(end) && end < start) {
             yearStartInput.value = yearEndInput.value
         }
-        onControlChange()
+        debouncedChange()
     })
 
     gravatarToggle.addEventListener("change", onControlChange)
