@@ -228,7 +228,7 @@ export function updatePreview(state: {
     summaryTheme.textContent = theme
         .replace(/-(?:dark|light)$/, "")
         .replace(/^\w/, (c) => c.toUpperCase())
-        + (theme.endsWith("-light") ? " Light" : "")
+        + (theme.endsWith("-light") ? " Light" : " Dark")
     const parts: string[] = []
     if (fontLabel !== "Inter") parts.push(fontLabel)
     if (fontSize.length > 0) parts.push(fontSize)
