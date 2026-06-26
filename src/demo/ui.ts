@@ -706,7 +706,6 @@ export async function initDemo(): Promise<void> {
         updateGravatarWarning()
         updateUrlWarning()
         updatePreview()
-        void updateGravatarProfileWarning()
     }
 
     function resetSettings(): void {
@@ -786,7 +785,10 @@ export async function initDemo(): Promise<void> {
     letterSpacingInput.addEventListener("input", debouncedChange)
 
     copyrightInput.addEventListener("input", debouncedChange)
-    emailInput.addEventListener("input", debouncedChange)
+    emailInput.addEventListener("input", () => {
+        debouncedChange()
+        void updateGravatarProfileWarning()
+    })
     urlInput.addEventListener("input", debouncedChange)
     yearStartInput.addEventListener("input", () => {
         const start = parseInt(yearStartInput.value)
@@ -805,7 +807,10 @@ export async function initDemo(): Promise<void> {
         debouncedChange()
     })
 
-    gravatarToggle.addEventListener("change", onControlChange)
+    gravatarToggle.addEventListener("change", () => {
+        onControlChange()
+        void updateGravatarProfileWarning()
+    })
     gravatarToggle.parentElement?.querySelector("span")?.addEventListener("click", () => {
         gravatarToggle.checked = !gravatarToggle.checked
         gravatarToggle.dispatchEvent(new Event("change"))
