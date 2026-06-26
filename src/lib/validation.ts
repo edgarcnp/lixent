@@ -68,7 +68,7 @@ export function assertValidUrl(raw: string): void {
  */
 export function assertValidEmail(raw: string): void {
     if (raw.length === 0) return
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) || /[<>"]/.test(raw)) {
         throw new Error(`Invalid email: ${raw}`)
     }
 }
@@ -152,9 +152,9 @@ export function assertValidCustomName(raw: string): void {
  * Validate custom license text.
  *
  * Cannot be empty (it's the entire license body). Capped at 50 KB to prevent
- * excessively large pages.
+ * excessively large pages. Blocks HTML tags as a defense-in-depth measure.
  *
- * @throws {Error} If the text is empty or exceeds the max length.
+ * @throws {Error} If the text is empty, exceeds the max length, or contains HTML tags.
  */
 export function assertValidCustomText(raw: string): void {
     if (raw.length === 0) {
@@ -162,6 +162,9 @@ export function assertValidCustomText(raw: string): void {
     }
     if (raw.length > MAX_CUSTOM_TEXT_BYTES) {
         throw new Error(`Custom license text exceeds ${MAX_CUSTOM_TEXT_BYTES} bytes`)
+    }
+    if (/<[a-z/]/i.test(raw)) {
+        throw new Error("Custom license text contains HTML tags")
     }
 }
 
