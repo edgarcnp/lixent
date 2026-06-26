@@ -49,16 +49,15 @@ const themeList = themes
                 </div>
 
                 <div class="util-scroll">
-                    <div class="accordion open" data-section="theme-font">
+                    <div class="accordion open" data-section="theme">
                         <button class="accordion-header" type="button" aria-expanded="true">
                             <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                            <span class="accordion-title">Theme & Font</span>
-                            <span class="accordion-summary" id="summary-theme-font">Minimal</span>
+                            <span class="accordion-title">Theme</span>
+                            <span class="accordion-summary" id="summary-theme">Minimal</span>
                         </button>
                         <div class="accordion-body">
                             <div class="accordion-body-inner">
                                 <div class="util-section">
-                                    <label>Theme</label>
                                     <div class="theme-gallery" id="theme-gallery">
                                         {themeList.map((t) => (
                                             <button
@@ -79,6 +78,18 @@ const themeList = themes
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" data-section="font-styling">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Font & Styling</span>
+                            <span class="accordion-summary" id="summary-font-styling">Default</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
                                 <div class="util-section">
                                     <label for="font-select">Font</label>
                                     <select id="font-select">
@@ -88,6 +99,26 @@ const themeList = themes
                                 <div class="font-preview-card" id="font-preview">
                                     <span class="font-preview-pangram">The quick brown fox jumps over the lazy dog.</span>
                                     <span class="font-preview-specimen">AaBbCcDd 0123456789</span>
+                                </div>
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="font-size-input">Font Size</label>
+                                        <input type="text" id="font-size-input" placeholder="18px" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="font-weight-input">Font Weight</label>
+                                        <input type="text" id="font-weight-input" placeholder="400" />
+                                    </div>
+                                </div>
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="line-height-input">Line Height</label>
+                                        <input type="text" id="line-height-input" placeholder="1.7" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="letter-spacing-input">Letter Spacing</label>
+                                        <input type="text" id="letter-spacing-input" placeholder="0.5px" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -165,38 +196,6 @@ const themeList = themes
                             </div>
                         </div>
                     </div>
-
-                    <div class="accordion" data-section="styling">
-                        <button class="accordion-header" type="button" aria-expanded="false">
-                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                            <span class="accordion-title">Styling</span>
-                            <span class="accordion-summary" id="summary-styling">Defaults</span>
-                        </button>
-                        <div class="accordion-body">
-                            <div class="accordion-body-inner">
-                                <div class="field-row">
-                                    <div class="util-section">
-                                        <label for="font-size-input">Font Size</label>
-                                        <input type="text" id="font-size-input" placeholder="18px" />
-                                    </div>
-                                    <div class="util-section">
-                                        <label for="font-weight-input">Font Weight</label>
-                                        <input type="text" id="font-weight-input" placeholder="400" />
-                                    </div>
-                                </div>
-                                <div class="field-row">
-                                    <div class="util-section">
-                                        <label for="line-height-input">Line Height</label>
-                                        <input type="text" id="line-height-input" placeholder="1.7" />
-                                    </div>
-                                    <div class="util-section">
-                                        <label for="letter-spacing-input">Letter Spacing</label>
-                                        <input type="text" id="letter-spacing-input" placeholder="0.5px" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="util-actions">
@@ -251,9 +250,6 @@ const themeList = themes
                             </span>
                         </footer>
                     </div>
-                </div>
-                <div class="summary-pill" id="summary-pill" title="Click to copy config">
-                    <span id="pill-content">MIT <span class="pill-sep">·</span> John Doe</span>
                 </div>
             </div>
         </div>

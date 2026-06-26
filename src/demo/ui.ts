@@ -415,23 +415,20 @@ export async function initDemo(): Promise<void> {
 
         previewUrl.textContent = `${theme} / ${licenseId}`
 
-        const pillContent = $("pill-content")
         const licenseName = getLicenseName(licenseId)
         const fontLabel = fontSelect.value || "Default"
-        const yearLabel = yearStart !== yearEnd ? `${yearStart}–${yearEnd}` : String(yearStart)
-        pillContent.innerHTML = `${escapeHtml(licenseName)} <span class="pill-sep">·</span> ${escapeHtml(copyright)} <span class="pill-sep">·</span> ${yearLabel} <span class="pill-sep">·</span> ${escapeHtml(theme)} <span class="pill-sep">·</span> ${escapeHtml(fontLabel)}`
 
-        const summaryThemeFont = $("summary-theme-font")
+        const summaryTheme = $("summary-theme")
+        const summaryFontStyling = $("summary-font-styling")
         const summaryLicense = $("summary-license")
         const summaryIdentity = $("summary-identity")
-        const summaryStyling = $("summary-styling")
-        summaryThemeFont.textContent = `${theme} · ${fontLabel}`
+        summaryTheme.textContent = theme
+        const parts: string[] = []
+        if (fontLabel !== "Default") parts.push(fontLabel)
+        if (fontSize.length > 0) parts.push(fontSize)
+        summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Default"
         summaryLicense.textContent = licenseName
         summaryIdentity.textContent = copyright + (hasEmail ? ` · ${email.split("@")[1]}` : "")
-        const stylingParts: string[] = []
-        if (fontSize.length > 0) stylingParts.push(fontSize)
-        if (fontWeight.length > 0) stylingParts.push(fontWeight)
-        summaryStyling.textContent = stylingParts.length > 0 ? stylingParts.join(" · ") : "Defaults"
     }
 
     function getCurrentSettings(): DemoSettings {
@@ -545,21 +542,6 @@ export async function initDemo(): Promise<void> {
             const isOpen = accordion.classList.contains("open")
             accordion.classList.toggle("open")
             header.setAttribute("aria-expanded", String(!isOpen))
-        })
-    })
-
-    const summaryPill = $("summary-pill")
-    summaryPill.addEventListener("click", () => {
-        const settings = getCurrentSettings()
-        const config = buildConfigJson(settings)
-        const json = JSON.stringify(config, null, 2)
-        void navigator.clipboard.writeText(json).then(() => {
-            const pillContent = $("pill-content")
-            const original = pillContent.innerHTML
-            pillContent.textContent = "Copied!"
-            setTimeout(() => {
-                pillContent.innerHTML = original
-            }, 2000)
         })
     })
 
