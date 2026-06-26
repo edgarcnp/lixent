@@ -341,8 +341,8 @@ function buildConfigJson(settings: DemoSettings): Record<string, unknown> {
         license: settings.license,
         theme: settings.theme,
     }
-    if (settings.font.length > 0) config.font = settings.font
-    if (settings.fontSize.length > 0) config.fontSize = settings.fontSize
+    if (settings.font.length > 0 && settings.font !== "Inter") config.font = settings.font
+    if (settings.fontSize.length > 0 && settings.fontSize !== "18px") config.fontSize = settings.fontSize
     if (settings.fontWeight.length > 0) config.fontWeight = settings.fontWeight
     if (settings.lineHeight.length > 0) config.lineHeight = settings.lineHeight
     if (settings.letterSpacing.length > 0) config.letterSpacing = settings.letterSpacing
@@ -484,7 +484,7 @@ export async function initDemo(): Promise<void> {
 
     const fontDropdown = createDropdown({
         container: $("font-dropdown"),
-        options: [{ value: "", label: "Default (from theme)" }],
+        options: [{ value: "Inter", label: "Inter (default)" }],
         placeholder: "Select font...",
         searchPlaceholder: "Search fonts...",
         onSelect: (value) => {
@@ -507,11 +507,11 @@ export async function initDemo(): Promise<void> {
         allFonts = ((await res.json()) as { items: GoogleFont[] }).items
         allFonts.sort((a, b) => a.family.localeCompare(b.family))
         fontDropdown.setOptions([
-            { value: "", label: "Default (from theme)" },
+            { value: "Inter", label: "Inter (default)" },
             ...allFonts.map(fontToOption),
         ])
     } catch {
-        fontDropdown.setOptions([{ value: "", label: "Failed to load fonts" }])
+        fontDropdown.setOptions([{ value: "Inter", label: "Inter (default)" }])
     }
 
     function getSelectedTheme(): string {
@@ -711,8 +711,8 @@ export async function initDemo(): Promise<void> {
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo-mode")
         setSelectedTheme(projectConfig.theme ?? "minimal-dark")
-        fontDropdown.setValue(projectConfig.font ?? "")
-        fontSizeInput.value = projectConfig.fontSize ?? ""
+        fontDropdown.setValue(projectConfig.font ?? "Inter")
+        fontSizeInput.value = projectConfig.fontSize ?? "18px"
         fontWeightInput.value = projectConfig.fontWeight ?? ""
         lineHeightInput.value = projectConfig.lineHeight ?? ""
         letterSpacingInput.value = projectConfig.letterSpacing ?? ""
@@ -856,8 +856,8 @@ export async function initDemo(): Promise<void> {
     const projectConfig = await loadProjectConfig()
 
     setSelectedTheme(projectConfig.theme ?? "minimal-dark")
-    if (projectConfig.font) fontDropdown.setValue(projectConfig.font)
-    fontSizeInput.value = projectConfig.fontSize ?? ""
+    fontDropdown.setValue(projectConfig.font ?? "Inter")
+    fontSizeInput.value = projectConfig.fontSize ?? "18px"
     fontWeightInput.value = projectConfig.fontWeight ?? ""
     lineHeightInput.value = projectConfig.lineHeight ?? ""
     letterSpacingInput.value = projectConfig.letterSpacing ?? ""
