@@ -93,7 +93,7 @@ function validateConfig(config: LixentConfig): void {
         assertValidYear(config.yearRange.end)
     }
     if (config.year != null && config.yearRange != null) {
-        console.warn("[lixent] Warning: Both year and yearRange are set. yearRange takes precedence.")
+        throw new Error("[lixent] Both `year` and `yearRange` are set. Use only one.")
     }
     if (config.customLicense?.name != null) assertValidCustomName(config.customLicense.name)
     if (config.customLicense?.text != null) assertValidCustomText(config.customLicense.text)
