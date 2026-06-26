@@ -122,7 +122,7 @@ export async function initDemo(): Promise<void> {
 
     const fontDropdown = createDropdown({
         container: $("font-dropdown"),
-        options: [{ value: "Inter", label: "Inter" }],
+        options: [],
         placeholder: "Select font...",
         searchPlaceholder: "Search fonts...",
         onSelect: () => onControlChange(),
@@ -222,15 +222,11 @@ export async function initDemo(): Promise<void> {
         const res = await fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
         if (!res.ok) throw new Error(`fonts.json: ${res.status}`)
         const fonts = ((await res.json()) as { items: GoogleFont[] }).items
-            .filter((f) => f.family !== "Inter")
         fonts.sort((a, b) => a.family.localeCompare(b.family))
         setAllFonts(fonts)
-        fontDropdown.setOptions([
-            { value: "Inter", label: "Inter" },
-            ...fonts.map(fontToOption),
-        ])
+        fontDropdown.setOptions(fonts.map(fontToOption))
     } catch {
-        fontDropdown.setOptions([{ value: "Inter", label: "Inter" }])
+        fontDropdown.setOptions([])
     }
 
     const debouncedChange = debounce(onControlChange, 300)
