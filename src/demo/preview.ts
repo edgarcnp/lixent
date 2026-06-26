@@ -9,7 +9,7 @@ import { $, escapeHtml, formatParagraphs, isValidEmail, isValidUrl, BASE_URL } f
 let allLicenses: SpdxLicense[] = []
 let allFonts: GoogleFont[] = []
 let activeGoogleFontLink: HTMLLinkElement | null = null
-let activeThemeLink: HTMLLinkElement | null = null
+let pendingThemeLoad = 0
 
 export function getLicenseName(id: string): string {
     const match = allLicenses.find((l) => l.licenseId === id)
@@ -139,16 +139,17 @@ export function updatePreview(state: {
 
     const newHref = `${BASE_URL}themes/${theme}.css`
     if (previewTheme.href !== newHref) {
+        const loadId = ++pendingThemeLoad
         const newLink = document.createElement("link")
         newLink.rel = "stylesheet"
         newLink.href = newHref
         newLink.onload = () => {
-            previewTheme.href = newHref
-            activeThemeLink?.remove()
-            activeThemeLink = null
+            if (loadId === pendingThemeLoad) {
+                previewTheme.href = newHref
+            }
+            newLink.remove()
         }
         document.head.appendChild(newLink)
-        activeThemeLink = newLink
     }
 
     if (fontFamily.length > 0) {
