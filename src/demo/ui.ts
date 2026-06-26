@@ -192,6 +192,8 @@ async function fetchAndRender(
     copyright: string,
     yearStart: number,
     yearEnd: number,
+    url: string,
+    email: string,
     previewLicenseText: HTMLElement,
     previewTitle: HTMLElement,
 ): Promise<void> {
@@ -200,7 +202,7 @@ async function fetchAndRender(
     licenseAbort = controller
     try {
         const rawText = await loadLicenseText(licenseId, controller.signal)
-        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd)
+        const rendered = renderLicenseText(rawText, copyright, yearStart, yearEnd, url, email)
         previewTitle.textContent = `${getLicenseName(licenseId)} License`
         previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {
@@ -251,7 +253,9 @@ export async function initDemo(): Promise<void> {
     }
 
     try {
-        allFonts = ((await fetch("/fonts.json").then((r) => r.json())) as { items: GoogleFont[] }).items
+        const res = await fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
+        if (!res.ok) throw new Error(`fonts.json: ${res.status}`)
+        allFonts = ((await res.json()) as { items: GoogleFont[] }).items
         allFonts.sort((a, b) => a.family.localeCompare(b.family))
         populateFontDropdown(allFonts)
     } catch {
@@ -325,7 +329,7 @@ export async function initDemo(): Promise<void> {
 
         updateDeprecatedWarning()
 
-        void fetchAndRender(licenseId, copyright, yearStart, yearEnd, previewLicenseText, previewTitle)
+        void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, previewLicenseText, previewTitle)
 
         const hasUrl = url.length > 0 && isValidUrl(url)
         const hasEmail = email.length > 0 && isValidEmail(email)

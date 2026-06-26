@@ -56,6 +56,8 @@ export function renderLicenseText(
     copyright: string,
     yearStart: number,
     yearEnd: number,
+    url?: string,
+    email?: string,
 ): string {
     const yearStr = yearStart !== yearEnd
         ? `${yearStart}\u2013${yearEnd}`
@@ -64,6 +66,8 @@ export function renderLicenseText(
     return converted
         .replace(/\{\{year\}\}/g, yearStr)
         .replace(/\{\{name\}\}/g, copyright)
+        .replace(/\{\{url\}\}/g, url ?? "")
+        .replace(/\{\{email\}\}/g, email ?? "")
 }
 
 export { SPDX_LIST_URL, SPDX_TEXT_BASE }
