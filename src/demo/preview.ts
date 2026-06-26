@@ -9,6 +9,8 @@ import { $, escapeHtml, formatParagraphs, isValidEmail, isValidUrl, BASE_URL } f
 let allLicenses: SpdxLicense[] = []
 let allFonts: GoogleFont[] = []
 let activeGoogleFontLink: HTMLLinkElement | null = null
+const themeCache = new Map<string, string>()
+let previewThemeStyle: HTMLStyleElement | null = null
 let pendingThemeLoad = 0
 
 export function getLicenseName(id: string): string {
@@ -61,6 +63,21 @@ export function setAllLicenses(licenses: SpdxLicense[]): void {
 
 export function setAllFonts(fonts: GoogleFont[]): void {
     allFonts = fonts
+}
+
+export function initPreviewTheme(): void {
+    const link = $("preview-theme") as HTMLLinkElement
+    const href = link.href
+    void fetch(href)
+        .then((r) => r.text())
+        .then((css) => {
+            themeCache.set(href, css)
+            const style = document.createElement("style")
+            style.id = "preview-theme"
+            style.textContent = css
+            link.replaceWith(style)
+            previewThemeStyle = style
+        })
 }
 
 let licenseAbort: AbortController | null = null
@@ -138,18 +155,28 @@ export function updatePreview(state: {
     const previewUrl = $("preview-url")
 
     const newHref = `${BASE_URL}themes/${theme}.css`
-    if (previewTheme.href !== newHref) {
-        const loadId = ++pendingThemeLoad
-        const newLink = document.createElement("link")
-        newLink.rel = "stylesheet"
-        newLink.href = newHref
-        newLink.onload = () => {
-            if (loadId === pendingThemeLoad) {
-                previewTheme.href = newHref
-            }
-            newLink.remove()
+    const cached = themeCache.get(newHref)
+    if (cached != null) {
+        if (!previewThemeStyle) {
+            previewThemeStyle = document.createElement("style")
+            previewThemeStyle.id = "preview-theme"
+            previewTheme.replaceWith(previewThemeStyle)
         }
-        document.head.appendChild(newLink)
+        previewThemeStyle.textContent = cached
+    } else {
+        const loadId = ++pendingThemeLoad
+        void fetch(newHref)
+            .then((r) => r.text())
+            .then((css) => {
+                themeCache.set(newHref, css)
+                if (loadId !== pendingThemeLoad) return
+                if (!previewThemeStyle) {
+                    previewThemeStyle = document.createElement("style")
+                    previewThemeStyle.id = "preview-theme"
+                    previewTheme.replaceWith(previewThemeStyle)
+                }
+                previewThemeStyle.textContent = css
+            })
     }
 
     if (fontFamily.length > 0) {
