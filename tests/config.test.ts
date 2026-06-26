@@ -69,7 +69,7 @@ describe("loadConfig", () => {
     })
 
     it("prefers lixent.config.json over package.json", () => {
-        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "serif-dark" }
+        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "dracula-dark" }
         const pkg = { name: "pkg", lixent: { copyright: "From Package" } }
         writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
         writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))

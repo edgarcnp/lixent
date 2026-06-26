@@ -3,8 +3,8 @@ import assert from "node:assert/strict"
 import { themes, getTheme, isValidTheme } from "../src/themes/index.ts"
 
 describe("themes", () => {
-    it("contains 16 themes", () => {
-        assert.equal(themes.length, 16)
+    it("contains 20 themes", () => {
+        assert.equal(themes.length, 20)
     })
 
     it("each theme has required fields", () => {
@@ -52,7 +52,7 @@ describe("isValidTheme", () => {
         assert.ok(isValidTheme("minimal-dark"))
         assert.ok(isValidTheme("github-light"))
         assert.ok(isValidTheme("terminal-dark"))
-        assert.ok(isValidTheme("sans-light"))
+        assert.ok(isValidTheme("dracula-dark"))
     })
 
     it("returns false for invalid theme", () => {
