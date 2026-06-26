@@ -18,7 +18,6 @@ interface DemoSettings {
     yearStart: string
     yearEnd: string
     gravatar: boolean
-    mode: string
 }
 
 function $(id: string): HTMLElement {
@@ -26,6 +25,8 @@ function $(id: string): HTMLElement {
     if (!el) throw new Error(`Element #${id} not found`)
     return el
 }
+
+const BASE_URL = document.body.dataset.baseUrl ?? "/"
 
 function escapeHtml(s: string): string {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;")
@@ -109,8 +110,8 @@ function applyMode(mode: "dark" | "light"): void {
     }
 }
 
-function buildConfigJson(settings: DemoSettings): Record<string, string | boolean> {
-    const config: Record<string, string | boolean> = {
+function buildConfigJson(settings: DemoSettings): Record<string, unknown> {
+    const config: Record<string, unknown> = {
         copyright: settings.copyright || "John Doe",
         license: settings.license,
         theme: settings.theme,
@@ -123,6 +124,15 @@ function buildConfigJson(settings: DemoSettings): Record<string, string | boolea
     if (settings.email.length > 0) config.email = settings.email
     if (settings.url.length > 0 && isValidUrl(settings.url)) config.url = settings.url
     if (settings.gravatar) config.gravatar = true
+    const start = parseInt(settings.yearStart)
+    const end = parseInt(settings.yearEnd)
+    if (!isNaN(start) && !isNaN(end)) {
+        if (start !== end) {
+            config.yearRange = { start, end }
+        } else if (start !== new Date().getFullYear()) {
+            config.year = start
+        }
+    }
     return config
 }
 
@@ -307,7 +317,7 @@ export async function initDemo(): Promise<void> {
         const yearEnd = yearEndInput.value.length > 0 ? parseInt(yearEndInput.value) : currentYear
         const showGravatar = gravatarToggle.checked
 
-        previewTheme.href = `/themes/${theme}.css`
+        previewTheme.href = `${BASE_URL}themes/${theme}.css`
 
         const previewContent = $("preview-content")
         if (fontFamily.length > 0) {
@@ -386,7 +396,6 @@ export async function initDemo(): Promise<void> {
             yearStart: yearStartInput.value,
             yearEnd: yearEndInput.value,
             gravatar: gravatarToggle.checked,
-            mode: getPreferredMode(),
         }
     }
 
