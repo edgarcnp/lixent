@@ -148,7 +148,13 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
         renderOptions()
         positionPanel()
         const selected = optionsList.querySelector(".custom-dropdown-option.selected")
-        if (selected) selected.scrollIntoView({ block: "nearest" })
+        if (selected) {
+            selected.scrollIntoView({ block: "nearest" })
+            const panelRect = optionsList.getBoundingClientRect()
+            const itemRect = selected.getBoundingClientRect()
+            const offset = itemRect.top - panelRect.top - (panelRect.height / 2) + (itemRect.height / 2)
+            optionsList.scrollTop += offset
+        }
         requestAnimationFrame(() => searchInput.focus())
         document.addEventListener("click", onOutsideClick)
         document.addEventListener("keydown", onKeyDown)
