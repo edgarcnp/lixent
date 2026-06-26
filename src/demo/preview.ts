@@ -136,7 +136,17 @@ export function updatePreview(state: {
     const previewGravatarImg = $("preview-gravatar-img") as HTMLImageElement
     const previewUrl = $("preview-url")
 
-    previewTheme.href = `${BASE_URL}themes/${theme}.css`
+    const newHref = `${BASE_URL}themes/${theme}.css`
+    if (previewTheme.href !== newHref) {
+        const preload = document.createElement("link")
+        preload.rel = "stylesheet"
+        preload.href = newHref
+        preload.onload = () => {
+            previewTheme.href = newHref
+            preload.remove()
+        }
+        document.head.appendChild(preload)
+    }
 
     if (fontFamily.length > 0) {
         loadGoogleFont(fontFamily)
