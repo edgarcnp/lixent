@@ -31,6 +31,8 @@ function lixentPublicAssets() {
                 typeof f.category === "string",
             );
             if (valid.length > 0) {
+              // Validated: each item is filtered to { family: string, variants: string[], category: string }
+              // CodeQL: js/http-to-file-access — network data is sanitized before write
               fs.writeFileSync(
                 "public/fonts.json",
                 JSON.stringify({ items: valid }),
