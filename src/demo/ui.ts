@@ -9,7 +9,6 @@ import {
     fontToOption,
     licenseToOption,
     updatePreview,
-    initPreviewTheme,
 } from "./preview.ts"
 import { buildConfigJson } from "./settings.ts"
 
@@ -49,7 +48,6 @@ function checkGravatarProfile(email: string): Promise<boolean> {
 }
 
 export async function initDemo(): Promise<void> {
-    initPreviewTheme()
     const themeGallery = $("theme-gallery")
     const themeModeToggle = document.getElementById("theme-mode-toggle")
     const fontSizeInput = $("font-size-input") as HTMLInputElement

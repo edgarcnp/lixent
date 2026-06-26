@@ -65,21 +65,6 @@ export function setAllFonts(fonts: GoogleFont[]): void {
     allFonts = fonts
 }
 
-export function initPreviewTheme(): void {
-    const link = $("preview-theme") as HTMLLinkElement
-    const href = link.href
-    void fetch(href)
-        .then((r) => r.text())
-        .then((css) => {
-            themeCache.set(href, css)
-            const style = document.createElement("style")
-            style.id = "preview-theme"
-            style.textContent = css
-            link.replaceWith(style)
-            previewThemeStyle = style
-        })
-}
-
 let licenseAbort: AbortController | null = null
 
 export async function fetchAndRender(
