@@ -327,6 +327,12 @@ export async function initDemo(): Promise<void> {
         yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => b.classList.remove("active"))
         btn.classList.add("active")
         const mode = btn.dataset.mode
+        if (mode === "range") {
+            if (yearStartInput.value.length === 0) yearStartInput.value = String(currentYear - 1)
+            if (yearEndInput.value.length === 0) yearEndInput.value = String(currentYear)
+        } else {
+            if (yearInput.value.length === 0) yearInput.value = String(currentYear)
+        }
         yearSingleRow.style.display = mode === "single" ? "flex" : "none"
         yearRangeRow.style.display = mode === "range" ? "flex" : "none"
         onControlChange()
