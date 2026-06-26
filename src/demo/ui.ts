@@ -219,7 +219,7 @@ async function fetchAndRender(
 }
 
 export async function initDemo(): Promise<void> {
-    const themeSelect = $("theme-select") as HTMLSelectElement
+    const themeGallery = $("theme-gallery")
     const fontSelect = $("font-select") as HTMLSelectElement
     const fontSizeInput = $("font-size-input") as HTMLInputElement
     const fontWeightInput = $("font-weight-input") as HTMLInputElement
@@ -270,6 +270,17 @@ export async function initDemo(): Promise<void> {
         fontSelect.innerHTML = '<option value="" selected disabled>Failed to load fonts</option>'
     }
 
+    function getSelectedTheme(): string {
+        const active = themeGallery.querySelector(".theme-card.selected")
+        return (active as HTMLElement | null)?.dataset.theme ?? "minimal"
+    }
+
+    function setSelectedTheme(id: string): void {
+        themeGallery.querySelectorAll(".theme-card").forEach((card) => {
+            card.classList.toggle("selected", (card as HTMLElement).dataset.theme === id)
+        })
+    }
+
     function updateGravatarWarning(): void {
         const email = emailInput.value.trim()
         const show = gravatarToggle.checked && email.length === 0
@@ -309,7 +320,7 @@ export async function initDemo(): Promise<void> {
     }
 
     function updatePreview(): void {
-        const theme = themeSelect.value
+        const theme = getSelectedTheme()
         const fontFamily = fontSelect.value
         const fontSize = fontSizeInput.value.trim()
         const fontWeight = fontWeightInput.value.trim()
@@ -332,6 +343,24 @@ export async function initDemo(): Promise<void> {
         } else {
             loadGoogleFont("")
             previewContent.style.removeProperty("--lx-font-body")
+        }
+
+        const fontPreview = $("font-preview")
+        const pangram = fontPreview.querySelector<HTMLElement>(".font-preview-pangram")
+        const specimen = fontPreview.querySelector<HTMLElement>(".font-preview-specimen")
+        if (pangram && specimen) {
+            if (fontFamily.length > 0) {
+                const fontCss = getFontFamily(fontFamily)
+                pangram.style.fontFamily = fontCss
+                specimen.style.fontFamily = fontCss
+                pangram.style.opacity = "1"
+                specimen.style.opacity = "1"
+            } else {
+                pangram.style.fontFamily = ""
+                specimen.style.fontFamily = ""
+                pangram.style.opacity = "0.5"
+                specimen.style.opacity = "0.5"
+            }
         }
         if (fontSize.length > 0) {
             previewContent.style.setProperty("--lx-font-size", fontSize)
@@ -385,11 +414,29 @@ export async function initDemo(): Promise<void> {
         }
 
         previewUrl.textContent = `${theme} / ${licenseId}`
+
+        const pillContent = $("pill-content")
+        const licenseName = getLicenseName(licenseId)
+        const fontLabel = fontSelect.value || "Default"
+        const yearLabel = yearStart !== yearEnd ? `${yearStart}–${yearEnd}` : String(yearStart)
+        pillContent.innerHTML = `${escapeHtml(licenseName)} <span class="pill-sep">·</span> ${escapeHtml(copyright)} <span class="pill-sep">·</span> ${yearLabel} <span class="pill-sep">·</span> ${escapeHtml(theme)} <span class="pill-sep">·</span> ${escapeHtml(fontLabel)}`
+
+        const summaryThemeFont = $("summary-theme-font")
+        const summaryLicense = $("summary-license")
+        const summaryIdentity = $("summary-identity")
+        const summaryStyling = $("summary-styling")
+        summaryThemeFont.textContent = `${theme} · ${fontLabel}`
+        summaryLicense.textContent = licenseName
+        summaryIdentity.textContent = copyright + (hasEmail ? ` · ${email.split("@")[1]}` : "")
+        const stylingParts: string[] = []
+        if (fontSize.length > 0) stylingParts.push(fontSize)
+        if (fontWeight.length > 0) stylingParts.push(fontWeight)
+        summaryStyling.textContent = stylingParts.length > 0 ? stylingParts.join(" · ") : "Defaults"
     }
 
     function getCurrentSettings(): DemoSettings {
         return {
-            theme: themeSelect.value,
+            theme: getSelectedTheme(),
             font: fontSelect.value,
             fontSize: fontSizeInput.value,
             fontWeight: fontWeightInput.value,
@@ -414,7 +461,7 @@ export async function initDemo(): Promise<void> {
 
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo-mode")
-        themeSelect.value = projectConfig.theme ?? "minimal"
+        setSelectedTheme(projectConfig.theme ?? "minimal")
         fontSelect.value = projectConfig.font ?? ""
         fontSizeInput.value = projectConfig.fontSize ?? ""
         fontWeightInput.value = projectConfig.fontWeight ?? ""
@@ -452,7 +499,13 @@ export async function initDemo(): Promise<void> {
 
     const debouncedChange = debounce(onControlChange, 300)
 
-    themeSelect.addEventListener("change", onControlChange)
+    themeGallery.addEventListener("click", (e) => {
+        const card = (e.target as HTMLElement).closest(".theme-card")
+        if (card instanceof HTMLElement && card.dataset.theme) {
+            setSelectedTheme(card.dataset.theme)
+            onControlChange()
+        }
+    })
     fontSelect.addEventListener("change", onControlChange)
     fontSizeInput.addEventListener("input", debouncedChange)
     fontWeightInput.addEventListener("input", debouncedChange)
@@ -485,6 +538,31 @@ export async function initDemo(): Promise<void> {
         gravatarToggle.dispatchEvent(new Event("change"))
     })
 
+    document.querySelectorAll(".accordion-header").forEach((header) => {
+        header.addEventListener("click", () => {
+            const accordion = header.closest(".accordion")
+            if (!accordion) return
+            const isOpen = accordion.classList.contains("open")
+            accordion.classList.toggle("open")
+            header.setAttribute("aria-expanded", String(!isOpen))
+        })
+    })
+
+    const summaryPill = $("summary-pill")
+    summaryPill.addEventListener("click", () => {
+        const settings = getCurrentSettings()
+        const config = buildConfigJson(settings)
+        const json = JSON.stringify(config, null, 2)
+        void navigator.clipboard.writeText(json).then(() => {
+            const pillContent = $("pill-content")
+            const original = pillContent.innerHTML
+            pillContent.textContent = "Copied!"
+            setTimeout(() => {
+                pillContent.innerHTML = original
+            }, 2000)
+        })
+    })
+
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
     utilReset.addEventListener("click", resetSettings)
@@ -513,7 +591,7 @@ export async function initDemo(): Promise<void> {
 
     const projectConfig = await loadProjectConfig()
 
-    themeSelect.value = projectConfig.theme ?? "minimal"
+    setSelectedTheme(projectConfig.theme ?? "minimal")
     if (projectConfig.font) fontSelect.value = projectConfig.font
     fontSizeInput.value = projectConfig.fontSize ?? ""
     fontWeightInput.value = projectConfig.fontWeight ?? ""

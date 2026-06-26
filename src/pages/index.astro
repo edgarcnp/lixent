@@ -49,99 +49,153 @@ const themeList = themes
                 </div>
 
                 <div class="util-scroll">
-                    <div class="util-section">
-                        <label for="theme-select">Theme</label>
-                        <select id="theme-select">
-                            {themeList.map((t) => (
-                                <option value={t.id} selected={t.id === "minimal"}>
-                                    {t.name} {t.dark ? "(dark)" : ""}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div class="util-section">
-                        <label for="font-select">Font</label>
-                        <select id="font-select">
-                            <option value="" selected>Loading fonts...</option>
-                        </select>
-                    </div>
-
-                    <div class="field-row">
-                        <div class="util-section">
-                            <label for="font-size-input">Font Size</label>
-                            <input type="text" id="font-size-input" placeholder="18px" />
-                        </div>
-                        <div class="util-section">
-                            <label for="font-weight-input">Font Weight</label>
-                            <input type="text" id="font-weight-input" placeholder="400" />
-                        </div>
-                    </div>
-
-                    <div class="field-row">
-                        <div class="util-section">
-                            <label for="line-height-input">Line Height</label>
-                            <input type="text" id="line-height-input" placeholder="1.7" />
-                        </div>
-                        <div class="util-section">
-                            <label for="letter-spacing-input">Letter Spacing</label>
-                            <input type="text" id="letter-spacing-input" placeholder="0.5px" />
-                        </div>
-                    </div>
-
-                    <div class="util-section">
-                        <label for="license-select">License</label>
-                        <select id="license-select">
-                            <option value="" selected disabled>Loading licenses...</option>
-                        </select>
-                        <span class="util-warn-icon" id="deprecated-warning" style="display:none;" data-tip="This license is deprecated">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                        </span>
-                    </div>
-
-                    <div class="util-section">
-                        <label for="copyright-input">Copyright Name</label>
-                        <input type="text" id="copyright-input" value="John Doe" />
-                    </div>
-
-                    <div class="util-section">
-                        <label for="email-input">Email</label>
-                        <div class="util-input-wrap">
-                            <input type="email" id="email-input" placeholder="john@example.com" />
-                            <span class="util-warn-icon" id="email-warning" style="display:none;" data-tip="Enter an email to use Gravatar">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                            </span>
+                    <div class="accordion open" data-section="theme-font">
+                        <button class="accordion-header" type="button" aria-expanded="true">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Theme & Font</span>
+                            <span class="accordion-summary" id="summary-theme-font">Minimal</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <label>Theme</label>
+                                    <div class="theme-gallery" id="theme-gallery">
+                                        {themeList.map((t) => (
+                                            <button
+                                                class:list={["theme-card", { selected: t.id === "minimal" }]}
+                                                data-theme={t.id}
+                                                type="button"
+                                                aria-label={`Select ${t.name} theme`}
+                                            >
+                                                <div class="theme-color-strip">
+                                                    <span style={`background: ${t.id === "minimal" ? "#faf9f7" : t.id === "minimal-dark" ? "#1a1a1a" : t.id === "github" ? "#ffffff" : t.id === "github-dark" ? "#0d1117" : t.id === "terminal" ? "#0a0a0a" : t.id === "newspaper" ? "#ffffff" : t.id === "elegant" ? "#fafaf9" : t.id === "mono" ? "#ffffff" : t.id === "serif" ? "#fffbf5" : "#ffffff"}`}></span>
+                                                    <span style={`background: ${t.id === "minimal" ? "#2563eb" : t.id === "minimal-dark" ? "#60a5fa" : t.id === "github" ? "#0969da" : t.id === "github-dark" ? "#58a6ff" : t.id === "terminal" ? "#33ff33" : t.id === "newspaper" ? "#1a1a1a" : t.id === "elegant" ? "#b45309" : t.id === "mono" ? "#171717" : t.id === "serif" ? "#92400e" : "#2563eb"}`}></span>
+                                                    <span style={`background: ${t.id === "minimal" ? "#374151" : t.id === "minimal-dark" ? "#e5e5e5" : t.id === "github" ? "#1f2328" : t.id === "github-dark" ? "#e6edf3" : t.id === "terminal" ? "#33ff33" : t.id === "newspaper" ? "#1a1a1a" : t.id === "elegant" ? "#1c1917" : t.id === "mono" ? "#171717" : t.id === "serif" ? "#292524" : "#1a1a1a"}`}></span>
+                                                </div>
+                                                <span class="theme-card-name">{t.name}</span>
+                                                {t.dark && <span class="theme-card-badge">dark</span>}
+                                                <span class="theme-check"><IconCheck /></span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <label for="font-select">Font</label>
+                                    <select id="font-select">
+                                        <option value="" selected>Loading fonts...</option>
+                                    </select>
+                                </div>
+                                <div class="font-preview-card" id="font-preview">
+                                    <span class="font-preview-pangram">The quick brown fox jumps over the lazy dog.</span>
+                                    <span class="font-preview-specimen">AaBbCcDd 0123456789</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="util-section">
-                        <label for="url-input">URL</label>
-                        <div class="util-input-wrap">
-                            <input type="url" id="url-input" placeholder="https://example.com" />
-                            <span class="util-warn-icon" id="url-warning" style="display:none;" data-tip="Invalid URL format">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                            </span>
+                    <div class="accordion" data-section="license">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">License</span>
+                            <span class="accordion-summary" id="summary-license">MIT</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <label for="license-select">License</label>
+                                    <select id="license-select">
+                                        <option value="" selected disabled>Loading licenses...</option>
+                                    </select>
+                                    <span class="util-warn-icon" id="deprecated-warning" style="display:none;" data-tip="This license is deprecated">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="util-section">
-                        <label for="year-start-input" class="sr-only">Year Range</label>
-                        <div class="year-range-row">
-                            <input type="number" id="year-start-input" min="1900" max="2100" placeholder="Start" />
-                            <span class="year-range-sep">–</span>
-                            <input type="number" id="year-end-input" min="1900" max="2100" placeholder="End" />
+                    <div class="accordion" data-section="identity">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Identity</span>
+                            <span class="accordion-summary" id="summary-identity">John Doe</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <label for="copyright-input">Copyright Name</label>
+                                    <input type="text" id="copyright-input" value="John Doe" />
+                                </div>
+                                <div class="util-section">
+                                    <label for="email-input">Email</label>
+                                    <div class="util-input-wrap">
+                                        <input type="email" id="email-input" placeholder="john@example.com" />
+                                        <span class="util-warn-icon" id="email-warning" style="display:none;" data-tip="Enter an email to use Gravatar">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <label for="url-input">URL</label>
+                                    <div class="util-input-wrap">
+                                        <input type="url" id="url-input" placeholder="https://example.com" />
+                                        <span class="util-warn-icon" id="url-warning" style="display:none;" data-tip="Invalid URL format">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <label for="year-start-input" class="sr-only">Year Range</label>
+                                    <div class="year-range-row">
+                                        <input type="number" id="year-start-input" min="1900" max="2100" placeholder="Start" />
+                                        <span class="year-range-sep">–</span>
+                                        <input type="number" id="year-end-input" min="1900" max="2100" placeholder="End" />
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <div class="toggle-label">
+                                        <input type="checkbox" id="gravatar-toggle" />
+                                        <span>Show Gravatar</span>
+                                    </div>
+                                    <span class="gravatar-warning" id="gravatar-warning" style="display:none;">
+                                        No Gravatar profile found for this email.<br />
+                                        <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer">Create one at gravatar.com</a>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="util-section">
-                        <div class="toggle-label">
-                            <input type="checkbox" id="gravatar-toggle" />
-                            <span>Show Gravatar</span>
+                    <div class="accordion" data-section="styling">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Styling</span>
+                            <span class="accordion-summary" id="summary-styling">Defaults</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="font-size-input">Font Size</label>
+                                        <input type="text" id="font-size-input" placeholder="18px" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="font-weight-input">Font Weight</label>
+                                        <input type="text" id="font-weight-input" placeholder="400" />
+                                    </div>
+                                </div>
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="line-height-input">Line Height</label>
+                                        <input type="text" id="line-height-input" placeholder="1.7" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="letter-spacing-input">Letter Spacing</label>
+                                        <input type="text" id="letter-spacing-input" placeholder="0.5px" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="gravatar-warning" id="gravatar-warning" style="display:none;">
-                            No Gravatar profile found for this email.<br />
-                            <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer">Create one at gravatar.com</a>
-                        </span>
                     </div>
                 </div>
 
@@ -197,6 +251,9 @@ const themeList = themes
                             </span>
                         </footer>
                     </div>
+                </div>
+                <div class="summary-pill" id="summary-pill" title="Click to copy config">
+                    <span id="pill-content">MIT <span class="pill-sep">·</span> John Doe</span>
                 </div>
             </div>
         </div>
