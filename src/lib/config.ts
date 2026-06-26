@@ -92,11 +92,40 @@ function validateConfig(config: LixentConfig): void {
         assertValidYear(config.yearRange.start)
         assertValidYear(config.yearRange.end)
     }
+    if (config.year != null && config.yearRange != null) {
+        console.warn("[lixent] Warning: Both year and yearRange are set. yearRange takes precedence.")
+    }
     if (config.customLicense?.name != null) assertValidCustomName(config.customLicense.name)
     if (config.customLicense?.text != null) assertValidCustomText(config.customLicense.text)
     if (config.themeOverrides != null) {
         assertValidThemeOverrides(config.themeOverrides, THEME_VARIABLES)
     }
+}
+
+/**
+ * Coerce a raw parsed JSON value into a LixentConfig shape.
+ *
+ * Handles common mistakes like `"year": "2024"` (string instead of number)
+ * or `yearRange: { start: "2020", end: "2026" }` (strings instead of numbers).
+ */
+function coerceConfig(raw: Record<string, unknown>): LixentConfig {
+    const config = raw as unknown as LixentConfig
+    if (typeof config.year === "string") {
+        const n = Number(config.year)
+        config.year = Number.isFinite(n) ? n : config.year
+    }
+    if (config.yearRange != null && typeof config.yearRange === "object") {
+        const yr = config.yearRange as Record<string, unknown>
+        if (typeof yr.start === "string") {
+            const n = Number(yr.start)
+            yr.start = Number.isFinite(n) ? n : yr.start
+        }
+        if (typeof yr.end === "string") {
+            const n = Number(yr.end)
+            yr.end = Number.isFinite(n) ? n : yr.end
+        }
+    }
+    return config
 }
 
 /**
@@ -148,7 +177,8 @@ export function loadConfig(root: string = process.cwd()): LixentConfig {
 
     if (existsSync(configPath)) {
         const raw = readFileSync(configPath, "utf-8")
-        const config = JSON.parse(raw) as LixentConfig
+        const parsed = JSON.parse(raw) as Record<string, unknown>
+        const config = coerceConfig(parsed)
         validateConfig(config)
         return config
     }

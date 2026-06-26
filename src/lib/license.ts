@@ -93,7 +93,7 @@ export function convertPlaceholders(text: string): string {
         .replace(/<name of author>/gi, "{{name}}")
         .replace(/<copyright holder>/gi, "{{name}}")
         .replace(/<program>/gi, "{{name}}")
-        .replace(/<owner>/g, "{{name}}")
+        .replace(/<owner>/gi, "{{name}}")
         .replace(/\[yyyy\]/g, "{{year}}")
         .replace(/\[year\]/g, "{{year}}")
         .replace(/\[fullname\]/g, "{{name}}")
