@@ -165,8 +165,8 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     function scrollToSelected(): void {
         const selectedIndex = filteredOptions.findIndex((o) => o.value === currentValue)
         if (selectedIndex < 0) return
-        const panelHeight = Math.min(PANEL_MAX_HEIGHT, (filteredOptions.length * ITEM_HEIGHT) + 8)
-        optionsList.scrollTop = (selectedIndex * ITEM_HEIGHT) - (panelHeight / 2) + (ITEM_HEIGHT / 2)
+        const visibleHeight = optionsList.clientHeight || PANEL_MAX_HEIGHT
+        optionsList.scrollTop = (selectedIndex * ITEM_HEIGHT) - (visibleHeight / 2) + (ITEM_HEIGHT / 2)
     }
 
     function selectOption(value: string): void {

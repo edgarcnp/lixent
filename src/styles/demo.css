@@ -521,7 +521,8 @@
 .custom-dropdown-option {
     display: flex;
     align-items: center;
-    padding: 8px 10px;
+    height: 33px;
+    padding: 0 10px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.8125rem;
