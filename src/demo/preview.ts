@@ -21,8 +21,6 @@ let el: {
     previewCopyright: HTMLElement
     previewLicenseText: HTMLElement
     previewTitle: HTMLElement
-    previewGravatar: HTMLElement
-    previewGravatarImg: HTMLImageElement
     previewUrl: HTMLElement
     fontPreview: HTMLElement
     summaryTheme: HTMLElement
@@ -31,14 +29,15 @@ let el: {
     summaryIdentity: HTMLElement
 } | null = null
 
+let gravatarRow: HTMLDivElement | null = null
+let gravatarImg: HTMLImageElement | null = null
+
 export function initPreviewElements(): void {
     el = {
         previewContent: $("preview-content"),
         previewCopyright: $("preview-copyright"),
         previewLicenseText: $("preview-license-text"),
         previewTitle: $("preview-title"),
-        previewGravatar: $("preview-gravatar"),
-        previewGravatarImg: $("preview-gravatar-img") as HTMLImageElement,
         previewUrl: $("preview-url"),
         fontPreview: $("font-preview"),
         summaryTheme: $("summary-theme"),
@@ -234,15 +233,31 @@ function updateCopyrightLine(
 function updateGravatar(email: string, copyright: string, showGravatar: boolean): void {
     if (!el) return
     const hasEmail = email.length > 0 && isValidEmail(email)
+    const header = el.previewTitle.closest(".license-header")
+    if (!header) return
+
     if (showGravatar && hasEmail) {
-        const newSrc = getGravatarUrl(email, 64)
-        if (el.previewGravatarImg.src !== newSrc) {
-            el.previewGravatarImg.src = newSrc
-            el.previewGravatarImg.alt = copyright
+        if (!gravatarRow) {
+            gravatarRow = document.createElement("div")
+            gravatarRow.className = "identity-row"
+            gravatarImg = document.createElement("img")
+            gravatarImg.className = "gravatar"
+            gravatarImg.width = 40
+            gravatarImg.height = 40
+            gravatarRow.appendChild(gravatarImg)
+            gravatarRow.appendChild(el.previewTitle)
+            header.prepend(gravatarRow)
         }
-        el.previewGravatar.style.display = "block"
-    } else {
-        el.previewGravatar.style.display = "none"
+        const newSrc = getGravatarUrl(email, 40)
+        if (gravatarImg && gravatarImg.src !== newSrc) {
+            gravatarImg.src = newSrc
+            gravatarImg.alt = copyright
+        }
+    } else if (gravatarRow) {
+        header.prepend(el.previewTitle)
+        gravatarRow.remove()
+        gravatarRow = null
+        gravatarImg = null
     }
 }
 

@@ -1036,31 +1036,23 @@
     color: #fbbf24;
 }
 
-.preview-content .islands {
+.preview-content .identity-row {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
-.preview-content .license-card {
-    background: var(--lx-surface, #f3f1ed);
-    border: 1px solid var(--lx-border, #e5e1dc);
-    border-radius: var(--lx-border-radius, 6px);
-    padding: var(--lx-padding, 2rem);
-}
-
-.preview-content .identity-card .license-header {
-    text-align: center;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.preview-content .islands::after {
-    content: "";
+.preview-content .identity-row .gravatar {
+    border-radius: 50%;
     display: block;
-    height: 1px;
-    background: var(--lx-border, #e5e1dc);
+    flex-shrink: 0;
+}
+
+.preview-content .license-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.5px solid var(--lx-border, #e5e1dc);
 }
 
 .preview-content .copyright a {
@@ -1070,47 +1062,39 @@
 }
 
 .preview-content h1 {
-    font-size: 2rem;
+    font-size: clamp(1.75rem, 1.5rem + 1.5vw, 2.5rem);
     font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 0.75rem;
     color: var(--lx-text, #1a1a1a);
 }
 
 .preview-content .copyright {
     color: var(--lx-text-muted, #6b7280);
-    font-size: 0.95rem;
+    font-size: 0.8125rem;
 }
 
 .preview-content .license-body p {
     margin-bottom: 1em;
-    line-height: var(--lx-line-height, 1.8);
+    text-align: justify;
+    hyphens: auto;
+    line-height: var(--lx-line-height, 1.7);
 }
 
 .preview-content footer {
     text-align: center;
     padding: 1.5rem 1.25rem;
     color: var(--lx-text-muted, #6b7280);
-    font-size: 0.8125rem;
-    display: flex;
-    justify-content: center;
+    font-size: 0.75rem;
 }
 
-.preview-content .footer-pill {
-    background: var(--lx-surface, #f0eee9);
-    border: 1px solid var(--lx-border, #d6d3cd);
-    border-radius: 9999px;
-    padding: 0.5rem 1.25rem;
-}
-
-.preview-content .footer-pill a {
+.preview-content footer a {
     color: var(--lx-accent, #2563eb);
     text-decoration: none;
     font-weight: 500;
 }
 
-.preview-content .footer-pill a:hover {
+.preview-content footer a:hover {
     text-decoration: underline;
 }
 
