@@ -1,4 +1,5 @@
 import { loadLicenses, loadProjectConfig } from "./licenses.ts"
+import type { ProjectConfig } from "./licenses.ts"
 import type { GoogleFont } from "../lib/font.ts"
 import { $, debounce, getPreferredMode } from "./helpers.ts"
 import { createDropdown } from "./dropdown.ts"
@@ -224,18 +225,22 @@ export async function initDemo(): Promise<void> {
 
     utilDownload.addEventListener("click", downloadConfig)
 
-    setSelectedTheme(projectConfig.theme ?? "minimal-dark")
-    fontDropdown.setValue(projectConfig.font ?? "Inter")
-    fontSizeInput.value = projectConfig.fontSize ?? ""
-    fontWeightInput.value = projectConfig.fontWeight ?? ""
-    lineHeightInput.value = projectConfig.lineHeight ?? ""
-    letterSpacingInput.value = projectConfig.letterSpacing ?? ""
-    licenseDropdown.setValue(projectConfig.license ?? "MIT")
-    copyrightInput.value = projectConfig.copyright ?? ""
-    emailInput.value = projectConfig.email ?? ""
-    urlInput.value = projectConfig.url ?? ""
-    applyYearConfig(projectConfig)
-    gravatarToggle.checked = projectConfig.gravatar ?? false
+    function applyProjectConfig(config: ProjectConfig): void {
+        setSelectedTheme(config.theme ?? "minimal-dark")
+        fontDropdown.setValue(config.font ?? "Inter")
+        fontSizeInput.value = config.fontSize ?? ""
+        fontWeightInput.value = config.fontWeight ?? ""
+        lineHeightInput.value = config.lineHeight ?? ""
+        letterSpacingInput.value = config.letterSpacing ?? ""
+        licenseDropdown.setValue(config.license ?? "MIT")
+        copyrightInput.value = config.copyright ?? ""
+        emailInput.value = config.email ?? ""
+        urlInput.value = config.url ?? ""
+        applyYearConfig(config)
+        gravatarToggle.checked = config.gravatar ?? false
+    }
+
+    applyProjectConfig(projectConfig)
 
     applyMode(getPreferredMode())
     ready = true
