@@ -91,7 +91,10 @@ export async function initDemo(): Promise<void> {
         })
     }
 
+    let ready = false
+
     function onControlChange(): void {
+        if (!ready) return
         updateGravatarWarning()
         updateUrlWarning()
         runUpdatePreview()
@@ -231,5 +234,6 @@ export async function initDemo(): Promise<void> {
     gravatarToggle.checked = projectConfig.gravatar ?? false
 
     applyMode(getPreferredMode())
+    ready = true
     onControlChange()
 }
