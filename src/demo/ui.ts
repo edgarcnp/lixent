@@ -30,7 +30,6 @@ export async function initDemo(): Promise<void> {
     const utilToggle = $("util-toggle")
     const utilMenu = document.querySelector<HTMLElement>(".util-menu")
     if (!utilMenu) throw new Error("Element .util-menu not found")
-    const utilReset = $("util-reset")
     const modeToggle = $("mode-toggle")
 
     const currentYear = new Date().getFullYear()
@@ -159,24 +158,6 @@ export async function initDemo(): Promise<void> {
         fontDropdown.setOptions([])
     }
 
-    function resetSettings(): void {
-        localStorage.removeItem("lixent-demo-mode")
-        setSelectedTheme(projectConfig.theme ?? "minimal-dark")
-        fontDropdown.setValue(projectConfig.font ?? "Inter")
-        fontSizeInput.value = projectConfig.fontSize ?? ""
-        fontWeightInput.value = projectConfig.fontWeight ?? ""
-        lineHeightInput.value = projectConfig.lineHeight ?? ""
-        letterSpacingInput.value = projectConfig.letterSpacing ?? ""
-        licenseDropdown.setValue(projectConfig.license ?? "MIT")
-        copyrightInput.value = projectConfig.copyright ?? ""
-        emailInput.value = projectConfig.email ?? ""
-        urlInput.value = projectConfig.url ?? ""
-        applyYearConfig(projectConfig)
-        gravatarToggle.checked = projectConfig.gravatar ?? false
-        applyMode(getPreferredMode())
-        onControlChange()
-    }
-
     const debouncedChange = debounce(onControlChange, 300)
 
     fontSizeInput.addEventListener("input", debouncedChange)
@@ -213,7 +194,6 @@ export async function initDemo(): Promise<void> {
 
     utilOpen.addEventListener("click", () => utilMenu.classList.add("open"))
     utilToggle.addEventListener("click", () => utilMenu.classList.remove("open"))
-    utilReset.addEventListener("click", resetSettings)
     modeToggle.addEventListener("click", toggleMode)
 
     const utilCopy = $("util-copy")
