@@ -189,8 +189,14 @@ export async function initDemo(): Promise<void> {
             const accordion = header.closest(".accordion")
             if (!accordion) return
             const isOpen = accordion.classList.contains("open")
-            accordion.classList.toggle("open")
-            header.setAttribute("aria-expanded", String(!isOpen))
+            document.querySelectorAll(".accordion.open").forEach((a) => {
+                a.classList.remove("open")
+                a.querySelector<HTMLElement>(".accordion-header")?.setAttribute("aria-expanded", "false")
+            })
+            if (!isOpen) {
+                accordion.classList.add("open")
+                header.setAttribute("aria-expanded", "true")
+            }
         })
     })
 
