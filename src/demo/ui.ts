@@ -131,7 +131,33 @@ export async function initDemo(): Promise<void> {
         URL.revokeObjectURL(url)
     }
 
-    const projectConfig = await loadProjectConfig()
+    const [projectResult, licenseResult, fontResult] = await Promise.allSettled([
+        loadProjectConfig(),
+        loadLicenses(),
+        fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
+            .then((r) => { if (!r.ok) throw new Error(`fonts.json: ${r.status}`); return r.json() })
+            .then((d) => (d as { items: GoogleFont[] }).items),
+    ])
+
+    const projectConfig = projectResult.status === "fulfilled" ? projectResult.value : {}
+
+    if (licenseResult.status === "fulfilled") {
+        const licenses = licenseResult.value
+        licenses.sort((a, b) => a.name.localeCompare(b.name))
+        setAllLicenses(licenses)
+        licenseDropdown.setOptions(licenses.map(licenseToOption))
+    } else {
+        licenseDropdown.setOptions([{ value: "", label: "Failed to load licenses" }])
+    }
+
+    if (fontResult.status === "fulfilled") {
+        const fonts = fontResult.value
+        fonts.sort((a, b) => a.family.localeCompare(b.family))
+        setAllFonts(fonts)
+        fontDropdown.setOptions(fonts.map(fontToOption))
+    } else {
+        fontDropdown.setOptions([])
+    }
 
     function resetSettings(): void {
         localStorage.removeItem("lixent-demo-mode")
@@ -149,26 +175,6 @@ export async function initDemo(): Promise<void> {
         gravatarToggle.checked = projectConfig.gravatar ?? false
         applyMode(getPreferredMode())
         onControlChange()
-    }
-
-    try {
-        const licenses = await loadLicenses()
-        licenses.sort((a, b) => a.name.localeCompare(b.name))
-        setAllLicenses(licenses)
-        licenseDropdown.setOptions(licenses.map(licenseToOption))
-    } catch {
-        licenseDropdown.setOptions([{ value: "", label: "Failed to load licenses" }])
-    }
-
-    try {
-        const res = await fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
-        if (!res.ok) throw new Error(`fonts.json: ${res.status}`)
-        const fonts = ((await res.json()) as { items: GoogleFont[] }).items
-        fonts.sort((a, b) => a.family.localeCompare(b.family))
-        setAllFonts(fonts)
-        fontDropdown.setOptions(fonts.map(fontToOption))
-    } catch {
-        fontDropdown.setOptions([])
     }
 
     const debouncedChange = debounce(onControlChange, 300)
