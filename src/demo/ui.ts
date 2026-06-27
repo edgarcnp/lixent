@@ -2,7 +2,7 @@ import { loadLicenses, loadProjectConfig } from "./licenses.ts"
 import type { GoogleFont } from "../lib/font.ts"
 import { $, debounce, getPreferredMode } from "./helpers.ts"
 import { createDropdown } from "./dropdown.ts"
-import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview } from "./preview.ts"
+import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview, initPreviewElements } from "./preview.ts"
 import { buildConfigJson } from "./settings.ts"
 import { applyMode, toggleMode } from "./mode.ts"
 import { createWarnings } from "./warnings.ts"
@@ -10,6 +10,7 @@ import { createThemeSelect } from "./theme-select.ts"
 import { createYearInput } from "./year-input.ts"
 
 export async function initDemo(): Promise<void> {
+    initPreviewElements()
     const themeGallery = $("theme-gallery")
     const themeModeToggle = document.getElementById("theme-mode-toggle")
     const fontSizeInput = $("font-size-input") as HTMLInputElement

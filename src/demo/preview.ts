@@ -13,6 +13,38 @@ const themeCache = new Map<string, string>()
 let previewThemeStyle: HTMLStyleElement | null = null
 let themeAbort: AbortController | null = null
 
+let el: {
+    previewContent: HTMLElement
+    previewCopyright: HTMLElement
+    previewLicenseText: HTMLElement
+    previewTitle: HTMLElement
+    previewGravatar: HTMLElement
+    previewGravatarImg: HTMLImageElement
+    previewUrl: HTMLElement
+    fontPreview: HTMLElement
+    summaryTheme: HTMLElement
+    summaryFontStyling: HTMLElement
+    summaryLicense: HTMLElement
+    summaryIdentity: HTMLElement
+} | null = null
+
+export function initPreviewElements(): void {
+    el = {
+        previewContent: $("preview-content"),
+        previewCopyright: $("preview-copyright"),
+        previewLicenseText: $("preview-license-text"),
+        previewTitle: $("preview-title"),
+        previewGravatar: $("preview-gravatar"),
+        previewGravatarImg: $("preview-gravatar-img") as HTMLImageElement,
+        previewUrl: $("preview-url"),
+        fontPreview: $("font-preview"),
+        summaryTheme: $("summary-theme"),
+        summaryFontStyling: $("summary-font-styling"),
+        summaryLicense: $("summary-license"),
+        summaryIdentity: $("summary-identity"),
+    }
+}
+
 export function getLicenseName(id: string): string {
     const match = allLicenses.find((l) => l.licenseId === id)
     return match != null ? match.name : id
@@ -135,15 +167,9 @@ export function updatePreview(state: {
         ? yearStart
         : (yearEndInput.value.length > 0 ? parseInt(yearEndInput.value) : currentYear)
     const showGravatar = gravatarToggle.checked
+    if (!el) return
 
     const previewTheme = $("preview-theme") as HTMLLinkElement
-    const previewContent = $("preview-content")
-    const previewCopyright = $("preview-copyright")
-    const previewLicenseText = $("preview-license-text")
-    const previewTitle = $("preview-title")
-    const previewGravatar = $("preview-gravatar")
-    const previewGravatarImg = $("preview-gravatar-img") as HTMLImageElement
-    const previewUrl = $("preview-url")
 
     const newHref = `${BASE_URL}themes/${theme}.css`
     const cached = themeCache.get(newHref)
@@ -173,15 +199,14 @@ export function updatePreview(state: {
 
     if (fontFamily.length > 0) {
         loadGoogleFont(fontFamily)
-        previewContent.style.setProperty("--lx-font-body", getFontFamily(fontFamily))
+        el.previewContent.style.setProperty("--lx-font-body", getFontFamily(fontFamily))
     } else {
         loadGoogleFont("")
-        previewContent.style.setProperty("--lx-font-body", "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif")
+        el.previewContent.style.setProperty("--lx-font-body", "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif")
     }
 
-    const fontPreview = $("font-preview")
-    const pangram = fontPreview.querySelector<HTMLElement>(".font-preview-pangram")
-    const specimen = fontPreview.querySelector<HTMLElement>(".font-preview-specimen")
+    const pangram = el.fontPreview.querySelector<HTMLElement>(".font-preview-pangram")
+    const specimen = el.fontPreview.querySelector<HTMLElement>(".font-preview-specimen")
     if (pangram && specimen) {
         if (fontFamily.length > 0) {
             const fontCss = getFontFamily(fontFamily)
@@ -197,31 +222,31 @@ export function updatePreview(state: {
         }
     }
     if (fontSize.length > 0) {
-        previewContent.style.setProperty("--lx-font-size", fontSize)
+        el.previewContent.style.setProperty("--lx-font-size", fontSize)
     } else {
-        previewContent.style.setProperty("--lx-font-size", "18px")
+        el.previewContent.style.setProperty("--lx-font-size", "18px")
     }
     if (fontWeight.length > 0) {
-        previewContent.style.setProperty("font-weight", fontWeight)
+        el.previewContent.style.setProperty("font-weight", fontWeight)
     } else {
-        previewContent.style.removeProperty("font-weight")
+        el.previewContent.style.removeProperty("font-weight")
     }
     if (lineHeight.length > 0) {
-        previewContent.style.setProperty("--lx-line-height", lineHeight)
+        el.previewContent.style.setProperty("--lx-line-height", lineHeight)
     } else {
-        previewContent.style.setProperty("--lx-line-height", "1.7")
+        el.previewContent.style.setProperty("--lx-line-height", "1.7")
     }
     if (letterSpacing.length > 0) {
-        previewContent.style.setProperty("letter-spacing", letterSpacing)
+        el.previewContent.style.setProperty("letter-spacing", letterSpacing)
     } else {
-        previewContent.style.removeProperty("letter-spacing")
+        el.previewContent.style.removeProperty("letter-spacing")
     }
 
     const show = isDeprecated(licenseId)
     const deprecatedWarning = $("deprecated-warning")
     deprecatedWarning.style.display = show ? "inline-flex" : "none"
 
-    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, previewLicenseText, previewTitle)
+    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, el.previewLicenseText, el.previewTitle)
 
     const hasUrl = url.length > 0 && isValidUrl(url)
     const hasEmail = email.length > 0 && isValidEmail(email)
@@ -236,36 +261,32 @@ export function updatePreview(state: {
     const yearDisplay = yearStart !== yearEnd
         ? `${yearStart}\u2013${yearEnd}`
         : String(yearStart)
-    previewCopyright.innerHTML = `Copyright &copy; ${yearDisplay} ${nameHtml}${emailHtml}`
+    el.previewCopyright.innerHTML = `Copyright &copy; ${yearDisplay} ${nameHtml}${emailHtml}`
 
     if (showGravatar && hasEmail) {
         const newSrc = getGravatarUrl(email, 64)
-        if (previewGravatarImg.src !== newSrc) {
-            previewGravatarImg.src = newSrc
-            previewGravatarImg.alt = copyright
+        if (el.previewGravatarImg.src !== newSrc) {
+            el.previewGravatarImg.src = newSrc
+            el.previewGravatarImg.alt = copyright
         }
-        previewGravatar.style.display = "block"
+        el.previewGravatar.style.display = "block"
     } else {
-        previewGravatar.style.display = "none"
+        el.previewGravatar.style.display = "none"
     }
 
-    previewUrl.textContent = `${theme} / ${licenseId}`
+    el.previewUrl.textContent = `${theme} / ${licenseId}`
 
     const licenseName = getLicenseName(licenseId)
     const fontLabel = fontDropdown.getValue() || "Inter"
 
-    const summaryTheme = $("summary-theme")
-    const summaryFontStyling = $("summary-font-styling")
-    const summaryLicense = $("summary-license")
-    const summaryIdentity = $("summary-identity")
-    summaryTheme.textContent = theme
+    el.summaryTheme.textContent = theme
         .replace(/-(?:dark|light)$/, "")
         .replace(/^\w/, (c) => c.toUpperCase())
         + (theme.endsWith("-light") ? " Light" : " Dark")
     const parts: string[] = []
     if (fontLabel !== "Inter") parts.push(fontLabel)
     if (fontSize.length > 0) parts.push(fontSize)
-    summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Inter"
-    summaryLicense.textContent = licenseName
-    summaryIdentity.textContent = (copyright || "John Doe") + (hasEmail ? ` · ${email.split("@")[1]}` : "")
+    el.summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Inter"
+    el.summaryLicense.textContent = licenseName
+    el.summaryIdentity.textContent = (copyright || "John Doe") + (hasEmail ? ` · ${email.split("@")[1]}` : "")
 }
