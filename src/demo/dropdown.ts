@@ -166,6 +166,8 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
             optionsList.scrollTop += offset
         }
         requestAnimationFrame(() => searchInput.focus())
+        window.addEventListener("scroll", positionPanel, { passive: true })
+        window.addEventListener("resize", positionPanel, { passive: true })
         document.addEventListener("click", onOutsideClick)
         document.addEventListener("keydown", onKeyDown)
     }
@@ -173,6 +175,8 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     function close(): void {
         isOpen = false
         wrapper.classList.remove("open")
+        window.removeEventListener("scroll", positionPanel)
+        window.removeEventListener("resize", positionPanel)
         document.removeEventListener("click", onOutsideClick)
         document.removeEventListener("keydown", onKeyDown)
     }
