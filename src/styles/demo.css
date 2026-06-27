@@ -476,6 +476,7 @@
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
+    line-height: normal;
     outline: none;
     transition: border-color 0.15s;
     box-sizing: border-box;
@@ -586,6 +587,7 @@
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
+    line-height: normal;
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
