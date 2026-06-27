@@ -3,8 +3,6 @@
   --lx-text: #e5e5e5;
   --lx-text-muted: #a3a3a3;
   --lx-accent: #60a5fa;
-  --lx-border: #404040;
-  --lx-surface: #262626;
+  --lx-divider: #404040;
   --lx-font-body: "Georgia", "Times New Roman", serif;
-  --lx-font-mono: "Menlo", "Consolas", monospace;
 }

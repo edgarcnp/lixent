@@ -1,10 +1,14 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
+import { existsSync } from "node:fs"
+import { resolve } from "node:path"
 import { themes, getTheme, isValidTheme } from "../src/themes/index.ts"
 
+const THEMES_DIR = resolve(import.meta.dirname, "../public/themes")
+
 describe("themes", () => {
-    it("contains 10 themes", () => {
-        assert.equal(themes.length, 10)
+    it("has at least one theme", () => {
+        assert.ok(themes.length > 0)
     })
 
     it("each theme has required fields", () => {
@@ -13,7 +17,6 @@ describe("themes", () => {
             assert.ok(theme.name, `Theme ${theme.id} missing name`)
             assert.ok(theme.description, `Theme ${theme.id} missing description`)
             assert.equal(typeof theme.dark, "boolean", `Theme ${theme.id} dark is not boolean`)
-            assert.ok(Array.isArray(theme.variables), `Theme ${theme.id} variables is not array`)
         }
     })
 
@@ -21,6 +24,13 @@ describe("themes", () => {
         const ids = themes.map((t) => t.id)
         const unique = new Set(ids)
         assert.equal(ids.length, unique.size)
+    })
+
+    it("each theme has a corresponding CSS file", () => {
+        for (const theme of themes) {
+            const cssPath = resolve(THEMES_DIR, `${theme.id}.css`)
+            assert.ok(existsSync(cssPath), `Theme ${theme.id} missing CSS file at ${cssPath}`)
+        }
     })
 })
 

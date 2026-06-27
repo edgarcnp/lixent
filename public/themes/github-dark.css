@@ -3,8 +3,6 @@
   --lx-text: #e6edf3;
   --lx-text-muted: #8b949e;
   --lx-accent: #58a6ff;
-  --lx-border: #30363d;
-  --lx-surface: #161b22;
+  --lx-divider: #30363d;
   --lx-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-  --lx-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
