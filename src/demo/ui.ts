@@ -201,25 +201,37 @@ export async function initDemo(): Promise<void> {
     const utilCopyLabel = $("util-copy-label")
     const utilCopyCheck = $("util-copy-check")
     const utilDownload = $("util-download")
-    let copyResetTimer: ReturnType<typeof setTimeout> | null = null
+    const utilDownloadLabel = $("util-download-label")
+    const utilDownloadCheck = $("util-download-check")
+    const copyTimer = { id: null as ReturnType<typeof setTimeout> | null }
+    const downloadTimer = { id: null as ReturnType<typeof setTimeout> | null }
+
+    function flashButton(btn: HTMLElement, label: HTMLElement, check: HTMLElement, message: string, timer: { id: ReturnType<typeof setTimeout> | null }): void {
+        label.textContent = message
+        check.style.display = "inline-flex"
+        btn.classList.add("flash")
+        if (timer.id) clearTimeout(timer.id)
+        timer.id = setTimeout(() => {
+            label.textContent = message === "Copied!" ? "Copy" : "Download"
+            check.style.display = "none"
+            btn.classList.remove("flash")
+            timer.id = null
+        }, 2000)
+    }
 
     utilCopy.addEventListener("click", () => {
         const settings = getCurrentSettings()
         const config: Record<string, unknown> = buildConfigJson(settings)
         const json = JSON.stringify(config, null, 2)
         void navigator.clipboard.writeText(json).then(() => {
-            utilCopyLabel.textContent = "Copied!"
-            utilCopyCheck.style.display = "inline-flex"
-            if (copyResetTimer) clearTimeout(copyResetTimer)
-            copyResetTimer = setTimeout(() => {
-                utilCopyLabel.textContent = "Copy"
-                utilCopyCheck.style.display = "none"
-                copyResetTimer = null
-            }, 2000)
+            flashButton(utilCopy, utilCopyLabel, utilCopyCheck, "Copied!", copyTimer)
         })
     })
 
-    utilDownload.addEventListener("click", downloadConfig)
+    utilDownload.addEventListener("click", () => {
+        downloadConfig()
+        flashButton(utilDownload, utilDownloadLabel, utilDownloadCheck, "Downloaded!", downloadTimer)
+    })
 
     function applyProjectConfig(config: ProjectConfig): void {
         setSelectedTheme(config.theme ?? DEFAULTS.theme)

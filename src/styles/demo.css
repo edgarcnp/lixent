@@ -842,14 +842,34 @@
 
 .util-actions .button {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 0.625rem;
+    height: 2.25rem;
+    line-height: 2.25rem;
+    padding: 0 0.75rem;
     font-size: 0.8125rem;
     font-weight: 500;
     font-family: inherit;
     border-radius: var(--demo-radius);
     cursor: pointer;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, opacity 0.15s, transform 0.1s;
+    box-sizing: border-box;
+}
+
+.util-actions .button:active {
+    transform: scale(0.96);
+}
+
+.util-actions .button.flash {
+    animation: btn-flash 0.4s ease;
+}
+
+@keyframes btn-flash {
+    0% { transform: scale(1); }
+    30% { transform: scale(0.95); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 
 .util-actions .button.primary {
