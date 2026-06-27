@@ -21,6 +21,8 @@ export interface DropdownInstance {
     setOptions: (options: DropdownOption[]) => void
 }
 
+const MAX_VISIBLE = 100
+
 export function createDropdown(config: DropdownConfig): DropdownInstance {
     let currentValue = ""
     let isOpen = false
@@ -71,7 +73,8 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
         }
 
         focusedIndex = -1
-        for (const opt of filtered) {
+        const visible = filtered.slice(0, MAX_VISIBLE)
+        for (const opt of visible) {
             const el = document.createElement("div")
             el.className = "custom-dropdown-option"
             if (opt.value === currentValue) el.classList.add("selected")
@@ -102,6 +105,13 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
             })
 
             optionsList.appendChild(el)
+        }
+
+        if (filtered.length > MAX_VISIBLE) {
+            const footer = document.createElement("div")
+            footer.className = "custom-dropdown-empty"
+            footer.textContent = `Refine search to see more (${filtered.length} total)`
+            optionsList.appendChild(footer)
         }
     }
 
