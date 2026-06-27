@@ -23,7 +23,7 @@ export interface DropdownInstance {
 }
 
 const ITEM_HEIGHT = 33
-const BUFFER = 7
+const BUFFER = 21
 const PANEL_MAX_HEIGHT = 320
 
 export function createDropdown(config: DropdownConfig): DropdownInstance {
