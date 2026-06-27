@@ -3,12 +3,5 @@
     "url": "https://example.com",
     "email": "john@example.com",
     "license": "MIT",
-    "theme": "minimal-dark",
-    "gravatar": true,
-    "font": "Inter",
-    "fontSize": "18px",
-    "fontWeight": "400",
-    "lineHeight": "1.7",
-    "letterSpacing": "0.025em",
-    "year": 2025
+    "theme": "minimal-dark"
 }
