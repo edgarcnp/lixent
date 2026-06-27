@@ -132,7 +132,7 @@ export async function initDemo(): Promise<void> {
         a.href = url
         a.download = "lixent.config.json"
         a.click()
-        URL.revokeObjectURL(url)
+        setTimeout(() => URL.revokeObjectURL(url), 0)
     }
 
     const [projectResult, licenseResult, fontResult] = await Promise.allSettled([
