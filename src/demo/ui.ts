@@ -203,6 +203,7 @@ export async function initDemo(): Promise<void> {
     const utilCopyLabel = $("util-copy-label")
     const utilCopyCheck = $("util-copy-check")
     const utilDownload = $("util-download")
+    let copyResetTimer: ReturnType<typeof setTimeout> | null = null
 
     utilCopy.addEventListener("click", () => {
         const settings = getCurrentSettings()
@@ -211,9 +212,11 @@ export async function initDemo(): Promise<void> {
         void navigator.clipboard.writeText(json).then(() => {
             utilCopyLabel.textContent = "Copied!"
             utilCopyCheck.style.display = "inline-flex"
-            setTimeout(() => {
+            if (copyResetTimer) clearTimeout(copyResetTimer)
+            copyResetTimer = setTimeout(() => {
                 utilCopyLabel.textContent = "Copy"
                 utilCopyCheck.style.display = "none"
+                copyResetTimer = null
             }, 2000)
         })
     })
