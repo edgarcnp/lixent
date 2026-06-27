@@ -56,6 +56,20 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     config.container.appendChild(wrapper)
 
     let currentOptions = [...config.options]
+    const loadedFonts = new Set<string>()
+
+    const fontObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) continue
+            const el = entry.target as HTMLElement
+            const font = el.dataset.font
+            if (font && !loadedFonts.has(font)) {
+                loadedFonts.add(font)
+                void document.fonts.load(`16px ${font}`)
+            }
+            fontObserver.unobserve(el)
+        }
+    }, { root: optionsList, rootMargin: "50px" })
 
     function renderOptions(filter = ""): void {
         optionsList.innerHTML = ""
@@ -85,6 +99,8 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
                 preview.className = "option-font-preview"
                 preview.textContent = opt.label
                 preview.style.fontFamily = opt.fontPreview
+                el.dataset.font = opt.label
+                fontObserver.observe(el)
                 el.appendChild(preview)
             } else {
                 const label = document.createElement("span")
