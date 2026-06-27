@@ -1,8 +1,8 @@
 :root {
-  --lx-bg: #f8f8f8;
+  --lx-bg: #eef0ee;
   --lx-text: #1a3a1a;
   --lx-text-muted: #2d6b2d;
   --lx-accent: #1a6b1a;
-  --lx-border: #c4d4c4;
-  --lx-surface: #e8f0e8;
+  --lx-border: #b4c4b4;
+  --lx-surface: #dce4dc;
 }
