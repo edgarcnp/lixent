@@ -357,7 +357,7 @@ export async function fetchAndRender(
             ? `${yearStart}\u2013${yearEnd}`
             : String(yearStart)
         const rendered = renderLicenseText(rawText, { year: yearStr, name: copyright, url, email })
-        previewTitle.textContent = `${getLicenseName(licenseId)} License`
+        previewTitle.textContent = getLicenseName(licenseId)
         previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return
