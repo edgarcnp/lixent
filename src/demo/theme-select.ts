@@ -8,12 +8,14 @@ export function createThemeSelect(
     themeModeToggle: HTMLElement | null,
     onChange: () => void,
 ): ThemeSelect {
+    let selectedTheme = "minimal-dark"
+
     function getSelectedTheme(): string {
-        const active = themeGallery.querySelector(".theme-card.selected")
-        return (active as HTMLElement | null)?.dataset.theme ?? "minimal-dark"
+        return selectedTheme
     }
 
     function setSelectedTheme(id: string): void {
+        selectedTheme = id
         themeGallery.querySelectorAll(".theme-card").forEach((card) => {
             card.classList.toggle("selected", (card as HTMLElement).dataset.theme === id)
         })
@@ -43,12 +45,10 @@ export function createThemeSelect(
             const mode = btn.dataset.mode
             themeGallery.dataset.mode = mode
 
-            const currentId = document.querySelector<HTMLElement>(".theme-card.selected")?.dataset.theme
-            const currentBase = currentId?.replace(/-dark$|-light$/, "") ?? "minimal"
+            const currentBase = selectedTheme.replace(/-dark$|-light$/, "")
             const targetId = `${currentBase}-${mode}`
 
-            const targetCard = themeGallery.querySelector<HTMLElement>(`[data-theme="${targetId}"]`)
-            if (targetCard) {
+            if (themeGallery.querySelector<HTMLElement>(`[data-theme="${targetId}"]`)) {
                 setSelectedTheme(targetId)
                 onChange()
             }

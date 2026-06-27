@@ -13,14 +13,16 @@ export function createYearInput(
     currentYear: number,
     onChange: () => void,
 ): YearInput {
+    let yearMode: "single" | "range" = "single"
+
     function getYearMode(): "single" | "range" {
-        const raw = yearModeToggle.querySelector<HTMLElement>(".year-mode-btn.active")?.dataset.mode
-        return raw === "range" ? "range" : "single"
+        return yearMode
     }
 
     function applyConfig(config: { year?: number, yearRange?: { start: number, end: number } }): void {
         const isYearRange = config.yearRange != null
         const mode = isYearRange ? "range" : "single"
+        yearMode = mode
         yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => {
             b.classList.toggle("active", (b as HTMLElement).dataset.mode === mode)
         })
@@ -59,9 +61,10 @@ export function createYearInput(
     yearModeToggle.addEventListener("click", (e) => {
         const btn = (e.target as HTMLElement).closest(".year-mode-btn")
         if (!(btn instanceof HTMLElement) || !btn.dataset.mode) return
+        const mode = btn.dataset.mode as "single" | "range"
+        yearMode = mode
         yearModeToggle.querySelectorAll(".year-mode-btn").forEach((b) => b.classList.remove("active"))
         btn.classList.add("active")
-        const mode = btn.dataset.mode
         if (mode === "range") {
             yearStartInput.value ||= String(currentYear - 1)
             yearEndInput.value ||= String(currentYear)
