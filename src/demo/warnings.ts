@@ -15,6 +15,7 @@ export function createWarnings(
     const emailWarning = $("email-warning")
     const urlWarning = $("url-warning")
     const gravatarWarning = $("gravatar-warning")
+    let pendingGravatarEmail = ""
 
     function updateGravatarWarning(): void {
         const email = emailInput.value.trim()
@@ -29,7 +30,9 @@ export function createWarnings(
             gravatarWarning.style.display = "none"
             return
         }
+        pendingGravatarEmail = email
         const exists = await checkGravatarProfile(email)
+        if (email !== pendingGravatarEmail) return
         gravatarWarning.style.display = exists ? "none" : "block"
     }
 
