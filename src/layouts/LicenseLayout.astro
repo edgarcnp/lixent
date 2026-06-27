@@ -1,9 +1,8 @@
 ---
 import { Image } from "astro:assets"
 import { getGravatarUrl } from "../lib/gravatar.ts"
-import { formatYear, formatYearRange } from "../lib/year.ts"
 import { CSS_DANGEROUS_PATTERN } from "../lib/validation.ts"
-import { getGoogleFontsUrl } from "../lib/font.ts"
+import { getGoogleFontsUrl, cssWeightToVariants } from "../lib/font.ts"
 import { getTheme, THEME_VARIABLES } from "../themes/index.ts"
 import type { LixentConfig } from "../lib/types.ts"
 import "../styles/base.css"
@@ -11,10 +10,11 @@ import "../styles/base.css"
 interface Props {
     title: string
     config: LixentConfig
+    yearStr: string
     copyright?: string
 }
 
-const { title, config, copyright } = Astro.props
+const { title, config, yearStr, copyright } = Astro.props
 
 const builtInTheme = getTheme(config.theme)
 const themePath
@@ -59,18 +59,10 @@ const fontOverride = fontOverrideParts.length > 0
     ? fontOverrideParts.join(" ")
     : ""
 
-const googleFontsUrl = rawFont != null && rawFont.length > 0 ? getGoogleFontsUrl(rawFont) : null
+const variants = cssWeightToVariants(config.fontWeight)
+const googleFontsUrl = rawFont != null && rawFont.length > 0 ? getGoogleFontsUrl(rawFont, variants) : null
 
 const name = copyright ?? config.copyright
-
-let yearStr: string
-if (config.year != null) {
-    yearStr = formatYear(config.year)
-} else if (config.yearRange != null) {
-    yearStr = formatYearRange(config.yearRange.start, config.yearRange.end)
-} else {
-    yearStr = formatYear()
-}
 
 const hasUrl = config.url != null && config.url.length > 0
 const hasEmail = config.email != null && config.email.length > 0
@@ -101,43 +93,36 @@ const gravatarUrl
     </head>
     <body>
         <main>
-            <div class="islands">
-                <article class="license-card identity-card">
-                    <header class="license-header">
-                        {gravatarUrl && (
-                            <Image
-                                class="gravatar"
-                                src={gravatarUrl}
-                                alt={config.copyright}
-                                width={64}
-                                height={64}
-                                loading="eager"
-                            />
-                        )}
+            <header class="license-header">
+                {gravatarUrl && (
+                    <div class="identity-row">
+                        <Image
+                            class="gravatar"
+                            src={gravatarUrl}
+                            alt={config.copyright}
+                            width={40}
+                            height={40}
+                            loading="eager"
+                        />
                         <h1>{title}</h1>
-                        <p class="copyright">
-                            Copyright &copy; {yearStr}{" "}
-                            {hasUrl
-                                ? <a href={config.url} target="_blank" rel="noopener noreferrer">{name}</a>
-                                : name
-                            }
-                            {hasEmail && (
-                                <span class="email"> &lt;<a href={`mailto:${config.email}`}>{config.email}</a>&gt;</span>
-                            )}
-                        </p>
-                    </header>
-                </article>
-                <article class="license-card content-card">
-                    <div class="license-content">
-                        <slot />
                     </div>
-                </article>
-            </div>
+                )}
+                {!gravatarUrl && <h1>{title}</h1>}
+                <p class="copyright">
+                    Copyright &copy; {yearStr}{" "}
+                    {hasUrl
+                        ? <a href={config.url} target="_blank" rel="noopener noreferrer">{name}</a>
+                        : name
+                    }
+                    {hasEmail && (
+                        <span class="email"> &lt;<a href={`mailto:${config.email}`}>{config.email}</a>&gt;</span>
+                    )}
+                </p>
+            </header>
+            <slot />
         </main>
         <footer>
-            <span class="footer-pill">
-                Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
-            </span>
+            Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
         </footer>
     </body>
 </html>
