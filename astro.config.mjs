@@ -18,52 +18,44 @@ function lixentPublicAssets() {
           fs.copyFileSync("lixent.config.json", "public/lixent.config.json");
         }
 
+        let fontCatalog = null;
+        let fetchError = null;
+
         try {
           const res = await fetch(fontsUrl, { signal: AbortSignal.timeout(30_000) });
-          if (res.ok) {
+          if (!res.ok) {
+            fetchError = `Font catalog fetch failed (${res.status})`;
+          } else {
             const data = await res.json();
             const items = Array.isArray(data?.items) ? data.items : [];
-            const valid = items.filter(
+            fontCatalog = items.filter(
               (f) =>
                 f &&
                 typeof f.family === "string" &&
                 Array.isArray(f.variants) &&
                 typeof f.category === "string",
             );
-            if (valid.length > 0) {
-              fs.writeFileSync(
-                "public/fonts.json",
-                JSON.stringify({ items: valid }),
-              );
-              logger.info(`Font catalog: ${valid.length} fonts`);
-            } else {
-              if (!fs.existsSync("public/fonts.json")) {
-                throw new Error(
-                  "[lixent] Font catalog returned no valid fonts and no existing public/fonts.json found.",
-                );
-              }
-              logger.warn(
-                "Font catalog: no valid fonts found, using existing public/fonts.json",
-              );
-            }
-          } else {
-            if (!fs.existsSync("public/fonts.json")) {
-              throw new Error(
-                `[lixent] Font catalog fetch failed (${res.status}) and no existing public/fonts.json found.`,
-              );
-            }
-            logger.warn(
-              `Font catalog fetch failed (${res.status}), using existing public/fonts.json`,
-            );
           }
-        } catch {
+        } catch (err) {
+          fetchError = err instanceof Error ? err.message : String(err);
+        }
+
+        if (fontCatalog != null && fontCatalog.length > 0) {
+          fs.writeFileSync(
+            "public/fonts.json",
+            JSON.stringify({ items: fontCatalog }),
+          );
+          logger.info(`Font catalog: ${fontCatalog.length} fonts`);
+        } else {
+          const reason = fetchError ?? "no valid fonts found";
           if (!fs.existsSync("public/fonts.json")) {
             throw new Error(
-              "[lixent] Font catalog fetch failed and no existing public/fonts.json found. " +
-              "Commit a fonts.json to public/ or ensure the fonts-data branch is reachable.",
+              `[lixent] ${reason} and no existing public/fonts.json found.`,
             );
           }
-          logger.warn("Font catalog fetch failed, using existing public/fonts.json");
+          logger.warn(
+            `Font catalog: ${reason}, using existing public/fonts.json`,
+          );
         }
       },
     },
