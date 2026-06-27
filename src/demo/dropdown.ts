@@ -22,7 +22,9 @@ export interface DropdownInstance {
     setOptions: (options: DropdownOption[]) => void
 }
 
-const MAX_VISIBLE = 100
+const ITEM_HEIGHT = 33
+const BUFFER = 7
+const PANEL_MAX_HEIGHT = 320
 
 export function createDropdown(config: DropdownConfig): DropdownInstance {
     let currentValue = ""
@@ -50,6 +52,14 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     const optionsList = document.createElement("div")
     optionsList.className = "custom-dropdown-options"
 
+    const topSpacer = document.createElement("div")
+    topSpacer.className = "virtual-spacer-top"
+    const bottomSpacer = document.createElement("div")
+    bottomSpacer.className = "virtual-spacer-bottom"
+
+    optionsList.appendChild(topSpacer)
+    optionsList.appendChild(bottomSpacer)
+
     panel.appendChild(searchWrap)
     panel.appendChild(optionsList)
     wrapper.appendChild(trigger)
@@ -57,6 +67,7 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     config.container.appendChild(wrapper)
 
     let currentOptions = [...config.options]
+    let filteredOptions: DropdownOption[] = []
     const loadedFonts = new Set<string>()
 
     const fontObserver = new IntersectionObserver((entries) => {
@@ -72,24 +83,21 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
         }
     }, { root: optionsList, rootMargin: "50px" })
 
-    function renderOptions(filter = ""): void {
-        optionsList.innerHTML = ""
-        const lower = filter.toLowerCase()
-        const filtered = lower.length > 0
-            ? currentOptions.filter((o) => o.label.toLowerCase().includes(lower) || (o.meta?.toLowerCase().includes(lower) ?? false))
-            : currentOptions
+    function renderVirtualList(): void {
+        const scrollTop = optionsList.scrollTop
+        const panelHeight = Math.min(PANEL_MAX_HEIGHT, (filteredOptions.length * ITEM_HEIGHT) + 8)
+        const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER)
+        const endIndex = Math.min(
+            filteredOptions.length,
+            Math.ceil((scrollTop + panelHeight) / ITEM_HEIGHT) + BUFFER,
+        )
 
-        if (filtered.length === 0) {
-            const empty = document.createElement("div")
-            empty.className = "custom-dropdown-empty"
-            empty.textContent = "No results found"
-            optionsList.appendChild(empty)
-            return
-        }
+        topSpacer.style.height = `${(startIndex * ITEM_HEIGHT)}px`
+        bottomSpacer.style.height = `${((filteredOptions.length - endIndex) * ITEM_HEIGHT)}px`
 
-        focusedIndex = -1
-        const visible = filtered.slice(0, MAX_VISIBLE)
-        for (const opt of visible) {
+        const fragment = document.createDocumentFragment()
+        for (let i = startIndex; i < endIndex; i++) {
+            const opt = filteredOptions[i]
             const el = document.createElement("div")
             el.className = "custom-dropdown-option"
             if (opt.value === currentValue) el.classList.add("selected")
@@ -121,15 +129,37 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
                 selectOption(opt.value)
             })
 
-            optionsList.appendChild(el)
+            fragment.appendChild(el)
         }
 
-        if (filtered.length > MAX_VISIBLE) {
-            const footer = document.createElement("div")
-            footer.className = "custom-dropdown-empty"
-            footer.textContent = `Refine search to see more (${filtered.length} total)`
-            optionsList.appendChild(footer)
+        for (const child of [...optionsList.children]) {
+            if (child !== topSpacer && child !== bottomSpacer) child.remove()
         }
+        optionsList.insertBefore(fragment, bottomSpacer)
+    }
+
+    function renderOptions(filter = ""): void {
+        const lower = filter.toLowerCase()
+        filteredOptions = lower.length > 0
+            ? currentOptions.filter((o) => o.label.toLowerCase().includes(lower) || (o.meta?.toLowerCase().includes(lower) ?? false))
+            : [...currentOptions]
+
+        if (filteredOptions.length === 0) {
+            for (const child of [...optionsList.children]) {
+                if (child !== topSpacer && child !== bottomSpacer) child.remove()
+            }
+            topSpacer.style.height = "0px"
+            bottomSpacer.style.height = "0px"
+            const empty = document.createElement("div")
+            empty.className = "custom-dropdown-empty"
+            empty.textContent = "No results found"
+            optionsList.insertBefore(empty, bottomSpacer)
+            return
+        }
+
+        focusedIndex = -1
+        optionsList.scrollTop = 0
+        renderVirtualList()
     }
 
     function selectOption(value: string): void {
@@ -152,7 +182,7 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
 
     function positionPanel(): void {
         const rect = trigger.getBoundingClientRect()
-        const panelHeight = Math.min(320, optionsList.scrollHeight + 52)
+        const panelHeight = Math.min(PANEL_MAX_HEIGHT, (filteredOptions.length * ITEM_HEIGHT) + 52)
         const spaceBelow = window.innerHeight - rect.bottom
         const spaceAbove = rect.top
         const openUp = spaceBelow < panelHeight && spaceAbove > spaceBelow
@@ -252,6 +282,10 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     searchInput.addEventListener("click", (e) => {
         e.stopPropagation()
     })
+
+    optionsList.addEventListener("scroll", () => {
+        renderVirtualList()
+    }, { passive: true })
 
     renderOptions()
 
