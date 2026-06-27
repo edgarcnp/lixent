@@ -396,9 +396,7 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
-    height: 2.25rem;
-    padding: 0 0.75rem;
-    line-height: 2.25rem;
+    padding: 0.625rem 0.75rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
@@ -406,6 +404,7 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     text-align: left;
     gap: 0.5rem;
+    box-sizing: border-box;
 }
 
 .custom-dropdown-trigger:hover {
@@ -473,14 +472,13 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: 6px;
-    height: 2rem;
-    padding: 0 0.625rem;
-    line-height: 2rem;
+    padding: 0.5rem 0.625rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
     outline: none;
     transition: border-color 0.15s;
+    box-sizing: border-box;
 }
 
 .custom-dropdown-search input:focus {
@@ -584,14 +582,13 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
-    height: 2.25rem;
-    padding: 0 0.75rem;
-    line-height: 2.25rem;
+    padding: 0.625rem 0.75rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
 }
 
 .util-section select:hover,
