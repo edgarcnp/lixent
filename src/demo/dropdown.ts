@@ -162,6 +162,13 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
         renderVirtualList()
     }
 
+    function scrollToSelected(): void {
+        const selectedIndex = filteredOptions.findIndex((o) => o.value === currentValue)
+        if (selectedIndex < 0) return
+        const panelHeight = Math.min(PANEL_MAX_HEIGHT, (filteredOptions.length * ITEM_HEIGHT) + 8)
+        optionsList.scrollTop = (selectedIndex * ITEM_HEIGHT) - (panelHeight / 2) + (ITEM_HEIGHT / 2)
+    }
+
     function selectOption(value: string): void {
         currentValue = value
         const opt = currentOptions.find((o) => o.value === value)
@@ -203,16 +210,12 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
         wrapper.classList.add("open")
         searchInput.value = ""
         renderOptions()
-        positionPanel()
-        const selected = optionsList.querySelector(".custom-dropdown-option.selected")
-        if (selected) {
-            selected.scrollIntoView({ block: "nearest" })
-            const panelRect = optionsList.getBoundingClientRect()
-            const itemRect = selected.getBoundingClientRect()
-            const offset = itemRect.top - panelRect.top - (panelRect.height / 2) + (itemRect.height / 2)
-            optionsList.scrollTop += offset
-        }
-        requestAnimationFrame(() => searchInput.focus())
+        requestAnimationFrame(() => {
+            positionPanel()
+            scrollToSelected()
+            renderVirtualList()
+            searchInput.focus()
+        })
         window.addEventListener("scroll", positionPanel, { passive: true })
         window.addEventListener("resize", positionPanel, { passive: true })
         document.addEventListener("click", onOutsideClick)
