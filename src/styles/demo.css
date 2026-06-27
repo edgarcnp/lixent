@@ -45,7 +45,7 @@
 /* Utility Menu */
 .util-menu {
     width: 300px;
-    background: var(--demo-surface);
+    background: var(--demo-surface-2);
     border-right: 1px solid var(--demo-border);
     display: flex;
     flex-direction: column;
@@ -161,7 +161,7 @@
 }
 
 .accordion-header:hover {
-    background: var(--demo-surface-2);
+    background: var(--demo-surface);
 }
 
 .accordion-chevron {
@@ -183,7 +183,7 @@
 .accordion-summary {
     font-size: 0.6875rem;
     color: var(--demo-text-muted);
-    background: var(--demo-surface-2);
+    background: var(--demo-surface);
     padding: 2px 6px;
     border-radius: 9999px;
     white-space: nowrap;
