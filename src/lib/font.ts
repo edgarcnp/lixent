@@ -54,17 +54,6 @@ export function getGoogleFontsUrl(family: string, variants: string[] = ["regular
 }
 
 /**
- * Wrap a font family name for use in a CSS `font-family` value.
- *
- * @param family - Font family name (e.g. `"Inter"`).
- * @returns CSS font-family string (e.g. `"Inter", sans-serif`).
- */
-export function getFontFamily(family: string): string {
-    const safe = family.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
-    return `"${safe}", sans-serif`
-}
-
-/**
  * Convert a CSS font-weight value to Google Fonts variant strings.
  *
  * Always includes `"regular"` (400) as the base. If the configured weight
