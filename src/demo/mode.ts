@@ -17,10 +17,11 @@ export function applyMode(mode: "dark" | "light"): void {
         btn.classList.remove("rotate")
         void btn.offsetWidth
         btn.classList.add("rotate")
+        const duration = parseFloat(getComputedStyle(btn).animationDuration) * 1000
         setTimeout(() => {
             modeIcon.innerHTML = mode === "dark" ? MOON_SVG : SUN_SVG
-        }, 200)
-        setTimeout(() => btn.classList.remove("rotate"), 400)
+        }, duration / 2)
+        setTimeout(() => btn.classList.remove("rotate"), duration)
     } else {
         modeIcon.innerHTML = mode === "dark" ? MOON_SVG : SUN_SVG
     }
