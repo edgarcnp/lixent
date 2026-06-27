@@ -10,7 +10,8 @@ import { DEFAULTS } from "./settings.ts"
 let allLicenses: SpdxLicense[] = []
 let allFonts: GoogleFont[] = []
 let activeGoogleFontLink: HTMLLinkElement | null = null
-const loadedFontFamilies = new Set<string>()
+const preloadedFamilies = new Set<string>()
+const fullyLoadedFamilies = new Set<string>()
 const themeCache = new Map<string, string>()
 let previewThemeStyle: HTMLStyleElement | null = null
 let themeAbort: AbortController | null = null
@@ -80,11 +81,13 @@ export function loadGoogleFont(family: string): void {
         activeGoogleFontLink = null
         return
     }
-    if (loadedFontFamilies.has(family)) return
+    if (fullyLoadedFamilies.has(family)) return
     const font = allFonts.find((f) => f.family === family)
     if (font == null) return
     const url = getGoogleFontsUrl(font.family, font.variants)
     if (url == null) return
+    preloadedFamilies.delete(family)
+    fullyLoadedFamilies.add(family)
     const link = document.createElement("link")
     link.rel = "stylesheet"
     link.href = url
@@ -92,17 +95,16 @@ export function loadGoogleFont(family: string): void {
         activeGoogleFontLink?.remove()
         activeGoogleFontLink = link
     }, { once: true })
-    loadedFontFamilies.add(family)
     document.head.appendChild(link)
 }
 
 export function preloadGoogleFont(family: string): void {
-    if (loadedFontFamilies.has(family)) return
+    if (preloadedFamilies.has(family) || fullyLoadedFamilies.has(family)) return
     const font = allFonts.find((f) => f.family === family)
     if (font == null) return
     const url = getGoogleFontsUrl(font.family, ["regular"])
     if (url == null) return
-    loadedFontFamilies.add(family)
+    preloadedFamilies.add(family)
     const link = document.createElement("link")
     link.rel = "stylesheet"
     link.href = url
