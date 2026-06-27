@@ -692,6 +692,10 @@
     user-select: none;
 }
 
+.toggle-label label {
+    cursor: pointer;
+}
+
 .toggle-label input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;

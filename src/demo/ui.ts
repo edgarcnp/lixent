@@ -182,10 +182,6 @@ export async function initDemo(): Promise<void> {
         onControlChange()
         void updateGravatarProfileWarning()
     })
-    gravatarToggle.parentElement?.querySelector("span")?.addEventListener("click", () => {
-        gravatarToggle.checked = !gravatarToggle.checked
-        gravatarToggle.dispatchEvent(new Event("change"))
-    })
 
     document.querySelectorAll(".accordion-header").forEach((header) => {
         header.addEventListener("click", () => {
