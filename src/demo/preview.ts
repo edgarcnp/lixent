@@ -29,8 +29,7 @@ let el: {
     summaryIdentity: HTMLElement
 } | null = null
 
-let gravatarRow: HTMLDivElement | null = null
-let gravatarImg: HTMLImageElement | null = null
+let gravatarInline: HTMLImageElement | null = null
 
 export function initPreviewElements(): void {
     el = {
@@ -233,31 +232,23 @@ function updateCopyrightLine(
 function updateGravatar(email: string, copyright: string, showGravatar: boolean): void {
     if (!el) return
     const hasEmail = email.length > 0 && isValidEmail(email)
-    const header = el.previewTitle.closest(".license-header")
-    if (!header) return
 
     if (showGravatar && hasEmail) {
-        if (!gravatarRow) {
-            gravatarRow = document.createElement("div")
-            gravatarRow.className = "identity-row"
-            gravatarImg = document.createElement("img")
-            gravatarImg.className = "gravatar"
-            gravatarImg.width = 40
-            gravatarImg.height = 40
-            gravatarRow.appendChild(gravatarImg)
-            gravatarRow.appendChild(el.previewTitle)
-            header.prepend(gravatarRow)
+        if (!gravatarInline) {
+            gravatarInline = document.createElement("img")
+            gravatarInline.className = "gravatar-inline"
+            gravatarInline.width = 24
+            gravatarInline.height = 24
+            el.previewCopyright.prepend(gravatarInline)
         }
-        const newSrc = getGravatarUrl(email, 40)
-        if (gravatarImg && gravatarImg.src !== newSrc) {
-            gravatarImg.src = newSrc
-            gravatarImg.alt = copyright
+        const newSrc = getGravatarUrl(email, 24)
+        if (gravatarInline.src !== newSrc) {
+            gravatarInline.src = newSrc
+            gravatarInline.alt = copyright
         }
-    } else if (gravatarRow) {
-        header.prepend(el.previewTitle)
-        gravatarRow.remove()
-        gravatarRow = null
-        gravatarImg = null
+    } else if (gravatarInline) {
+        gravatarInline.remove()
+        gravatarInline = null
     }
 }
 

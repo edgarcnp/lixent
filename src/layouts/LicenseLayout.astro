@@ -94,21 +94,18 @@ const gravatarUrl
     <body>
         <main>
             <header class="license-header">
-                {gravatarUrl && (
-                    <div class="identity-row">
+                <h1>{title}</h1>
+                <p class="copyright">
+                    {gravatarUrl && (
                         <Image
-                            class="gravatar"
+                            class="gravatar-inline"
                             src={gravatarUrl}
                             alt={config.copyright}
-                            width={40}
-                            height={40}
+                            width={24}
+                            height={24}
                             loading="eager"
                         />
-                        <h1>{title}</h1>
-                    </div>
-                )}
-                {!gravatarUrl && <h1>{title}</h1>}
-                <p class="copyright">
+                    )}
                     Copyright &copy; {yearStr}{" "}
                     {hasUrl
                         ? <a href={config.url} target="_blank" rel="noopener noreferrer">{name}</a>

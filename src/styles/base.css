@@ -60,17 +60,13 @@ main {
   border-bottom: 0.5px solid var(--lx-border);
 }
 
-.identity-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.gravatar {
+.gravatar-inline {
   border-radius: 50%;
-  display: block;
-  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.375rem;
+  position: relative;
+  top: -0.05em;
 }
 
 h1 {

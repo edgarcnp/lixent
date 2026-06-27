@@ -1035,17 +1035,13 @@
     color: #fbbf24;
 }
 
-.preview-content .identity-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-}
-
-.preview-content .identity-row .gravatar {
+.preview-content .gravatar-inline {
     border-radius: 50%;
-    display: block;
-    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.375rem;
+    position: relative;
+    top: -0.05em;
 }
 
 .preview-content .license-header {
