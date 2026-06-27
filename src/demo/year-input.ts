@@ -45,7 +45,7 @@ export function createYearInput(
         const start = parseInt(yearStartInput.value)
         const end = parseInt(yearEndInput.value)
         if (!isNaN(start) && !isNaN(end) && start > end) {
-            yearEndInput.value = yearStartInput.value
+            yearEndInput.value = String(start)
         }
         onChange()
     })
@@ -53,7 +53,7 @@ export function createYearInput(
         const start = parseInt(yearStartInput.value)
         const end = parseInt(yearEndInput.value)
         if (!isNaN(start) && !isNaN(end) && end < start) {
-            yearStartInput.value = yearEndInput.value
+            yearStartInput.value = String(end)
         }
         onChange()
     })
