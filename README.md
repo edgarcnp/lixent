@@ -9,8 +9,9 @@ Lixent generates a static HTML page displaying your software license. Users fork
 **Key differences from mit-license.org:**
 - Self-hosted — deploy to GitHub Pages, GitLab Pages, Cloudflare Pages, Netlify, Vercel, or your own server
 - Every SPDX license supported, not just MIT
-- 10 built-in themes with CSS custom properties
-- Custom license text support
+- 20 built-in themes (Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, and more)
+- Custom license text support (inline or file-based)
+- Custom theme support (inline JSON or external CSS)
 - Gravatar integration
 - Plain text and JSON endpoints
 
@@ -40,17 +41,21 @@ All configuration is in `lixent.config.json`:
 |-------|------|----------|-------------|
 | `copyright` | string | Yes | Your name or organization |
 | `license` | string | Yes | SPDX license ID or `"custom"` |
-| `theme` | string | Yes | Theme ID or path to custom CSS |
+| `theme` | string | Yes | Theme ID, `"custom"`, or path to custom CSS |
 | `url` | string | No | Your website URL |
 | `email` | string | No | Email for Gravatar |
 | `gravatar` | boolean | No | Show Gravatar avatar |
-| `customLicense` | object | No | Custom license text (when `license: "custom"`) |
+| `customLicense` | object | No | Custom license config (when `license: "custom"`) |
+| `licenseFile` | string | No | Path to license text file (when `license: "custom"`) |
+| `customTheme` | object | No | Inline custom theme colors (when `theme: "custom"`) |
 | `basePath` | string | No | For subpath deploys (e.g., `"/license"`) |
 | `themeOverrides` | object | No | Override CSS custom properties |
 | `year` | number | No | Override copyright year |
 | `yearRange` | object | No | Use year range instead of single year |
 
 ### Custom License
+
+**Inline text:**
 
 ```json
 {
@@ -62,7 +67,16 @@ All configuration is in `lixent.config.json`:
 }
 ```
 
-Available placeholders: `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}`
+**File-based:**
+
+```json
+{
+  "license": "custom",
+  "licenseFile": "LICENSE.txt"
+}
+```
+
+The file is read at build time and supports the same placeholders: `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}`. If both `customLicense.text` and `licenseFile` are set, `licenseFile` takes precedence.
 
 ### Theme Overrides
 
@@ -74,27 +88,76 @@ Override any CSS custom property without creating a full theme:
   "themeOverrides": {
     "--lx-bg": "#1a1a1a",
     "--lx-text": "#e5e5e5",
-    "--lx-accent": "#60a5fa"
+    "--lx-accent": "#60a5fa",
+    "--lx-text-muted": "#a3a3a3",
+    "--lx-divider": "#404040"
   }
 }
 ```
+
+### Year and YearRange
+
+By default, the current year is used. Override it:
+
+```json
+{
+  "year": 2025
+}
+```
+
+Or use a year range:
+
+```json
+{
+  "yearRange": { "start": 2020, "end": 2025 }
+}
+```
+
+**Note:** `year` and `yearRange` are mutually exclusive — setting both throws an error.
 
 ## Available Themes
 
 | Theme | Description | Dark |
 |-------|-------------|------|
-| `minimal` | Clean serif, generous spacing | No |
+| `minimal` | Clean sans-serif, generous spacing | No |
 | `minimal-dark` | Same as minimal, dark background | Yes |
 | `github` | GitHub README aesthetic | No |
 | `github-dark` | GitHub dark README | Yes |
 | `terminal` | Retro green-on-black | Yes |
 | `newspaper` | NYT/journalism style | No |
 | `elegant` | High-contrast, refined | No |
+| `tokyonight` | Popular VS Code theme | Yes |
+| `tokyonight-light` | Tokyo Night light variant | No |
+| `dracula` | Popular Dracula theme | Yes |
+| `dracula-light` | Dracula light variant | No |
+| `nord` | Arctic, north-bluish colors | Yes |
+| `nord-light` | Nord light variant | No |
+| `gruvbox` | Retro groove warm colors | Yes |
+| `gruvbox-light` | Gruvbox light variant | No |
+| `catppuccin` | Comforting pastel theme | Yes |
+| `catppuccin-light` | Catppuccin light variant | No |
 | `mono` | Pure monospace, no decoration | No |
 | `serif` | Traditional book-like | No |
 | `sans` | Modern sans-serif | No |
 
 ### Custom Themes
+
+**Inline JSON (simple):**
+
+```json
+{
+  "theme": "custom",
+  "customTheme": {
+    "bg": "#1a1a1a",
+    "text": "#e5e5e5",
+    "textMuted": "#a3a3a3",
+    "accent": "#60a5fa",
+    "border": "#404040"
+  }
+}
+```
+
+**External CSS file (advanced):**
 
 Create a CSS file defining all required custom properties:
 
@@ -104,15 +167,8 @@ Create a CSS file defining all required custom properties:
   --lx-text: #1a1a1a;
   --lx-text-muted: #666666;
   --lx-accent: #2563eb;
-  --lx-border: #e5e7eb;
-  --lx-surface: #f9fafb;
+  --lx-divider: #e5e7eb;
   --lx-font-body: "Inter", system-ui, sans-serif;
-  --lx-font-mono: "JetBrains Mono", monospace;
-  --lx-font-size: 1.125rem;
-  --lx-line-height: 1.7;
-  --lx-max-width: 720px;
-  --lx-padding: 2.5rem;
-  --lx-border-radius: 8px;
 }
 ```
 

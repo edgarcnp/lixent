@@ -47,7 +47,7 @@ bunx tsc --noEmit  # Type check
 ### Adding a Theme
 
 1. Create a new CSS file in `public/themes/` (e.g., `my-theme.css`)
-2. Define all 8 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-border`, `--lx-surface`, `--lx-font-body`, `--lx-font-mono`)
+2. Define all 6 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-divider`, `--lx-font-body`)
 3. Add the theme to `src/themes/index.ts`
 4. Test with `"theme": "my-theme"` in your config
 
