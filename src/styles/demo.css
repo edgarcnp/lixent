@@ -2,15 +2,17 @@
 
 /* Light mode (default) */
 .demo-layout {
-    --demo-bg: #f5f3ef;
+    --demo-bg: #d6d2cb;
     --demo-surface: #ffffff;
-    --demo-surface-2: #ebe8e3;
-    --demo-border: #e5e1dc;
-    --demo-border-hover: #cdc8c1;
+    --demo-surface-2: #f0ede8;
+    --demo-border: #b8b3ab;
+    --demo-border-hover: #9c9690;
     --demo-text: #1c1917;
-    --demo-text-muted: #78716c;
+    --demo-text-muted: #57534e;
     --demo-accent: #d97706;
     --demo-accent-hover: #b45309;
+    --demo-bg-secondary: #e8e5df;
+    --demo-text-secondary: #78716c;
     --demo-success: #16a34a;
     --demo-radius: 8px;
     --demo-radius-lg: 10px;
@@ -27,6 +29,8 @@
     --demo-text-muted: #a8a29e;
     --demo-accent: #f59e0b;
     --demo-accent-hover: #d97706;
+    --demo-bg-secondary: #1c1b1a;
+    --demo-text-secondary: #a8a29e;
 }
 
 .demo-layout {
