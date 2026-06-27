@@ -117,3 +117,181 @@ describe("loadConfig edge cases", () => {
         assert.equal(loaded.theme, "minimal")
     })
 })
+
+describe("loadConfig custom theme", () => {
+    it("loads custom theme from inline config", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "custom",
+            customTheme: {
+                bg: "#1a1a1a",
+                text: "#e5e5e5",
+                textMuted: "#a3a3a3",
+                accent: "#60a5fa",
+                border: "#404040",
+            },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        const loaded = loadConfig(TMP_DIR)
+        assert.equal(loaded.theme, "custom")
+        assert.ok(loaded.customTheme)
+        assert.equal(loaded.customTheme.bg, "#1a1a1a")
+    })
+
+    it("throws when theme is custom but customTheme is missing", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "custom",
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /Theme is "custom" but customTheme is not set/,
+        )
+    })
+
+    it("throws for disallowed key in customTheme", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "custom",
+            customTheme: { bg: "#000", evil: "#fff" },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /Disallowed key in customTheme/,
+        )
+    })
+})
+
+describe("loadConfig custom license from file", () => {
+    it("loads custom license from licenseFile", () => {
+        const licenseText = "Custom license for {{name}}"
+        writeFileSync(join(TMP_DIR, "CUSTOM-LICENSE"), licenseText)
+        const config = {
+            copyright: "Test",
+            license: "custom",
+            licenseFile: "./CUSTOM-LICENSE",
+            theme: "minimal",
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        const loaded = loadConfig(TMP_DIR)
+        assert.equal(loaded.license, "custom")
+        assert.equal(loaded.licenseFile, "./CUSTOM-LICENSE")
+    })
+
+    it("throws when license is custom but no text or file", () => {
+        const config = {
+            copyright: "Test",
+            license: "custom",
+            theme: "minimal",
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /neither customLicense\.text nor licenseFile is set/,
+        )
+    })
+})
+
+describe("loadConfig year and yearRange", () => {
+    it("accepts year only", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            year: 2025,
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        const loaded = loadConfig(TMP_DIR)
+        assert.equal(loaded.year, 2025)
+    })
+
+    it("accepts yearRange only", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            yearRange: { start: 2020, end: 2025 },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        const loaded = loadConfig(TMP_DIR)
+        assert.ok(loaded.yearRange)
+        assert.equal(loaded.yearRange.start, 2020)
+        assert.equal(loaded.yearRange.end, 2025)
+    })
+
+    it("throws when both year and yearRange are set", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            year: 2025,
+            yearRange: { start: 2020, end: 2025 },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /Both `year` and `yearRange` are set/,
+        )
+    })
+
+    it("throws when yearRange.start > yearRange.end", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            yearRange: { start: 2026, end: 2020 },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /yearRange\.start \(2026\) must not exceed yearRange\.end \(2020\)/,
+        )
+    })
+
+    it("throws when year is a non-numeric string", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            year: "not-a-number",
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /year must be a number, got "not-a-number"/,
+        )
+    })
+
+    it("throws when yearRange.start is a non-numeric string", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            yearRange: { start: "abc", end: 2025 },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /yearRange\.start must be a number, got "abc"/,
+        )
+    })
+
+    it("throws when yearRange.end is a non-numeric string", () => {
+        const config = {
+            copyright: "Test",
+            license: "MIT",
+            theme: "minimal",
+            yearRange: { start: 2020, end: "xyz" },
+        }
+        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /yearRange\.end must be a number, got "xyz"/,
+        )
+    })
+})

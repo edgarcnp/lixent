@@ -9,6 +9,7 @@ import {
     assertValidCustomName,
     assertValidCustomText,
     assertValidThemeOverrides,
+    assertValidCustomTheme,
 } from "../src/lib/validation.ts"
 
 describe("assertValidUrl", () => {
@@ -111,6 +112,13 @@ describe("assertValidFont", () => {
 describe("assertValidCopyright", () => {
     it("accepts valid copyright", () => {
         assert.doesNotThrow(() => assertValidCopyright("John Doe"))
+    })
+
+    it("rejects empty string", () => {
+        assert.throws(
+            () => assertValidCopyright(""),
+            /Copyright cannot be empty/,
+        )
     })
 
     it("rejects HTML tags", () => {
@@ -230,6 +238,13 @@ describe("assertValidThemeOverrides", () => {
         })
     })
 
+    it("rejects empty value", () => {
+        assert.throws(
+            () => assertValidThemeOverrides({ "--lx-bg": "" }, allowed),
+            /Empty value for --lx-bg in themeOverrides/,
+        )
+    })
+
     it("rejects disallowed CSS variable", () => {
         assert.throws(
             () => assertValidThemeOverrides({ "--lx-evil": "red" }, allowed),
@@ -249,5 +264,66 @@ describe("assertValidThemeOverrides", () => {
             () => assertValidThemeOverrides({ "--lx-bg": "url(https://evil.com)" }, allowed),
             /Unsafe value/,
         )
+    })
+})
+
+describe("assertValidCustomTheme", () => {
+    it("accepts valid theme colors", () => {
+        assert.doesNotThrow(() => {
+            assertValidCustomTheme({
+                bg: "#1a1a1a",
+                text: "#e5e5e5",
+                textMuted: "#a3a3a3",
+                accent: "#60a5fa",
+                border: "#404040",
+            })
+        })
+    })
+
+    it("accepts partial theme (only some keys)", () => {
+        assert.doesNotThrow(() => {
+            assertValidCustomTheme({ bg: "#000", text: "#fff" })
+        })
+    })
+
+    it("rejects disallowed key", () => {
+        assert.throws(
+            () => assertValidCustomTheme({ bg: "#000", evil: "#fff" }),
+            /Disallowed key in customTheme/,
+        )
+    })
+
+    it("rejects value with semicolon", () => {
+        assert.throws(
+            () => assertValidCustomTheme({ bg: "#000; color: red" }),
+            /contains unsafe characters/,
+        )
+    })
+
+    it("rejects value with curly braces", () => {
+        assert.throws(
+            () => assertValidCustomTheme({ bg: "#000 { color: red }" }),
+            /contains unsafe characters/,
+        )
+    })
+
+    it("rejects value with url()", () => {
+        assert.throws(
+            () => assertValidCustomTheme({ bg: "url(https://evil.com)" }),
+            /contains unsafe characters/,
+        )
+    })
+
+    it("rejects value exceeding 64 chars", () => {
+        assert.throws(
+            () => assertValidCustomTheme({ bg: "x".repeat(65) }),
+            /exceeds 64 characters/,
+        )
+    })
+
+    it("accepts named CSS colors", () => {
+        assert.doesNotThrow(() => {
+            assertValidCustomTheme({ bg: "white", text: "black" })
+        })
     })
 })
