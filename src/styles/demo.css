@@ -400,6 +400,7 @@
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
+    line-height: normal;
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     text-align: left;
