@@ -13,6 +13,7 @@ interface DropdownConfig {
     placeholder?: string
     searchPlaceholder?: string
     onSelect: (value: string) => void
+    loadFont?: (family: string) => void
 }
 
 export interface DropdownInstance {
@@ -65,7 +66,7 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
             const font = el.dataset.font
             if (font && !loadedFonts.has(font)) {
                 loadedFonts.add(font)
-                void document.fonts.load(`16px ${font}`)
+                config.loadFont?.(font)
             }
             fontObserver.unobserve(el)
         }

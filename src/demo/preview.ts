@@ -93,6 +93,17 @@ export function loadGoogleFont(family: string): void {
     document.head.appendChild(link)
 }
 
+export function preloadGoogleFont(family: string): void {
+    const font = allFonts.find((f) => f.family === family)
+    if (font == null) return
+    const url = getGoogleFontsUrl(font.family, ["regular"])
+    if (url == null) return
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = url
+    document.head.appendChild(link)
+}
+
 export function setAllLicenses(licenses: SpdxLicense[]): void {
     allLicenses = licenses
 }

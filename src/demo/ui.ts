@@ -3,7 +3,7 @@ import type { ProjectConfig } from "./licenses.ts"
 import type { GoogleFont } from "../lib/font.ts"
 import { $, debounce, getPreferredMode } from "./helpers.ts"
 import { createDropdown } from "./dropdown.ts"
-import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview, initPreviewElements } from "./preview.ts"
+import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview, initPreviewElements, preloadGoogleFont } from "./preview.ts"
 import { buildConfigJson, DEFAULTS } from "./settings.ts"
 import { applyMode, toggleMode } from "./mode.ts"
 import { createWarnings } from "./warnings.ts"
@@ -70,6 +70,7 @@ export async function initDemo(): Promise<void> {
         placeholder: "Select font...",
         searchPlaceholder: "Search fonts...",
         onSelect: () => onControlChange(),
+        loadFont: preloadGoogleFont,
     })
 
     function runUpdatePreview(): void {
