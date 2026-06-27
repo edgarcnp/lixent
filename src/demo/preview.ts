@@ -73,11 +73,11 @@ export function fontToOption(font: GoogleFont): DropdownOption {
 }
 
 export function loadGoogleFont(family: string): void {
-    if (activeGoogleFontLink) {
-        activeGoogleFontLink.remove()
+    if (family.length === 0) {
+        activeGoogleFontLink?.remove()
         activeGoogleFontLink = null
+        return
     }
-    if (family.length === 0) return
     const font = allFonts.find((f) => f.family === family)
     if (font == null) return
     const url = getGoogleFontsUrl(font.family, font.variants)
@@ -85,8 +85,11 @@ export function loadGoogleFont(family: string): void {
     const link = document.createElement("link")
     link.rel = "stylesheet"
     link.href = url
+    link.addEventListener("load", () => {
+        activeGoogleFontLink?.remove()
+        activeGoogleFontLink = link
+    }, { once: true })
     document.head.appendChild(link)
-    activeGoogleFontLink = link
 }
 
 export function setAllLicenses(licenses: SpdxLicense[]): void {
