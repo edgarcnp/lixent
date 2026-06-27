@@ -3,14 +3,29 @@ import LicenseLayout from "../layouts/LicenseLayout.astro"
 import LicenseBody from "../components/LicenseBody.astro"
 import { loadConfig } from "../lib/config.ts"
 import { fetchLicenseList, fetchLicenseText, renderLicenseText } from "../lib/license.ts"
+import { formatYear, formatYearRange } from "../lib/year.ts"
 
 const config = loadConfig()
 
 let renderedText: string
 let licenseName: string
 
+let yearStr: string
+if (config.year != null) {
+    yearStr = formatYear(config.year)
+} else if (config.yearRange != null) {
+    yearStr = formatYearRange(config.yearRange.start, config.yearRange.end)
+} else {
+    yearStr = formatYear()
+}
+
 if (config.license === "custom" && config.customLicense) {
-    renderedText = renderLicenseText(config.customLicense.text, config)
+    renderedText = renderLicenseText(config.customLicense.text, {
+        year: yearStr,
+        name: config.copyright,
+        url: config.url,
+        email: config.email,
+    })
     licenseName = config.customLicense.name
 } else {
     const licenses = await fetchLicenseList()
@@ -20,11 +35,16 @@ if (config.license === "custom" && config.customLicense) {
     }
 
     const rawText = await fetchLicenseText(config.license)
-    renderedText = renderLicenseText(rawText, config)
+    renderedText = renderLicenseText(rawText, {
+        year: yearStr,
+        name: config.copyright,
+        url: config.url,
+        email: config.email,
+    })
     licenseName = match.name
 }
 ---
 
-<LicenseLayout title={`${licenseName} License`} config={config}>
+<LicenseLayout title={licenseName} config={config} yearStr={yearStr}>
     <LicenseBody text={renderedText} />
 </LicenseLayout>

@@ -63,3 +63,33 @@ export function getFontFamily(family: string): string {
     const safe = family.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
     return `"${safe}", sans-serif`
 }
+
+/**
+ * Convert a CSS font-weight value to Google Fonts variant strings.
+ *
+ * Always includes `"regular"` (400) as the base. If the configured weight
+ * differs from 400, it is added as an additional variant.
+ *
+ * @param fontWeight - CSS font-weight value (e.g. `"700"`, `"bold"`, `"normal"`).
+ * @returns Array of Google Fonts variant strings (e.g. `["regular", "700"]`).
+ *
+ * @example
+ * ```ts
+ * cssWeightToVariants("700")   // → ["regular", "700"]
+ * cssWeightToVariants("bold")  // → ["regular", "700"]
+ * cssWeightToVariants("400")   // → ["regular"]
+ * cssWeightToVariants()        // → ["regular"]
+ * ```
+ */
+export function cssWeightToVariants(fontWeight?: string): string[] {
+    if (fontWeight == null || fontWeight.length === 0) return ["regular"]
+    let normalized: string
+    if (fontWeight === "bold") {
+        normalized = "700"
+    } else if (fontWeight === "normal") {
+        normalized = "400"
+    } else {
+        normalized = fontWeight
+    }
+    return normalized === "400" ? ["regular"] : ["regular", normalized]
+}
