@@ -396,7 +396,9 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
-    padding: 0.5rem 0.75rem 0.625rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    line-height: 2.25rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
@@ -471,7 +473,9 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: 6px;
-    padding: 0.4375rem 0.625rem;
+    height: 2rem;
+    padding: 0 0.625rem;
+    line-height: 2rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
@@ -580,7 +584,9 @@
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
-    padding: 0.5rem 0.75rem 0.625rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    line-height: 2.25rem;
     color: var(--demo-text);
     font-size: 0.8125rem;
     font-family: inherit;
