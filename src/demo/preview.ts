@@ -11,7 +11,7 @@ let allFonts: GoogleFont[] = []
 let activeGoogleFontLink: HTMLLinkElement | null = null
 const themeCache = new Map<string, string>()
 let previewThemeStyle: HTMLStyleElement | null = null
-let pendingThemeLoad = 0
+let themeAbort: AbortController | null = null
 
 export function getLicenseName(id: string): string {
     const match = allLicenses.find((l) => l.licenseId === id)
@@ -155,12 +155,12 @@ export function updatePreview(state: {
         }
         previewThemeStyle.textContent = cached
     } else {
-        const loadId = ++pendingThemeLoad
-        void fetch(newHref)
+        themeAbort?.abort()
+        themeAbort = new AbortController()
+        void fetch(newHref, { signal: themeAbort.signal })
             .then((r) => r.text())
             .then((css) => {
                 themeCache.set(newHref, css)
-                if (loadId !== pendingThemeLoad) return
                 if (!previewThemeStyle) {
                     previewThemeStyle = document.createElement("style")
                     previewThemeStyle.id = "preview-theme"
@@ -168,6 +168,7 @@ export function updatePreview(state: {
                 }
                 previewThemeStyle.textContent = css
             })
+            .catch((e: unknown) => { if (e instanceof Error && e.name !== "AbortError") console.warn(e) })
     }
 
     if (fontFamily.length > 0) {
