@@ -393,6 +393,8 @@
     display: flex;
     align-items: center;
     width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
@@ -471,6 +473,8 @@
 
 .custom-dropdown-search input {
     width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: 6px;
@@ -583,6 +587,8 @@
 
 .util-section select,
 .util-section input {
+    -webkit-appearance: none;
+    appearance: none;
     background: var(--demo-bg);
     border: 1px solid var(--demo-border);
     border-radius: var(--demo-radius);
