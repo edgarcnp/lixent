@@ -1,5 +1,14 @@
 import { isValidUrl } from "./helpers.ts"
 
+export const DEFAULTS = {
+    theme: "minimal-dark",
+    font: "Inter",
+    license: "MIT",
+    fontSize: "18px",
+    lineHeight: "1.7",
+    fontFallback: "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+} as const
+
 export interface DemoSettings {
     theme: string
     font: string
@@ -24,7 +33,7 @@ export function buildConfigJson(settings: DemoSettings): Record<string, unknown>
         theme: settings.theme,
     }
     if (settings.copyright.length > 0) config.copyright = settings.copyright
-    if (settings.font.length > 0 && settings.font !== "Inter") config.font = settings.font
+    if (settings.font.length > 0 && settings.font !== DEFAULTS.font) config.font = settings.font
     if (settings.fontSize.length > 0) config.fontSize = settings.fontSize
     if (settings.fontWeight.length > 0) config.fontWeight = settings.fontWeight
     if (settings.lineHeight.length > 0) config.lineHeight = settings.lineHeight

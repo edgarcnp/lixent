@@ -5,6 +5,7 @@ import type { SpdxLicense } from "../lib/license.ts"
 import type { GoogleFont } from "../lib/font.ts"
 import type { DropdownOption } from "./dropdown.ts"
 import { $, escapeHtml, formatParagraphs, isValidEmail, isValidUrl, BASE_URL } from "./helpers.ts"
+import { DEFAULTS } from "./settings.ts"
 
 let allLicenses: SpdxLicense[] = []
 let allFonts: GoogleFont[] = []
@@ -139,13 +140,13 @@ function updateFont(family: string): void {
         el.previewContent.style.setProperty("--lx-font-body", getFontFamily(family))
     } else {
         loadGoogleFont("")
-        el.previewContent.style.setProperty("--lx-font-body", "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif")
+        el.previewContent.style.setProperty("--lx-font-body", DEFAULTS.fontFallback)
     }
 
     const pangram = el.fontPreview.querySelector<HTMLElement>(".font-preview-pangram")
     const specimen = el.fontPreview.querySelector<HTMLElement>(".font-preview-specimen")
     if (pangram && specimen) {
-        const fontCss = family.length > 0 ? getFontFamily(family) : "\"Inter\", sans-serif"
+        const fontCss = family.length > 0 ? getFontFamily(family) : DEFAULTS.fontFallback
         pangram.style.fontFamily = fontCss
         specimen.style.fontFamily = fontCss
         pangram.style.opacity = "1"
@@ -169,7 +170,7 @@ function updateTypography(state: {
     if (fontSize.length > 0) {
         el.previewContent.style.setProperty("--lx-font-size", fontSize)
     } else {
-        el.previewContent.style.setProperty("--lx-font-size", "18px")
+        el.previewContent.style.setProperty("--lx-font-size", DEFAULTS.fontSize)
     }
     if (fontWeight.length > 0) {
         el.previewContent.style.setProperty("font-weight", fontWeight)
@@ -179,7 +180,7 @@ function updateTypography(state: {
     if (lineHeight.length > 0) {
         el.previewContent.style.setProperty("--lx-line-height", lineHeight)
     } else {
-        el.previewContent.style.setProperty("--lx-line-height", "1.7")
+        el.previewContent.style.setProperty("--lx-line-height", DEFAULTS.lineHeight)
     }
     if (letterSpacing.length > 0) {
         el.previewContent.style.setProperty("letter-spacing", letterSpacing)
@@ -242,9 +243,9 @@ function updateSummary(
         .replace(/^\w/, (c) => c.toUpperCase())
         + (theme.endsWith("-light") ? " Light" : " Dark")
     const parts: string[] = []
-    if (fontLabel !== "Inter") parts.push(fontLabel)
+    if (fontLabel !== DEFAULTS.font) parts.push(fontLabel)
     if (fontSize.length > 0) parts.push(fontSize)
-    el.summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Inter"
+    el.summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : DEFAULTS.font
     el.summaryLicense.textContent = getLicenseName(licenseId)
     el.summaryIdentity.textContent = (copyright || "John Doe") + (hasEmail ? ` · ${email.split("@")[1]}` : "")
 }
@@ -301,7 +302,7 @@ export function updatePreview(state: {
     updateCopyrightLine(copyright, email, url, yearStart, yearEnd)
     updateGravatar(email, copyright, gravatarToggle.checked)
     el.previewUrl.textContent = `${theme} / ${licenseId}`
-    updateSummary(theme, fontDropdown.getValue() || "Inter", fontSize, licenseId, copyright, email)
+    updateSummary(theme, fontDropdown.getValue() || DEFAULTS.font, fontSize, licenseId, copyright, email)
 }
 
 export async function fetchAndRender(

@@ -1,3 +1,5 @@
+import { DEFAULTS } from "./settings.ts"
+
 export interface ThemeSelect {
     getSelectedTheme: () => string
     setSelectedTheme: (id: string) => void
@@ -8,7 +10,7 @@ export function createThemeSelect(
     themeModeToggle: HTMLElement | null,
     onChange: () => void,
 ): ThemeSelect {
-    let selectedTheme = "minimal-dark"
+    let selectedTheme: string = DEFAULTS.theme
 
     function getSelectedTheme(): string {
         return selectedTheme

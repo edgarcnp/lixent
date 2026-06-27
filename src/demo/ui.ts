@@ -4,7 +4,7 @@ import type { GoogleFont } from "../lib/font.ts"
 import { $, debounce, getPreferredMode } from "./helpers.ts"
 import { createDropdown } from "./dropdown.ts"
 import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview, initPreviewElements } from "./preview.ts"
-import { buildConfigJson } from "./settings.ts"
+import { buildConfigJson, DEFAULTS } from "./settings.ts"
 import { applyMode, toggleMode } from "./mode.ts"
 import { createWarnings } from "./warnings.ts"
 import { createThemeSelect } from "./theme-select.ts"
@@ -226,13 +226,13 @@ export async function initDemo(): Promise<void> {
     utilDownload.addEventListener("click", downloadConfig)
 
     function applyProjectConfig(config: ProjectConfig): void {
-        setSelectedTheme(config.theme ?? "minimal-dark")
-        fontDropdown.setValue(config.font ?? "Inter")
+        setSelectedTheme(config.theme ?? DEFAULTS.theme)
+        fontDropdown.setValue(config.font ?? DEFAULTS.font)
         fontSizeInput.value = config.fontSize ?? ""
         fontWeightInput.value = config.fontWeight ?? ""
         lineHeightInput.value = config.lineHeight ?? ""
         letterSpacingInput.value = config.letterSpacing ?? ""
-        licenseDropdown.setValue(config.license ?? "MIT")
+        licenseDropdown.setValue(config.license ?? DEFAULTS.license)
         copyrightInput.value = config.copyright ?? ""
         emailInput.value = config.email ?? ""
         urlInput.value = config.url ?? ""
