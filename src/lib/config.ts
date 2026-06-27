@@ -31,6 +31,7 @@ import {
     assertValidCustomText,
     assertValidThemeOverrides,
     assertValidCssValue,
+    assertValidCustomTheme,
 } from "./validation.ts"
 
 const CONFIG_FILE = "lixent.config.json"
@@ -45,7 +46,11 @@ interface PackageJsonLixent {
     url?: string
     email?: string
     license?: string
+    customLicense?: { name?: string, text?: string }
+    licenseFile?: string
     theme?: string
+    customTheme?: Record<string, string>
+    themeOverrides?: Record<string, string>
     font?: string
     fontSize?: string
     fontWeight?: string
@@ -55,6 +60,8 @@ interface PackageJsonLixent {
     format?: "html" | "txt" | "json"
     basePath?: string
     urlMode?: "subpath" | "subdomain"
+    year?: number
+    yearRange?: { start?: number, end?: number }
 }
 
 interface PackageJson {
@@ -67,19 +74,29 @@ interface PackageJson {
  * Throws on invalid values, warns on non-critical issues (unknown theme, missing custom text).
  */
 function validateConfig(config: LixentConfig): void {
-    if (config.license === "custom" && !config.customLicense?.text) {
-        console.warn(
-            '[lixent] Warning: License is "custom" but customLicense.text is not set.',
-        )
+    if (config.license === "custom") {
+        const hasText = config.customLicense?.text != null && config.customLicense.text.length > 0
+        const hasFile = config.licenseFile != null && config.licenseFile.length > 0
+        if (!hasText && !hasFile) {
+            throw new Error(
+                '[lixent] License is "custom" but neither customLicense.text nor licenseFile is set.',
+            )
+        }
     }
 
     assertValidCopyright(config.copyright)
     if (config.url != null) assertValidUrl(config.url)
     if (config.email != null) assertValidEmail(config.email)
-    if (!isValidTheme(config.theme)) {
+    if (config.theme === "custom") {
+        if (config.customTheme == null) {
+            throw new Error('[lixent] Theme is "custom" but customTheme is not set.')
+        }
+        assertValidCustomTheme(config.customTheme)
+    } else if (!isValidTheme(config.theme) && !config.theme.startsWith("/")) {
         console.warn(
-            `[lixent] Warning: Unknown theme "${config.theme}". `
-          + "Using default theme.",
+            `[lixent] Warning: Unknown built-in theme "${config.theme}". `
+          + `For custom themes use an absolute path starting with "/" (e.g. "/my-theme.css"). `
+          + `The page will attempt to load the CSS from the configured path.`,
         )
     }
     if (config.font != null) assertValidFont(config.font)
@@ -91,6 +108,12 @@ function validateConfig(config: LixentConfig): void {
     if (config.yearRange != null) {
         assertValidYear(config.yearRange.start)
         assertValidYear(config.yearRange.end)
+        if (config.yearRange.start > config.yearRange.end) {
+            throw new Error(
+                `[lixent] yearRange.start (${config.yearRange.start}) must not exceed `
+              + `yearRange.end (${config.yearRange.end})`,
+            )
+        }
     }
     if (config.year != null && config.yearRange != null) {
         throw new Error("[lixent] Both `year` and `yearRange` are set. Use only one.")
@@ -109,20 +132,29 @@ function validateConfig(config: LixentConfig): void {
  * or `yearRange: { start: "2020", end: "2026" }` (strings instead of numbers).
  */
 function coerceConfig(raw: Record<string, unknown>): LixentConfig {
-    const config = raw as unknown as LixentConfig
-    if (typeof config.year === "string") {
-        const n = Number(config.year)
-        config.year = Number.isFinite(n) ? n : config.year
+    const config = { ...raw } as unknown as LixentConfig
+    if (typeof raw.year === "string") {
+        const n = Number(raw.year)
+        if (!Number.isFinite(n)) {
+            throw new Error(`[lixent] year must be a number, got "${raw.year}"`)
+        }
+        config.year = n
     }
-    if (config.yearRange != null && typeof config.yearRange === "object") {
-        const yr = config.yearRange as Record<string, unknown>
+    if (raw.yearRange != null && typeof raw.yearRange === "object") {
+        const yr = raw.yearRange as Record<string, unknown>
         if (typeof yr.start === "string") {
             const n = Number(yr.start)
-            yr.start = Number.isFinite(n) ? n : yr.start
+            if (!Number.isFinite(n)) {
+                throw new Error(`[lixent] yearRange.start must be a number, got "${yr.start}"`)
+            }
+            ;(config.yearRange as Record<string, unknown>).start = n
         }
         if (typeof yr.end === "string") {
             const n = Number(yr.end)
-            yr.end = Number.isFinite(n) ? n : yr.end
+            if (!Number.isFinite(n)) {
+                throw new Error(`[lixent] yearRange.end must be a number, got "${yr.end}"`)
+            }
+            ;(config.yearRange as Record<string, unknown>).end = n
         }
     }
     return config
@@ -140,25 +172,16 @@ function loadFromPackageJson(root: string): LixentConfig | null {
     const pkg = JSON.parse(raw) as PackageJson
     if (pkg.lixent == null) return null
 
-    const config: LixentConfig = {
-        copyright: pkg.lixent.copyright ?? pkg.name ?? "",
-        url: pkg.lixent.url,
-        email: pkg.lixent.email,
-        license: pkg.lixent.license ?? "MIT",
-        theme: pkg.lixent.theme ?? "minimal",
-        font: pkg.lixent.font,
-        fontSize: pkg.lixent.fontSize,
-        fontWeight: pkg.lixent.fontWeight,
-        lineHeight: pkg.lixent.lineHeight,
-        letterSpacing: pkg.lixent.letterSpacing,
-        gravatar: pkg.lixent.gravatar,
-        format: pkg.lixent.format,
-        basePath: pkg.lixent.basePath,
-        urlMode: pkg.lixent.urlMode,
+    const lixentRaw = pkg.lixent as Record<string, unknown>
+    if (lixentRaw.copyright == null || lixentRaw.copyright === "") {
+        lixentRaw.copyright = pkg.name ?? ""
     }
+    lixentRaw.license ??= "MIT"
+    lixentRaw.theme ??= "minimal"
 
-    validateConfig(config)
-    return config
+    const coerced = coerceConfig(lixentRaw)
+    validateConfig(coerced)
+    return coerced
 }
 
 /**

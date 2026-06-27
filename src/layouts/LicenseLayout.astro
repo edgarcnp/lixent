@@ -16,10 +16,12 @@ interface Props {
 
 const { title, config, yearStr, copyright } = Astro.props
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, "")
+
 const builtInTheme = getTheme(config.theme)
 const themePath
     = builtInTheme != null || !config.theme.startsWith("/")
-        ? `/themes/${config.theme}.css`
+        ? `${base}/themes/${config.theme}.css`
         : config.theme
 
 function sanitizeCssValue(v: string): string {
@@ -31,6 +33,26 @@ const themeOverrides
         ? Object.entries(config.themeOverrides)
             .filter(([k]) => THEME_VARIABLES.includes(k))
             .map(([k, v]) => CSS_DANGEROUS_PATTERN.test(v) ? "" : `${k}: ${sanitizeCssValue(v)};`)
+            .join(" ")
+        : ""
+
+const CUSTOM_THEME_MAP: Partial<Record<string, string>> = {
+    bg: "--lx-bg",
+    text: "--lx-text",
+    textMuted: "--lx-text-muted",
+    accent: "--lx-accent",
+    divider: "--lx-divider",
+}
+
+const customThemeVars
+    = config.theme === "custom" && config.customTheme != null
+        ? Object.entries(config.customTheme)
+            .map(([k, v]) => {
+                const cssVar = CUSTOM_THEME_MAP[k]
+                return cssVar != null && !CSS_DANGEROUS_PATTERN.test(v)
+                    ? `${cssVar}: ${sanitizeCssValue(v)};`
+                    : ""
+            })
             .join(" ")
         : ""
 
@@ -65,11 +87,12 @@ const googleFontsUrl = rawFont != null && rawFont.length > 0 ? getGoogleFontsUrl
 const name = copyright ?? config.copyright
 
 const hasUrl = config.url != null && config.url.length > 0
-const hasEmail = config.email != null && config.email.length > 0
+const email = config.email
+const hasEmail = email != null && email.length > 0
 
 const gravatarUrl
-    = config.gravatar === true && hasEmail && config.email != null
-        ? getGravatarUrl(config.email, 64)
+    = config.gravatar === true && hasEmail
+        ? getGravatarUrl(email, 64)
         : null;
 ---
 
@@ -78,14 +101,17 @@ const gravatarUrl
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+        <link rel="icon" href={`${base}/favicon.ico`} />
         <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
+        <meta name="description" content={`${title} — ${name}`} />
         {googleFontsUrl && <link rel="preconnect" href="https://fonts.googleapis.com" />}
         {googleFontsUrl && <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />}
         {googleFontsUrl && <link rel="stylesheet" href={googleFontsUrl} />}
         <link rel="stylesheet" href={themePath} />
+        {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled custom theme colors are safe */}
+        {customThemeVars && <style set:html={`:root { ${customThemeVars} }`} />}
         {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled theme overrides are safe */}
         {themeOverrides && <style set:html={`:root { ${themeOverrides} }`} />}
         {/* eslint-disable-next-line astro/no-set-html-directive -- User-controlled font overrides are safe */}
@@ -115,7 +141,7 @@ const gravatarUrl
                         : name
                     }
                     {hasEmail && (
-                        <span class="email"> &lt;<a href={`mailto:${config.email}`}>{config.email}</a>&gt;</span>
+                        <span class="email"> &lt;<a href={`mailto:${email}`}>{email}</a>&gt;</span>
                     )}
                 </p>
             </header>

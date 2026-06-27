@@ -101,6 +101,9 @@ export function assertValidFont(raw: string): void {
  * @throws {Error} If the value exceeds the max length or contains HTML tags.
  */
 export function assertValidCopyright(raw: string): void {
+    if (raw.length === 0) {
+        throw new Error("Copyright cannot be empty")
+    }
     if (raw.length > MAX_COPYRIGHT_BYTES) {
         throw new Error(`Copyright exceeds ${MAX_COPYRIGHT_BYTES} bytes`)
     }
@@ -186,6 +189,9 @@ export function assertValidThemeOverrides(
         if (!allowedKeys.includes(key)) {
             throw new Error(`Disallowed CSS variable in themeOverrides: ${key}`)
         }
+        if (value.length === 0) {
+            throw new Error(`Empty value for ${key} in themeOverrides`)
+        }
         if (CSS_DANGEROUS_PATTERN.test(value)) {
             throw new Error(`Unsafe value in themeOverrides for ${key}: ${value}`)
         }
@@ -214,5 +220,38 @@ export function assertValidCssValue(value: string, field: string): void {
     }
     if (!CSS_VALUE_PATTERN.test(value)) {
         throw new Error(`${field} contains invalid characters`)
+    }
+}
+
+/** Allowed keys for `customTheme`. */
+const CUSTOM_THEME_KEYS = ["bg", "text", "textMuted", "accent", "border"] as const
+
+/**
+ * Validate a custom theme object.
+ *
+ * Only allows the 5 predefined color keys. Values are checked for
+ * CSS injection patterns and must look like valid CSS colors.
+ *
+ * @param customTheme - The user's custom theme object.
+ * @throws {Error} If a disallowed key is used or a value contains dangerous characters.
+ */
+export function assertValidCustomTheme(
+    customTheme: Record<string, string>,
+): void {
+    for (const key of Object.keys(customTheme)) {
+        if (!(CUSTOM_THEME_KEYS as readonly string[]).includes(key)) {
+            throw new Error(`Disallowed key in customTheme: "${key}". Allowed: ${CUSTOM_THEME_KEYS.join(", ")}`)
+        }
+    }
+    for (const [key, value] of Object.entries(customTheme)) {
+        if (typeof value !== "string" || value.length === 0) {
+            throw new Error(`customTheme.${key} must be a non-empty string`)
+        }
+        if (value.length > 64) {
+            throw new Error(`customTheme.${key} exceeds 64 characters`)
+        }
+        if (CSS_DANGEROUS_PATTERN.test(value)) {
+            throw new Error(`customTheme.${key} contains unsafe characters: ${value}`)
+        }
     }
 }
