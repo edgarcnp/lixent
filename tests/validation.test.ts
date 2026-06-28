@@ -80,12 +80,18 @@ describe("assertValidFont", () => {
         assert.doesNotThrow(() => assertValidFont(""))
     })
 
-    it("accepts font with semicolon (valid CSS)", () => {
-        assert.doesNotThrow(() => assertValidFont("Inter; color: red"))
+    it("rejects font with semicolon (CSS injection)", () => {
+        assert.throws(
+            () => assertValidFont("Inter; color: red"),
+            /unsafe characters/,
+        )
     })
 
-    it("accepts font with curly braces (valid CSS)", () => {
-        assert.doesNotThrow(() => assertValidFont("Inter { color: red }"))
+    it("rejects font with curly braces (CSS injection)", () => {
+        assert.throws(
+            () => assertValidFont("Inter { color: red }"),
+            /unsafe characters/,
+        )
     })
 
     it("rejects font with url()", () => {
@@ -246,9 +252,17 @@ describe("assertValidThemeOverrides", () => {
         )
     })
 
-    it("accepts value with semicolon (valid CSS)", () => {
-        assert.doesNotThrow(
+    it("rejects value with semicolon (CSS injection)", () => {
+        assert.throws(
             () => assertValidThemeOverrides({ "--lx-bg": "red; color: blue" }, allowed),
+            /Unsafe value/,
+        )
+    })
+
+    it("rejects value with curly braces (CSS injection)", () => {
+        assert.throws(
+            () => assertValidThemeOverrides({ "--lx-bg": "red { color: blue }" }, allowed),
+            /Unsafe value/,
         )
     })
 
@@ -286,15 +300,17 @@ describe("assertValidCustomTheme", () => {
         )
     })
 
-    it("accepts value with semicolon (valid CSS)", () => {
-        assert.doesNotThrow(
+    it("rejects value with semicolon (CSS injection)", () => {
+        assert.throws(
             () => assertValidCustomTheme({ bg: "#000; color: red" }),
+            /contains unsafe characters/,
         )
     })
 
-    it("accepts value with curly braces (valid CSS)", () => {
-        assert.doesNotThrow(
+    it("rejects value with curly braces (CSS injection)", () => {
+        assert.throws(
             () => assertValidCustomTheme({ bg: "#000 { color: red }" }),
+            /contains unsafe characters/,
         )
     })
 
