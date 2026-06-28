@@ -20,37 +20,9 @@ import { validateConfig } from "./validator.ts"
 
 const CONFIG_FILE = "lixent.config.json"
 
-/**
- * Shape of the `"lixent"` field inside `package.json`.
- * Mirrors {@link LixentConfig} but with all fields optional since
- * `package.json` is a fallback, not the primary config source.
- */
-interface PackageJsonLixent {
-    copyright?: string
-    url?: string
-    email?: string
-    license?: string
-    customLicense?: { name?: string, text?: string }
-    licenseFile?: string
-    theme?: string
-    customTheme?: Record<string, string>
-    themeOverrides?: Record<string, string>
-    font?: string
-    fontSize?: string
-    fontWeight?: string
-    lineHeight?: string
-    letterSpacing?: string
-    gravatar?: boolean
-    format?: "html" | "txt" | "json"
-    basePath?: string
-    urlMode?: "subpath" | "subdomain"
-    year?: number
-    yearRange?: { start?: number, end?: number }
-}
-
 interface PackageJson {
     name?: string
-    lixent?: PackageJsonLixent
+    lixent?: Partial<LixentConfig>
 }
 
 /**
