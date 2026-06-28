@@ -139,3 +139,50 @@ export function getLicenseName(config: LixentConfig): string {
     }
     return config.license
 }
+
+/** Result of resolving a license from config. */
+export interface ResolvedLicense {
+    /** Display name (e.g. "MIT License" or custom name). */
+    name: string
+    /** Raw license text with original placeholders intact. */
+    text: string
+}
+
+/**
+ * Resolve the license name and raw text from config.
+ *
+ * Handles custom licenses (inline or file-based) and SPDX licenses.
+ * Returns raw text — rendering is the caller's responsibility.
+ */
+export async function resolveLicense(config: LixentConfig): Promise<ResolvedLicense> {
+    if (config.license === "custom") {
+        let customText = config.customLicense?.text ?? ""
+        if (config.licenseFile != null && config.licenseFile.length > 0) {
+            const { readFileSync: readFile } = await import("node:fs")
+            const { resolve: resolvePath } = await import("node:path")
+            customText = readFile(resolvePath(config.licenseFile), "utf-8")
+        }
+        if (!customText) {
+            throw new Error('[lixent] License is "custom" but no license text was found. Set customLicense.text or licenseFile.')
+        }
+        return {
+            name: config.customLicense?.name ?? "Custom License",
+            text: customText,
+        }
+    }
+
+    const [licenses, rawText] = await Promise.all([
+        fetchLicenseList(),
+        fetchLicenseText(config.license),
+    ])
+
+    const match = licenses.find((l) => l.licenseId === config.license)
+    if (!match) {
+        throw new Error(`Unknown license "${config.license}". Check your lixent.config.json.`)
+    }
+
+    return {
+        name: match.name,
+        text: rawText,
+    }
+}

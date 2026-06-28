@@ -1,16 +1,11 @@
 ---
-import { readFileSync } from "node:fs"
-import { resolve } from "node:path"
 import LicenseLayout from "../layouts/LicenseLayout.astro"
 import LicenseBody from "../components/LicenseBody.astro"
 import { loadConfig } from "../lib/config/index.ts"
-import { fetchLicenseList, fetchLicenseText, renderLicenseText } from "../lib/license.ts"
+import { resolveLicense, renderLicenseText } from "../lib/license.ts"
 import { formatYear, formatYearRange } from "../lib/year.ts"
 
 const config = loadConfig()
-
-let renderedText: string
-let licenseName: string
 
 let yearStr: string
 if (config.year != null) {
@@ -21,45 +16,15 @@ if (config.year != null) {
     yearStr = formatYear()
 }
 
-if (config.license === "custom") {
-    let customText = config.customLicense?.text ?? ""
-    if (config.licenseFile != null && config.licenseFile.length > 0) {
-        const filePath = resolve(config.licenseFile)
-        customText = readFileSync(filePath, "utf-8")
-    }
-    if (!customText) {
-        throw new Error('[lixent] License is "custom" but no license text was found. Set customLicense.text or licenseFile.')
-    }
-    renderedText = renderLicenseText(customText, {
-        year: yearStr,
-        name: config.copyright,
-        url: config.url,
-        email: config.email,
-    })
-    licenseName = config.customLicense?.name ?? "Custom License"
-} else {
-    const [licenses, rawTextResult] = await Promise.allSettled([
-        fetchLicenseList(),
-        fetchLicenseText(config.license),
-    ])
-    if (licenses.status === "rejected") throw licenses.reason
-    if (rawTextResult.status === "rejected") throw rawTextResult.reason
-
-    const match = licenses.value.find((l) => l.licenseId === config.license)
-    if (!match) {
-        throw new Error(`Unknown license "${config.license}". Check your lixent.config.json.`)
-    }
-
-    renderedText = renderLicenseText(rawTextResult.value, {
-        year: yearStr,
-        name: config.copyright,
-        url: config.url,
-        email: config.email,
-    })
-    licenseName = match.name
-}
+const license = await resolveLicense(config)
+const renderedText = renderLicenseText(license.text, {
+    year: yearStr,
+    name: config.copyright,
+    url: config.url,
+    email: config.email,
+})
 ---
 
-<LicenseLayout title={licenseName} config={config} yearStr={yearStr}>
+<LicenseLayout title={license.name} config={config} yearStr={yearStr}>
     <LicenseBody text={renderedText} />
 </LicenseLayout>
