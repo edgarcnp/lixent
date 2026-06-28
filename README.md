@@ -232,6 +232,36 @@ bun test        # Run tests
 bun run cq      # Lint + typecheck + test
 ```
 
+## Error Handling
+
+All errors are thrown at build time with a `[lixent]` prefix. If your config is invalid, the build fails with a clear message:
+
+```
+[lixent] Copyright cannot be empty
+[lixent] Unknown theme "foo". Use a built-in theme ID or an absolute path starting with "/"
+[lixent] Failed to fetch license MIT: Not Found
+```
+
+For programmatic use, errors carry structured data:
+
+```ts
+import { loadConfig } from "./src/lib/config/index.ts"
+import { ConfigError, LicenseError } from "./src/lib/errors.ts"
+
+try {
+    const config = loadConfig()
+} catch (e) {
+    if (e instanceof ConfigError) {
+        console.log(e.code)   // "EMPTY_FIELD", "INVALID_FORMAT", "TOO_LONG", ...
+        console.log(e.field)  // "copyright", "theme", "customLicense.name", ...
+    }
+    if (e instanceof LicenseError) {
+        console.log(e.code)       // "FETCH_FAILED", "NOT_FOUND", "INVALID_ID", ...
+        console.log(e.licenseId)  // "MIT", "GPL-3.0-only", ...
+    }
+}
+```
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
