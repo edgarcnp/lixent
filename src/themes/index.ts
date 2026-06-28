@@ -119,6 +119,8 @@ export const themes: ThemeMeta[] = [
     },
 ]
 
+const THEME_MAP = new Map(themes.map((t) => [t.id, t]))
+
 /**
  * Find a theme by its ID.
  *
@@ -126,7 +128,7 @@ export const themes: ThemeMeta[] = [
  * @returns The theme metadata, or `undefined` if not found.
  */
 export function getTheme(id: string): ThemeMeta | undefined {
-    return themes.find((t) => t.id === id)
+    return THEME_MAP.get(id)
 }
 
 /**
@@ -136,5 +138,5 @@ export function getTheme(id: string): ThemeMeta | undefined {
  * @returns `true` if the ID exists in the theme registry.
  */
 export function isValidTheme(id: string): boolean {
-    return id === "custom" || themes.some((t) => t.id === id)
+    return id === "custom" || THEME_MAP.has(id)
 }
