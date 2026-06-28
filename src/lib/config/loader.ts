@@ -37,19 +37,22 @@ function loadFromPackageJson(root: string): LixentConfig | null {
     const pkg = JSON.parse(raw) as PackageJson
     if (pkg.lixent == null) return null
 
-    const lixentRaw = pkg.lixent as Record<string, unknown>
-    if (lixentRaw.copyright == null || lixentRaw.copyright === "") {
-        if (pkg.name == null || pkg.name === "") {
-            throw new Error(
-                '[lixent] copyright is required. Set it in lixent field or provide a "name" field in package.json.',
-            )
-        }
-        lixentRaw.copyright = pkg.name
+    const lixent = pkg.lixent as Record<string, unknown>
+    const copyright = lixent.copyright ?? pkg.name
+    if (copyright == null || copyright === "") {
+        throw new Error(
+            '[lixent] copyright is required. Set it in lixent field or provide a "name" field in package.json.',
+        )
     }
-    lixentRaw.license ??= "MIT"
-    lixentRaw.theme ??= "minimal"
 
-    const coerced = coerceConfig(lixentRaw)
+    const merged = {
+        ...lixent,
+        copyright,
+        license: lixent.license ?? "MIT",
+        theme: lixent.theme ?? "minimal",
+    }
+
+    const coerced = coerceConfig(merged)
     validateConfig(coerced)
     return coerced
 }
