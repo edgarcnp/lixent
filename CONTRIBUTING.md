@@ -4,19 +4,9 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 
 ## AI Usage Policy
 
-### The Critical Rule
+Lixent has strict rules for AI usage. Please see [AI_POLICY.md](AI_POLICY.md) for the full policy.
 
-You must understand your code. If you can't explain what your changes do and how they interact with the rest of the codebase without the aid of AI tools, do not contribute to this project.
-
-Using AI to write code is fine. You can gain understanding by interrogating an agent with access to the codebase until you grasp all edge cases and effects of your changes. What's not fine is submitting agent-generated code without that understanding.
-
-### Guidelines
-
-- **Read and understand every line** you submit. If an AI tool generated it, review it line by line before committing.
-- **Be able to explain your changes** in the PR description without copy-pasting AI output. If asked "why did you do it this way?", you should have a real answer.
-- **Run the test suite** (`bun run cq`) on every change. Don't trust that AI-generated code works — verify it.
-- **Know the security model.** Lixent sanitizes user input for CSS injection and XSS. If your change touches user-facing input, you must understand why the existing guards exist and whether your change needs new ones.
-- **Don't submit slop.** Bulk-generated code that doesn't account for project conventions, error handling patterns, or the existing module structure will be rejected.
+The most important rule: **you must understand your code.** If you can't explain what your changes do and how they interact with the rest of the codebase without the aid of AI tools, do not contribute to this project.
 
 ## Getting Started
 
