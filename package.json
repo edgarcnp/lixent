@@ -1,7 +1,7 @@
 {
     "name": "lixent",
     "type": "module",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "A modern, self-hosted license page generator",
     "scripts": {
         "cq": "bun run lint && bun run typecheck && bun run test",
