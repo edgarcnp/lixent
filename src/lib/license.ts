@@ -19,6 +19,8 @@
  * @module
  */
 
+import { readFileSync } from "node:fs"
+import { resolve as resolvePath } from "node:path"
 import type { LixentConfig } from "./types.ts"
 import { LicenseError } from "./errors.ts"
 
@@ -143,9 +145,7 @@ export async function resolveLicense(config: LixentConfig): Promise<{ name: stri
     if (config.license === "custom") {
         let customText = config.customLicense?.text ?? ""
         if (config.licenseFile != null && config.licenseFile.length > 0) {
-            const { readFileSync: readFile } = await import("node:fs")
-            const { resolve: resolvePath } = await import("node:path")
-            customText = readFile(resolvePath(config.licenseFile), "utf-8")
+            customText = readFileSync(resolvePath(config.licenseFile), "utf-8")
         }
         if (!customText) {
             throw new LicenseError(
