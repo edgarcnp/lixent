@@ -1,5 +1,5 @@
 /**
- * Input validation for user-provided configuration values.
+ * Input validators for user-provided configuration values.
  *
  * All validators follow the `assert` pattern: they return `void` on success
  * and throw a {@link ConfigError} with a descriptive message on failure. Empty strings
@@ -21,17 +21,15 @@
 
 import { ConfigError } from "./errors.ts"
 import { hasCssUrl, hasHtmlTags } from "./sanitize.ts"
-
-/** Maximum byte length for the copyright field. */
-const MAX_COPYRIGHT_BYTES = 256
-/** Maximum byte length for the font family value. */
-const MAX_FONT_BYTES = 128
-/** Maximum byte length for custom license name. */
-const MAX_CUSTOM_NAME_BYTES = 256
-/** Maximum byte length for custom license text (50 KB). */
-const MAX_CUSTOM_TEXT_BYTES = 50 * 1024
-/** Only http and https protocols are allowed in URLs. */
-const ALLOWED_SCHEMES = ["http:", "https:"]
+import {
+    MAX_COPYRIGHT_BYTES,
+    MAX_FONT_BYTES,
+    MAX_CUSTOM_NAME_BYTES,
+    MAX_CUSTOM_TEXT_BYTES,
+    ALLOWED_SCHEMES,
+    CSS_VALUE_PATTERN,
+    CUSTOM_THEME_KEYS,
+} from "./constants.ts"
 
 /**
  * Validate a URL string.
@@ -194,9 +192,6 @@ export function assertValidThemeOverrides(
     }
 }
 
-/** Pattern for safe CSS property values (letters, numbers, spaces, units, etc.). */
-const CSS_VALUE_PATTERN = /^[a-zA-Z0-9 .%,+\-/()]+$/
-
 /**
  * Validate a generic CSS value (used for font-size, font-weight, etc.).
  *
@@ -218,9 +213,6 @@ export function assertValidCssValue(value: string, field: string): void {
         throw new ConfigError(`[lixent] ${field} contains invalid characters`)
     }
 }
-
-/** Allowed keys for `customTheme`. */
-const CUSTOM_THEME_KEYS = ["bg", "text", "textMuted", "accent", "border"] as const
 
 /**
  * Validate a custom theme object.

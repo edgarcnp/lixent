@@ -10,7 +10,7 @@ import {
     assertValidCustomText,
     assertValidThemeOverrides,
     assertValidCustomTheme,
-} from "../src/lib/validation.ts"
+} from "../src/lib/validators.ts"
 
 describe("assertValidUrl", () => {
     it("accepts valid HTTPS URL", () => {

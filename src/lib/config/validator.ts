@@ -21,7 +21,7 @@ import {
     assertValidThemeOverrides,
     assertValidCssValue,
     assertValidCustomTheme,
-} from "../validation.ts"
+} from "../validators.ts"
 
 /**
  * Validates a config object against security constraints.
