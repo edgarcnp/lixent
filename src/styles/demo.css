@@ -1082,7 +1082,7 @@
 .preview-content .license-header {
     margin-bottom: 1.25rem;
     padding-bottom: 1.25rem;
-    border-bottom: 0.5px solid var(--lx-border, #e5e1dc);
+    border-bottom: 0.5px solid var(--lx-divider, #e5e1dc);
 }
 
 .preview-content .copyright a {

@@ -73,8 +73,8 @@ export interface LixentConfig {
     /**
      * Override any of the 6 theme CSS variables without creating a full theme.
    *
-   * Allowed keys: `--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`,
-   * `--lx-border`, `--lx-surface`.
+     * Allowed keys: `--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`,
+     * `--lx-divider`, `--lx-font-body`.
      */
     themeOverrides?: Record<string, string>
 

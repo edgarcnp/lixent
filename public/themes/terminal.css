@@ -3,6 +3,6 @@
   --lx-text: #33ff33;
   --lx-text-muted: #1a8c1a;
   --lx-accent: #33ff33;
-  --lx-border: #1a3a1a;
-  --lx-surface: #0f1a0f;
+  --lx-divider: #1a3a1a;
+  --lx-font-body: "IBM Plex Mono", "Courier New", monospace;
 }

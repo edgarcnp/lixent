@@ -1,14 +1,15 @@
 /**
  * Theme registry and metadata.
  *
- * Themes are CSS files in `public/themes/` that define the 8 `--lx-*` CSS
- * custom properties. Each base theme has a dark and light variant.
+ * Themes are CSS files in `public/themes/` that define the 6 `--lx-*` CSS
+ * custom properties. This module provides the metadata (id, name, description,
+ * dark mode flag) used by the demo dropdown and config validation.
  *
  * ## Adding a theme
  *
- * 1. Create `public/themes/{base}-dark.css` and `public/themes/{base}-light.css`
- *    defining all 8 variables.
- * 2. That's it — the registry is built automatically from the filesystem.
+ * 1. Create `public/themes/my-theme.css` defining all 6 variables.
+ * 2. Add an entry to the {@link themes} array here.
+ * 3. Reference it as `"theme": "my-theme"` in `lixent.config.json`.
  *
  * ## CSS variables
  *
@@ -20,28 +21,17 @@
  * | `--lx-text` | Primary text color |
  * | `--lx-text-muted` | Secondary/muted text |
  * | `--lx-accent` | Links, highlights |
- * | `--lx-border` | Borders, dividers |
- * | `--lx-surface` | Card/panel backgrounds |
+ * | `--lx-divider` | Dividers/separator lines |
+ * | `--lx-font-body` | Body font family |
  *
  * @module
  */
 
-import { readdirSync, readFileSync } from "node:fs"
-import { join, basename } from "node:path"
-
-/** Metadata for a single theme. */
 export interface ThemeMeta {
-    /** Unique identifier used in `lixent.config.json` (e.g. `"minimal-dark"`, `"github-light"`). */
     id: string
-    /** Base theme name (e.g. `"minimal"`, `"github"`). */
-    base: string
-    /** Human-readable display name derived from the base. */
     name: string
-    /** Whether this is a dark theme. */
+    description: string
     dark: boolean
-    /** CSS variable names this theme defines. Always {@link THEME_VARIABLES}. */
-    variables: string[]
-    /** Preview colors parsed from the CSS file. */
     preview: { bg: string, accent: string, text: string }
 }
 
@@ -54,58 +44,93 @@ export const THEME_VARIABLES = [
     "--lx-text",
     "--lx-text-muted",
     "--lx-accent",
-    "--lx-border",
-    "--lx-surface",
+    "--lx-divider",
+    "--lx-font-body",
 ]
 
-const THEMES_DIR = join(process.cwd(), "public", "themes")
-
-function parseCssVar(css: string, variable: string): string {
-    const match = new RegExp(`${variable}:\\s*([^;]+)`).exec(css)
-    return match?.[1]?.trim() ?? ""
-}
-
-function buildThemes(): ThemeMeta[] {
-    const files = readdirSync(THEMES_DIR).filter((f) => f.endsWith(".css"))
-
-    return files
-        .map((file) => {
-            const id = basename(file, ".css")
-            const parts = id.split("-")
-            const mode = parts.pop()
-            if (mode !== "dark" && mode !== "light") return null
-
-            const base = parts.join("-")
-            const css = readFileSync(join(THEMES_DIR, file), "utf-8")
-
-            return {
-                id,
-                base,
-                name: base.charAt(0).toUpperCase() + base.slice(1),
-                dark: mode === "dark",
-                variables: THEME_VARIABLES,
-                preview: {
-                    bg: parseCssVar(css, "--lx-bg"),
-                    accent: parseCssVar(css, "--lx-accent"),
-                    text: parseCssVar(css, "--lx-text"),
-                },
-            }
-        })
-        .filter((t): t is ThemeMeta => t !== null)
-        .sort((a, b) => a.base.localeCompare(b.base) || (a.dark ? 1 : 0) - (b.dark ? 1 : 0))
-}
-
 /**
- * Registry of all built-in themes, auto-generated from `public/themes/*.css`.
+ * Registry of all built-in themes.
+ * Each entry maps to a CSS file in `public/themes/{id}.css`.
  */
-export const themes: ThemeMeta[] = buildThemes()
+export const themes: ThemeMeta[] = [
+    {
+        id: "minimal",
+        name: "Minimal",
+        description: "Clean serif theme with generous spacing",
+        dark: false,
+        preview: { bg: "#faf9f7", accent: "#2563eb", text: "#374151" },
+    },
+    {
+        id: "minimal-dark",
+        name: "Minimal Dark",
+        description: "Same as minimal, dark background",
+        dark: true,
+        preview: { bg: "#1a1a1a", accent: "#60a5fa", text: "#e5e5e5" },
+    },
+    {
+        id: "github",
+        name: "GitHub",
+        description: "GitHub README aesthetic",
+        dark: false,
+        preview: { bg: "#ffffff", accent: "#0969da", text: "#1f2328" },
+    },
+    {
+        id: "github-dark",
+        name: "GitHub Dark",
+        description: "GitHub dark README",
+        dark: true,
+        preview: { bg: "#0d1117", accent: "#58a6ff", text: "#e6edf3" },
+    },
+    {
+        id: "terminal",
+        name: "Terminal",
+        description: "Retro terminal, green-on-black",
+        dark: true,
+        preview: { bg: "#0a0a0a", accent: "#33ff33", text: "#33ff33" },
+    },
+    {
+        id: "newspaper",
+        name: "Newspaper",
+        description: "NYT/journalism style",
+        dark: false,
+        preview: { bg: "#ffffff", accent: "#1a1a1a", text: "#1a1a1a" },
+    },
+    {
+        id: "elegant",
+        name: "Elegant",
+        description: "High-contrast, refined",
+        dark: false,
+        preview: { bg: "#fafaf9", accent: "#b45309", text: "#1c1917" },
+    },
+    {
+        id: "mono",
+        name: "Mono",
+        description: "Pure monospace, no decoration",
+        dark: false,
+        preview: { bg: "#ffffff", accent: "#171717", text: "#171717" },
+    },
+    {
+        id: "serif",
+        name: "Serif",
+        description: "Traditional book-like",
+        dark: false,
+        preview: { bg: "#fffbf5", accent: "#92400e", text: "#292524" },
+    },
+    {
+        id: "sans",
+        name: "Sans",
+        description: "Modern sans-serif",
+        dark: false,
+        preview: { bg: "#ffffff", accent: "#2563eb", text: "#18181b" },
+    },
+]
 
 const THEME_MAP = new Map(themes.map((t) => [t.id, t]))
 
 /**
  * Find a theme by its ID.
  *
- * @param id - Theme identifier (e.g. `"minimal-dark"`, `"github-light"`).
+ * @param id - Theme identifier (e.g. `"minimal"`, `"github-dark"`).
  * @returns The theme metadata, or `undefined` if not found.
  */
 export function getTheme(id: string): ThemeMeta | undefined {
@@ -120,33 +145,4 @@ export function getTheme(id: string): ThemeMeta | undefined {
  */
 export function isValidTheme(id: string): boolean {
     return id === "custom" || THEME_MAP.has(id)
-}
-
-/**
- * Get all unique base themes.
- *
- * @returns Array of base theme names.
- */
-export function getBaseThemes(): string[] {
-    return [...new Set(themes.map((t) => t.base))]
-}
-
-/**
- * Get the dark variant of a base theme.
- *
- * @param base - Base theme name (e.g. `"minimal"`).
- * @returns The dark theme metadata, or `undefined` if not found.
- */
-export function getDarkTheme(base: string): ThemeMeta | undefined {
-    return themes.find((t) => t.base === base && t.dark)
-}
-
-/**
- * Get the light variant of a base theme.
- *
- * @param base - Base theme name (e.g. `"minimal"`).
- * @returns The light theme metadata, or `undefined` if not found.
- */
-export function getLightTheme(base: string): ThemeMeta | undefined {
-    return themes.find((t) => t.base === base && !t.dark)
 }

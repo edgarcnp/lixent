@@ -1,3 +1,4 @@
+import { themes } from "../themes/index.ts"
 import { DEFAULTS } from "./settings.ts"
 
 export interface ThemeSelect {
@@ -13,6 +14,7 @@ export function createThemeSelect(
 ): ThemeSelect {
     let selectedTheme: string = DEFAULTS.theme
     const customThemeInputs = document.getElementById("custom-theme-inputs")
+    const themeMap = new Map(themes.map((t) => [t.id, t]))
 
     function getSelectedTheme(): string {
         return selectedTheme
@@ -29,7 +31,8 @@ export function createThemeSelect(
             return
         }
         if (customThemeInputs) customThemeInputs.style.display = "none"
-        const mode = id.endsWith("-light") ? "light" : "dark"
+        const meta = themeMap.get(id)
+        const mode = meta?.dark ? "dark" : "light"
         themeGallery.dataset.mode = mode
         themeModeToggle?.querySelectorAll(".theme-mode-btn").forEach((btn) => {
             btn.classList.toggle("active", (btn as HTMLElement).dataset.mode === mode)
@@ -57,11 +60,12 @@ export function createThemeSelect(
 
             if (selectedTheme === "custom") return
 
-            const currentBase = selectedTheme.replace(/-dark$|-light$/, "")
-            const targetId = `${currentBase}-${mode}`
+            const currentMeta = themeMap.get(selectedTheme)
+            if (currentMeta?.dark === (mode === "dark")) return
 
-            if (themeGallery.querySelector<HTMLElement>(`[data-theme="${targetId}"]`)) {
-                setSelectedTheme(targetId)
+            const fallback = themes.find((t) => t.dark === (mode === "dark"))
+            if (fallback) {
+                setSelectedTheme(fallback.id)
                 onChange()
             }
         })
