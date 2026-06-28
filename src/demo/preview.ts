@@ -231,7 +231,7 @@ function updateCopyrightLine(
     el.previewCopyright.innerHTML = `Copyright &copy; ${yearDisplay} ${nameHtml}${emailHtml}`
 }
 
-function updateGravatar(email: string, copyright: string, showGravatar: boolean): void {
+async function updateGravatar(email: string, copyright: string, showGravatar: boolean): Promise<void> {
     if (!el) return
     const hasEmail = email.length > 0 && isValidEmail(email)
 
@@ -253,7 +253,7 @@ function updateGravatar(email: string, copyright: string, showGravatar: boolean)
             }
             el.previewCopyright.prepend(gravatarInline)
         }
-        const newSrc = getGravatarUrl(email, 24)
+        const newSrc = await getGravatarUrl(email, 24)
         if (gravatarInline.src !== newSrc) {
             gravatarInline.src = newSrc
             gravatarInline.alt = copyright
@@ -345,7 +345,7 @@ export function updatePreview(state: {
     void fetchAndRender(licenseId, copyright, yearStart, yearEnd, el.previewLicenseText, el.previewTitle, customLicenseName, customLicenseText)
 
     updateCopyrightLine(copyright, email, url, yearStart, yearEnd)
-    updateGravatar(email, copyright, gravatarToggle.checked)
+    void updateGravatar(email, copyright, gravatarToggle.checked)
     el.previewUrl.textContent = `${theme} / ${licenseId}`
     updateSummary(theme, fontDropdown.getValue() || DEFAULTS.font, fontSize, licenseId, copyright, email)
 }
