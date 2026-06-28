@@ -835,49 +835,20 @@
     line-height: 1.5;
 }
 
-/* Tooltip */
-.util-tooltip-trigger {
-    position: relative;
-}
-
-.util-tooltip-trigger::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.375rem 0.625rem;
-    background: var(--demo-text);
-    color: var(--demo-bg);
+.util-hint {
+    display: block;
+    margin-top: 0.375rem;
     font-size: 0.6875rem;
-    line-height: 1.4;
-    white-space: nowrap;
-    border-radius: var(--demo-radius);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    z-index: 10;
-    margin-bottom: 6px;
+    color: var(--demo-text-muted);
 }
 
-.util-tooltip-trigger::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: var(--demo-text);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    z-index: 10;
-    margin-bottom: -4px;
-}
-
-.util-tooltip-trigger:hover::after,
-.util-tooltip-trigger:hover::before {
-    opacity: 1;
+.util-hint code {
+    padding: 0.1em 0.3em;
+    background: var(--demo-surface-2);
+    border: 1px solid var(--demo-border);
+    border-radius: 3px;
+    font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+    font-size: 0.625rem;
 }
 
 /* Actions - sticky at bottom */
