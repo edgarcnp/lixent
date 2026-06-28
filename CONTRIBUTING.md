@@ -21,27 +21,36 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 
 ```
 ├── src/
-│   ├── components/     # Astro components
-│   ├── layouts/       # Page layouts
-│   ├── lib/           # Core utilities (config, types, license, gravatar, year)
-│   ├── pages/         # Route pages
-│   ├── styles/        # CSS files
-│   └── themes/        # Theme registry
-├── public/            # Static assets (theme CSS files, favicons)
-├── tests/             # Test files
-└── dist/              # Build output
+│   ├── components/     # Astro components (LicenseBody)
+│   ├── layouts/        # Page layouts (LicenseLayout)
+│   ├── lib/            # Core utilities
+│   │   ├── config/     # Config loading (coercion, validation, loader)
+│   │   ├── errors.ts   # ConfigError, LicenseError classes
+│   │   ├── font.ts     # Google Fonts URL generation
+│   │   ├── gravatar.ts # Gravatar URL generation
+│   │   ├── license.ts  # License fetching and rendering
+│   │   ├── types.ts    # LixentConfig interface
+│   │   ├── validation.ts # Input validators
+│   │   └── year.ts     # Year formatting
+│   ├── pages/          # Route pages (index.astro)
+│   ├── styles/         # CSS files (base.css)
+│   └── themes/         # Theme registry (index.ts)
+├── public/             # Static assets (theme CSS files, favicons)
+├── tests/              # Test files
+└── dist/               # Build output
 ```
 
 ### Commands
 
 ```bash
-bun dev        # Start dev server at localhost:4321
-bun run build  # Build for production
+bun dev         # Start dev server at localhost:4321
+bun run build   # Build for production
 bun run preview # Preview build locally
-bun run lint   # Run ESLint
+bun run lint    # Run ESLint
 bun run lint:fix # Auto-fix lint issues
-bun test       # Run tests
+bun test        # Run tests
 bunx tsc --noEmit  # Type check
+bun run cq      # Lint + typecheck + test (all-in-one)
 ```
 
 ### Adding a Theme
@@ -59,12 +68,13 @@ bunx tsc --noEmit  # Type check
 - No semicolons
 - Double quotes
 - 4-space indent
+- All errors use `[lixent]` prefix and throw `ConfigError` or `LicenseError`
 
 ## Pull Requests
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run `bun run lint` and `bun run build` to verify
+3. Run `bun run cq` to verify (lint + typecheck + test)
 4. Submit a pull request
 
 ### PR Guidelines

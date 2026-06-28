@@ -9,11 +9,11 @@ Lixent generates a static HTML page displaying your software license. Users fork
 **Key differences from mit-license.org:**
 - Self-hosted — deploy to GitHub Pages, GitLab Pages, Cloudflare Pages, Netlify, Vercel, or your own server
 - Every SPDX license supported, not just MIT
-- 20 built-in themes (Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, and more)
+- 10 built-in themes with light/dark variants
 - Custom license text support (inline or file-based)
 - Custom theme support (inline JSON or external CSS)
+- Font customization via Google Fonts
 - Gravatar integration
-- Plain text and JSON endpoints
 
 ## Quick Start
 
@@ -35,7 +35,7 @@ Lixent generates a static HTML page displaying your software license. Users fork
 
 ## Configuration
 
-All configuration is in `lixent.config.json`:
+All configuration is in `lixent.config.json` (or the `"lixent"` field in `package.json`):
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -45,10 +45,15 @@ All configuration is in `lixent.config.json`:
 | `url` | string | No | Your website URL |
 | `email` | string | No | Email for Gravatar |
 | `gravatar` | boolean | No | Show Gravatar avatar |
+| `font` | string | No | Google Fonts family name (e.g. `"Inter"`) |
+| `fontSize` | string | No | CSS font-size (e.g. `"1.125rem"`, `"18px"`) |
+| `fontWeight` | string | No | CSS font-weight (e.g. `"400"`, `"700"`) |
+| `lineHeight` | string | No | CSS line-height (e.g. `"1.7"`, `"1.5"`) |
+| `letterSpacing` | string | No | CSS letter-spacing (e.g. `"0.025em"`) |
 | `customLicense` | object | No | Custom license config (when `license: "custom"`) |
 | `licenseFile` | string | No | Path to license text file (when `license: "custom"`) |
 | `customTheme` | object | No | Inline custom theme colors (when `theme: "custom"`) |
-| `basePath` | string | No | For subpath deploys (e.g., `"/license"`) |
+| `basePath` | string | No | For subpath deploys (e.g. `"/license"`) |
 | `themeOverrides` | object | No | Override CSS custom properties |
 | `year` | number | No | Override copyright year |
 | `yearRange` | object | No | Use year range instead of single year |
@@ -77,6 +82,18 @@ All configuration is in `lixent.config.json`:
 ```
 
 The file is read at build time and supports the same placeholders: `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}`. If both `customLicense.text` and `licenseFile` are set, `licenseFile` takes precedence.
+
+### Font Customization
+
+Use any Google Fonts family:
+
+```json
+{
+  "font": "Merriweather",
+  "fontSize": "1.125rem",
+  "fontWeight": "700"
+}
+```
 
 ### Theme Overrides
 
@@ -126,16 +143,6 @@ Or use a year range:
 | `terminal` | Retro green-on-black | Yes |
 | `newspaper` | NYT/journalism style | No |
 | `elegant` | High-contrast, refined | No |
-| `tokyonight` | Popular VS Code theme | Yes |
-| `tokyonight-light` | Tokyo Night light variant | No |
-| `dracula` | Popular Dracula theme | Yes |
-| `dracula-light` | Dracula light variant | No |
-| `nord` | Arctic, north-bluish colors | Yes |
-| `nord-light` | Nord light variant | No |
-| `gruvbox` | Retro groove warm colors | Yes |
-| `gruvbox-light` | Gruvbox light variant | No |
-| `catppuccin` | Comforting pastel theme | Yes |
-| `catppuccin-light` | Catppuccin light variant | No |
 | `mono` | Pure monospace, no decoration | No |
 | `serif` | Traditional book-like | No |
 | `sans` | Modern sans-serif | No |
@@ -231,17 +238,15 @@ server {
 }
 ```
 
-## Output Formats
-
-Lixent generates a single HTML page at the root route `/`.
-
 ## Development
 
 ```bash
 bun install
-bun dev        # Start dev server
-bun run build  # Build for production
-bun run lint   # Run ESLint
+bun dev         # Start dev server
+bun run build   # Build for production
+bun run lint    # Run ESLint
+bun test        # Run tests
+bun run cq      # Lint + typecheck + test
 ```
 
 ## Tech Stack
