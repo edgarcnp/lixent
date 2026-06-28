@@ -1,14 +1,9 @@
 # Lixent
 
-A modern, self-hosted license page generator. Like [mit-license.org](https://mit-license.org) but for every license, with beautiful themes.
-
-## What is Lixent?
-
 Lixent generates a static HTML page displaying your software license. Users fork the repo, configure their identity once, and deploy to any static hosting platform. You control your own domain.
 
-**Key differences from mit-license.org:**
 - Self-hosted — deploy to GitHub Pages, GitLab Pages, Cloudflare Pages, Netlify, Vercel, or your own server
-- Every SPDX license supported, not just MIT
+- Every [SPDX License List](https://github.com/spdx/license-list-data) is supported
 - 10 built-in themes with light/dark variants
 - Custom license text support (inline or file-based)
 - Custom theme support (inline JSON or external CSS)
@@ -43,7 +38,7 @@ All configuration is in `lixent.config.json` (or the `"lixent"` field in `packag
 | `license` | string | Yes | SPDX license ID or `"custom"` |
 | `theme` | string | Yes | Theme ID, `"custom"`, or path to custom CSS |
 | `url` | string | No | Your website URL |
-| `email` | string | No | Email for Gravatar |
+| `email` | string | No | Email addres (Also used for Gravatar) |
 | `gravatar` | boolean | No | Show Gravatar avatar |
 | `font` | string | No | Google Fonts family name (e.g. `"Inter"`) |
 | `fontSize` | string | No | CSS font-size (e.g. `"1.125rem"`, `"18px"`) |
@@ -112,6 +107,23 @@ Override any CSS custom property without creating a full theme:
 }
 ```
 
+### Custom Themes
+
+**Inline JSON (simple):**
+
+```json
+{
+  "theme": "custom",
+  "customTheme": {
+    "bg": "#1a1a1a",
+    "text": "#e5e5e5",
+    "textMuted": "#a3a3a3",
+    "accent": "#60a5fa",
+    "border": "#404040"
+  }
+}
+```
+
 ### Year and YearRange
 
 By default, the current year is used. Override it:
@@ -131,38 +143,6 @@ Or use a year range:
 ```
 
 **Note:** `year` and `yearRange` are mutually exclusive — setting both throws an error.
-
-## Available Themes
-
-| Theme | Description | Dark |
-|-------|-------------|------|
-| `minimal` | Clean sans-serif, generous spacing | No |
-| `minimal-dark` | Same as minimal, dark background | Yes |
-| `github` | GitHub README aesthetic | No |
-| `github-dark` | GitHub dark README | Yes |
-| `terminal` | Retro green-on-black | Yes |
-| `newspaper` | NYT/journalism style | No |
-| `elegant` | High-contrast, refined | No |
-| `mono` | Pure monospace, no decoration | No |
-| `serif` | Traditional book-like | No |
-| `sans` | Modern sans-serif | No |
-
-### Custom Themes
-
-**Inline JSON (simple):**
-
-```json
-{
-  "theme": "custom",
-  "customTheme": {
-    "bg": "#1a1a1a",
-    "text": "#e5e5e5",
-    "textMuted": "#a3a3a3",
-    "accent": "#60a5fa",
-    "border": "#404040"
-  }
-}
-```
 
 **External CSS file (advanced):**
 
@@ -232,6 +212,9 @@ server {
     root /var/www/license;
     index index.html;
 
+    gzip on;
+    gzip_types text/html text/css application/javascript;
+
     location / {
         try_files $uri $uri/ =404;
     }
@@ -248,13 +231,6 @@ bun run lint    # Run ESLint
 bun test        # Run tests
 bun run cq      # Lint + typecheck + test
 ```
-
-## Tech Stack
-
-- [Astro 7](https://astro.build) — Static site generation
-- TypeScript — Type safety
-- CSS Custom Properties — Theme system
-- [SPDX License List](https://github.com/spdx/license-list-data) — License texts
 
 ## License
 
