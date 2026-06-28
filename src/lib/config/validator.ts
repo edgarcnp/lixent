@@ -35,6 +35,7 @@ export function validateConfig(config: LixentConfig): void {
         if (!hasText && !hasFile) {
             throw new ConfigError(
                 '[lixent] License is "custom" but neither customLicense.text nor licenseFile is set.',
+                { code: "MISSING_FIELD", field: "customLicense" },
             )
         }
     }
@@ -44,13 +45,17 @@ export function validateConfig(config: LixentConfig): void {
     if (config.email != null) assertValidEmail(config.email)
     if (config.theme === "custom") {
         if (config.customTheme == null) {
-            throw new ConfigError('[lixent] Theme is "custom" but customTheme is not set.')
+            throw new ConfigError(
+                '[lixent] Theme is "custom" but customTheme is not set.',
+                { code: "MISSING_FIELD", field: "customTheme" },
+            )
         }
         assertValidCustomTheme(config.customTheme)
     } else if (!isValidTheme(config.theme) && !config.theme.startsWith("/")) {
         throw new ConfigError(
             `[lixent] Unknown theme "${config.theme}". `
           + `Use a built-in theme ID or an absolute path starting with "/" (e.g. "/my-theme.css").`,
+            { code: "INVALID_VALUE", field: "theme" },
         )
     }
     if (config.font != null) assertValidFont(config.font)
@@ -66,11 +71,15 @@ export function validateConfig(config: LixentConfig): void {
             throw new ConfigError(
                 `[lixent] yearRange.start (${config.yearRange.start}) must not exceed `
               + `yearRange.end (${config.yearRange.end})`,
+                { code: "INVALID_VALUE", field: "yearRange" },
             )
         }
     }
     if (config.year != null && config.yearRange != null) {
-        throw new ConfigError("[lixent] Both `year` and `yearRange` are set. Use only one.")
+        throw new ConfigError(
+            "[lixent] Both `year` and `yearRange` are set. Use only one.",
+            { code: "MUTUALLY_EXCLUSIVE", field: "year" },
+        )
     }
     if (config.customLicense?.name != null) assertValidCustomName(config.customLicense.name)
     if (config.customLicense?.text != null) assertValidCustomText(config.customLicense.text)

@@ -45,6 +45,7 @@ function loadFromPackageJson(root: string): LixentConfig | null {
     if (copyright == null || copyright === "") {
         throw new ConfigError(
             '[lixent] copyright is required. Set it in lixent field or provide a "name" field in package.json.',
+            { code: "MISSING_FIELD", field: "copyright" },
         )
     }
 

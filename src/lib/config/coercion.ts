@@ -15,11 +15,17 @@ function coerceYear(value: unknown, field: string): number {
     if (typeof value === "string") {
         const n = Number(value)
         if (!Number.isFinite(n)) {
-            throw new ConfigError(`[lixent] ${field} must be a number, got "${value}"`)
+            throw new ConfigError(
+                `[lixent] ${field} must be a number, got "${value}"`,
+                { code: "INVALID_TYPE", field },
+            )
         }
         return n
     }
-    throw new ConfigError(`[lixent] ${field} must be a number, got ${String(value)}`)
+    throw new ConfigError(
+        `[lixent] ${field} must be a number, got ${String(value)}`,
+        { code: "INVALID_TYPE", field },
+    )
 }
 
 /**

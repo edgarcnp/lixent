@@ -44,7 +44,10 @@ interface SpdxLicenseList {
 async function fetchLicenseList(): Promise<SpdxLicense[]> {
     const response = await fetch(SPDX_LIST_URL, { signal: AbortSignal.timeout(15_000) })
     if (!response.ok) {
-        throw new LicenseError(`[lixent] Failed to fetch SPDX license list: ${response.statusText}`)
+        throw new LicenseError(
+            `[lixent] Failed to fetch SPDX license list: ${response.statusText}`,
+            { code: "FETCH_FAILED" },
+        )
     }
     const data = await response.json() as SpdxLicenseList
     return data.licenses
@@ -60,13 +63,19 @@ async function fetchLicenseList(): Promise<SpdxLicense[]> {
  */
 async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {
-        throw new LicenseError(`[lixent] Invalid license ID: ${id}`)
+        throw new LicenseError(
+            `[lixent] Invalid license ID: ${id}`,
+            { code: "INVALID_ID", licenseId: id },
+        )
     }
     const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, {
         signal: signal ?? AbortSignal.timeout(15_000),
     })
     if (!response.ok) {
-        throw new LicenseError(`[lixent] Failed to fetch license ${id}: ${response.statusText}`)
+        throw new LicenseError(
+            `[lixent] Failed to fetch license ${id}: ${response.statusText}`,
+            { code: "FETCH_FAILED", licenseId: id },
+        )
     }
     return response.text()
 }
@@ -139,7 +148,10 @@ export async function resolveLicense(config: LixentConfig): Promise<{ name: stri
             customText = readFile(resolvePath(config.licenseFile), "utf-8")
         }
         if (!customText) {
-            throw new LicenseError('[lixent] License is "custom" but no license text was found. Set customLicense.text or licenseFile.')
+            throw new LicenseError(
+                '[lixent] License is "custom" but no license text was found. Set customLicense.text or licenseFile.',
+                { code: "MISSING_TEXT" },
+            )
         }
         return {
             name: config.customLicense?.name ?? "Custom License",
@@ -154,7 +166,10 @@ export async function resolveLicense(config: LixentConfig): Promise<{ name: stri
 
     const match = licenses.find((l) => l.licenseId === config.license)
     if (!match) {
-        throw new LicenseError(`[lixent] Unknown license "${config.license}". Check your lixent.config.json.`)
+        throw new LicenseError(
+            `[lixent] Unknown license "${config.license}". Check your lixent.config.json.`,
+            { code: "NOT_FOUND", licenseId: config.license },
+        )
     }
 
     return {
