@@ -51,7 +51,7 @@ export interface SpdxLicenseList {
 export async function fetchLicenseList(): Promise<SpdxLicense[]> {
     const response = await fetch(SPDX_LIST_URL, { signal: AbortSignal.timeout(15_000) })
     if (!response.ok) {
-        throw new Error(`Failed to fetch SPDX license list: ${response.statusText}`)
+        throw new Error(`[lixent] Failed to fetch SPDX license list: ${response.statusText}`)
     }
     const data = await response.json() as SpdxLicenseList
     return data.licenses
@@ -66,13 +66,13 @@ export async function fetchLicenseList(): Promise<SpdxLicense[]> {
  */
 export async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {
-        throw new Error(`Invalid license ID: ${id}`)
+        throw new Error(`[lixent] Invalid license ID: ${id}`)
     }
     const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, {
         signal: signal ?? AbortSignal.timeout(15_000),
     })
     if (!response.ok) {
-        throw new Error(`Failed to fetch license ${id}: ${response.statusText}`)
+        throw new Error(`[lixent] Failed to fetch license ${id}: ${response.statusText}`)
     }
     return response.text()
 }
@@ -178,7 +178,7 @@ export async function resolveLicense(config: LixentConfig): Promise<ResolvedLice
 
     const match = licenses.find((l) => l.licenseId === config.license)
     if (!match) {
-        throw new Error(`Unknown license "${config.license}". Check your lixent.config.json.`)
+        throw new Error(`[lixent] Unknown license "${config.license}". Check your lixent.config.json.`)
     }
 
     return {
