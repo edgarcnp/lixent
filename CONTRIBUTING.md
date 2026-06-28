@@ -88,7 +88,7 @@ bun run cq      # Lint + typecheck + test (all-in-one)
 
 - Use GitHub Issues for bug reports and feature requests
 - Include steps to reproduce for bugs
-- Specify your Bun version
+- Specify your Bun and Lixent version
 
 ## License
 
