@@ -12,7 +12,7 @@
  * forms, or user sessions. The attack surface is limited to:
  *
  * 1. **CSS injection** via `themeOverrides`, `font`, or custom CSS values.
- *    Mitigated by: `hasCssUrl()` blocks `url()` which could exfiltrate data.
+ *    Mitigated by: `hasCssDangerous()` blocks `url()`, semicolons, and curly braces.
  * 2. **XSS via copyright** — mitigated by blocking HTML tags.
  * 3. **URL scheme abuse** — mitigated by allowing only `http:` / `https:`.
  *
@@ -20,7 +20,7 @@
  */
 
 import { ConfigError } from "./errors.ts"
-import { hasCssUrl, hasHtmlTags } from "./sanitize.ts"
+import { hasCssDangerous, hasHtmlTags } from "./sanitize.ts"
 import {
     MAX_COPYRIGHT_BYTES,
     MAX_FONT_BYTES,
@@ -92,7 +92,7 @@ export function assertValidFont(raw: string): void {
             { code: "TOO_LONG", field: "font" },
         )
     }
-    if (hasCssUrl(raw)) {
+    if (hasCssDangerous(raw)) {
         throw new ConfigError(
             `[lixent] Font value contains unsafe characters: ${raw}`,
             { code: "UNSAFE_VALUE", field: "font" },
@@ -243,7 +243,7 @@ export function assertValidThemeOverrides(
                 { code: "EMPTY_FIELD", field: `themeOverrides.${key}` },
             )
         }
-        if (hasCssUrl(value)) {
+        if (hasCssDangerous(value)) {
             throw new ConfigError(
                 `[lixent] Unsafe value in themeOverrides for ${key}: ${value}`,
                 { code: "UNSAFE_VALUE", field: `themeOverrides.${key}` },
@@ -269,7 +269,7 @@ export function assertValidCssValue(value: string, field: string): void {
             { code: "TOO_LONG", field },
         )
     }
-    if (hasCssUrl(value)) {
+    if (hasCssDangerous(value)) {
         throw new ConfigError(
             `[lixent] ${field} contains unsafe characters`,
             { code: "UNSAFE_VALUE", field },
@@ -316,7 +316,7 @@ export function assertValidCustomTheme(
                 { code: "TOO_LONG", field: `customTheme.${key}` },
             )
         }
-        if (hasCssUrl(value)) {
+        if (hasCssDangerous(value)) {
             throw new ConfigError(
                 `[lixent] customTheme.${key} contains unsafe characters: ${value}`,
                 { code: "UNSAFE_VALUE", field: `customTheme.${key}` },

@@ -12,6 +12,9 @@
 /** Regex that detects CSS `url()` calls (data exfiltration vector). */
 const CSS_URL_PATTERN = /url\s*\(/i
 
+/** Regex that detects CSS structural characters that could enable injection. */
+const CSS_STRUCTURAL_PATTERN = /[;{}]/
+
 /** Regex that detects HTML-like tags (`<script>`, `</div>`, etc.). */
 const HTML_TAG_PATTERN = /<[a-z/]/i
 
@@ -48,6 +51,25 @@ export function hasCssUrl(value: string): boolean {
 }
 
 /**
+ * Check if a CSS value contains dangerous characters (injection vectors).
+ *
+ * Blocks `url()` (data exfiltration), semicolons, and curly braces
+ * which could break out of a CSS declaration and inject arbitrary rules.
+ * Used during config validation for fields injected into `<style>` tags.
+ *
+ * @example
+ * ```ts
+ * hasCssDangerous("red") // false
+ * hasCssDangerous("url(https://evil.com)") // true
+ * hasCssDangerous("#fff; color: red") // true
+ * hasCssDangerous("{ color: red }") // true
+ * ```
+ */
+export function hasCssDangerous(value: string): boolean {
+    return CSS_STRUCTURAL_PATTERN.test(value) || CSS_URL_PATTERN.test(value)
+}
+
+/**
  * Strip `url()` calls from a CSS value.
  *
  * Defense-in-depth sanitization applied at render time, after validation.
@@ -61,5 +83,5 @@ export function hasCssUrl(value: string): boolean {
  * ```
  */
 export function stripCssUrl(value: string): string {
-    return value.replace(CSS_URL_PATTERN, "")
+    return value.replace(CSS_URL_PATTERN, "").replace(CSS_STRUCTURAL_PATTERN, "")
 }
