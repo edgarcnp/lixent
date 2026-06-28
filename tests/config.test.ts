@@ -2,7 +2,7 @@ import { describe, it, beforeEach, afterEach } from "node:test"
 import assert from "node:assert/strict"
 import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
 import { join } from "node:path"
-import { loadConfig } from "../src/lib/config.ts"
+import { loadConfig } from "../src/lib/config/index.ts"
 
 const TMP_DIR = join(import.meta.dirname, "../tmp-config-test")
 

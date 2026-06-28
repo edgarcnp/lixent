@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import { loadConfig } from "./src/lib/config.ts";
+import { loadConfig } from "./src/lib/config/index.ts";
 import fs from "node:fs";
 
 const lixent = loadConfig();

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import LicenseLayout from "../layouts/LicenseLayout.astro"
 import LicenseBody from "../components/LicenseBody.astro"
-import { loadConfig } from "../lib/config.ts"
+import { loadConfig } from "../lib/config/index.ts"
 import { fetchLicenseList, fetchLicenseText, renderLicenseText } from "../lib/license.ts"
 import { formatYear, formatYearRange } from "../lib/year.ts"
 
