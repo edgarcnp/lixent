@@ -83,10 +83,22 @@ const themes: ThemeMeta[] = [
         dark: true,
     },
     {
+        id: "terminal-light",
+        name: "Terminal Light",
+        description: "Retro terminal, green-on-light",
+        dark: false,
+    },
+    {
         id: "newspaper",
         name: "Newspaper",
         description: "NYT/journalism style",
         dark: false,
+    },
+    {
+        id: "newspaper-dark",
+        name: "Newspaper Dark",
+        description: "NYT/journalism style, dark background",
+        dark: true,
     },
     {
         id: "elegant",
@@ -95,10 +107,22 @@ const themes: ThemeMeta[] = [
         dark: false,
     },
     {
+        id: "elegant-dark",
+        name: "Elegant Dark",
+        description: "High-contrast, refined, dark background",
+        dark: true,
+    },
+    {
         id: "mono",
         name: "Mono",
         description: "Pure monospace, no decoration",
         dark: false,
+    },
+    {
+        id: "mono-dark",
+        name: "Mono Dark",
+        description: "Pure monospace, dark background",
+        dark: true,
     },
     {
         id: "serif",
@@ -107,10 +131,22 @@ const themes: ThemeMeta[] = [
         dark: false,
     },
     {
+        id: "serif-dark",
+        name: "Serif Dark",
+        description: "Traditional book-like, dark background",
+        dark: true,
+    },
+    {
         id: "sans",
         name: "Sans",
         description: "Modern sans-serif",
         dark: false,
+    },
+    {
+        id: "sans-dark",
+        name: "Sans Dark",
+        description: "Modern sans-serif, dark background",
+        dark: true,
     },
 ]
 
