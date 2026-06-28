@@ -88,7 +88,7 @@ const email = config.email
 const hasEmail = email != null && email.length > 0
 
 const gravatarUrl
-    = config.gravatar === true && hasEmail
+    = config.gravatar === true && email != null && email.length > 0
         ? await getGravatarUrl(email, 64)
         : null;
 ---
