@@ -19,9 +19,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "")
 
 const builtInTheme = getTheme(config.theme)
 const themePath
-    = builtInTheme != null || !config.theme.startsWith("/")
-        ? `${base}/themes/${config.theme}.css`
-        : config.theme
+    = config.theme === "custom"
+        ? `${base}/themes/minimal.css`
+        : builtInTheme != null || !config.theme.startsWith("/")
+            ? `${base}/themes/${config.theme}.css`
+            : config.theme
 
 const themeOverrides
     = config.themeOverrides != null
