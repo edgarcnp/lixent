@@ -1,27 +1,8 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import {
-    renderLicenseText,
-    getLicenseName,
-    SPDX_LIST_URL,
-    SPDX_TEXT_BASE,
-} from "../src/lib/license.ts"
-import type { LixentConfig } from "../src/lib/types.ts"
-
-const baseConfig: LixentConfig = {
-    copyright: "Test User",
-    license: "MIT",
-    theme: "minimal",
-}
+import { renderLicenseText } from "../src/lib/license.ts"
 
 const baseValues = { year: "2026", name: "Test User" }
-
-describe("SPDX URLs", () => {
-    it("points to raw GitHub content", () => {
-        assert.ok(SPDX_LIST_URL.startsWith("https://raw.githubusercontent.com/"))
-        assert.ok(SPDX_TEXT_BASE.startsWith("https://raw.githubusercontent.com/"))
-    })
-})
 
 describe("renderLicenseText", () => {
     it("replaces year placeholder", () => {
@@ -44,20 +25,5 @@ describe("renderLicenseText", () => {
 
     it("handles missing optional fields", () => {
         assert.equal(renderLicenseText("{{url}} {{email}}", baseValues), " ")
-    })
-})
-
-describe("getLicenseName", () => {
-    it("returns license id for standard license", () => {
-        assert.equal(getLicenseName(baseConfig), "MIT")
-    })
-
-    it("returns custom license name", () => {
-        const config: LixentConfig = {
-            ...baseConfig,
-            license: "custom",
-            customLicense: { name: "My License", text: "text" },
-        }
-        assert.equal(getLicenseName(config), "My License")
     })
 })

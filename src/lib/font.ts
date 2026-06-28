@@ -9,16 +9,6 @@
  * @module
  */
 
-/** A single font family from the Google Fonts catalog. */
-export interface GoogleFont {
-    /** Font family name (e.g. `"Inter"`, `"Merriweather"`). */
-    family: string
-    /** Available variants/weights (e.g. `["regular", "500", "700", "italic"]`). */
-    variants: string[]
-    /** CSS category (e.g. `"sans-serif"`, `"serif"`, `"monospace"`, `"display"`, `"handwriting"`). */
-    category: string
-}
-
 /**
  * Generate a Google Fonts CSS2 URL for a given font family and variants.
  *

@@ -96,14 +96,8 @@ export interface LixentConfig {
     /** Show a Gravatar avatar next to the copyright line. Requires `email` to be set. */
     gravatar?: boolean
 
-    /** Output format. Reserved for future use. */
-    format?: "html" | "txt" | "json"
-
     /** Base path for subpath deploys (e.g. `"/license"`). Passed to Astro's `base` option. */
     basePath?: string
-
-    /** URL mode for routing. Reserved for future use. */
-    urlMode?: "subpath" | "subdomain"
 
     /** Override the copyright year. Defaults to the current year. */
     year?: number

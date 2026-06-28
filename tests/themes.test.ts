@@ -1,38 +1,6 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { existsSync } from "node:fs"
-import { resolve } from "node:path"
-import { themes, getTheme, isValidTheme } from "../src/themes/index.ts"
-
-const THEMES_DIR = resolve(import.meta.dirname, "../public/themes")
-
-describe("themes", () => {
-    it("has at least one theme", () => {
-        assert.ok(themes.length > 0)
-    })
-
-    it("each theme has required fields", () => {
-        for (const theme of themes) {
-            assert.ok(theme.id, `Theme missing id`)
-            assert.ok(theme.name, `Theme ${theme.id} missing name`)
-            assert.ok(theme.description, `Theme ${theme.id} missing description`)
-            assert.equal(typeof theme.dark, "boolean", `Theme ${theme.id} dark is not boolean`)
-        }
-    })
-
-    it("each theme has unique id", () => {
-        const ids = themes.map((t) => t.id)
-        const unique = new Set(ids)
-        assert.equal(ids.length, unique.size)
-    })
-
-    it("each theme has a corresponding CSS file", () => {
-        for (const theme of themes) {
-            const cssPath = resolve(THEMES_DIR, `${theme.id}.css`)
-            assert.ok(existsSync(cssPath), `Theme ${theme.id} missing CSS file at ${cssPath}`)
-        }
-    })
-})
+import { getTheme, isValidTheme } from "../src/themes/index.ts"
 
 describe("getTheme", () => {
     it("returns theme by id", () => {

@@ -22,24 +22,16 @@
 import type { LixentConfig } from "./types.ts"
 import { LicenseError } from "./errors.ts"
 
-/** URL for the full SPDX license list (JSON format). */
-export const SPDX_LIST_URL = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
+const SPDX_LIST_URL = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
+const SPDX_TEXT_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
 
-/** Base URL for individual SPDX license text files. Append `{licenseId}.txt`. */
-export const SPDX_TEXT_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
-
-/** A single entry from the SPDX license list. */
-export interface SpdxLicense {
-    /** SPDX identifier (e.g. `"MIT"`, `"Apache-2.0"`). */
+interface SpdxLicense {
     licenseId: string
-    /** Human-readable name (e.g. "MIT License"). */
     name: string
-    /** Whether this license ID is deprecated in the SPDX standard. */
     isDeprecatedLicenseId: boolean
 }
 
-/** Response shape from the SPDX licenses.json endpoint. */
-export interface SpdxLicenseList {
+interface SpdxLicenseList {
     licenses: SpdxLicense[]
 }
 
@@ -49,7 +41,7 @@ export interface SpdxLicenseList {
  * Uses a 15-second timeout. Throws if the network request fails.
  * Called at build time in `index.astro` and at runtime in the demo.
  */
-export async function fetchLicenseList(): Promise<SpdxLicense[]> {
+async function fetchLicenseList(): Promise<SpdxLicense[]> {
     const response = await fetch(SPDX_LIST_URL, { signal: AbortSignal.timeout(15_000) })
     if (!response.ok) {
         throw new LicenseError(`[lixent] Failed to fetch SPDX license list: ${response.statusText}`)
@@ -65,7 +57,7 @@ export async function fetchLicenseList(): Promise<SpdxLicense[]> {
  * @param signal - Optional AbortSignal. Defaults to a 15-second timeout.
  * @returns The raw license text with original placeholders intact.
  */
-export async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
+async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {
         throw new LicenseError(`[lixent] Invalid license ID: ${id}`)
     }
@@ -92,7 +84,7 @@ export async function fetchLicenseText(id: string, signal?: AbortSignal): Promis
  * @param text - Raw license text from SPDX.
  * @returns License text with canonical `{{year}}` / `{{name}}` placeholders.
  */
-export function convertPlaceholders(text: string): string {
+function convertPlaceholders(text: string): string {
     return text
         .replace(/<year>/gi, "{{year}}")
         .replace(/<copyright holders>/gi, "{{name}}")
@@ -130,32 +122,12 @@ export function renderLicenseText(
 }
 
 /**
- * Get the display name of the configured license.
- *
- * @returns The `customLicense.name` if license is `"custom"`, otherwise the SPDX ID.
- */
-export function getLicenseName(config: LixentConfig): string {
-    if (config.license === "custom" && config.customLicense) {
-        return config.customLicense.name
-    }
-    return config.license
-}
-
-/** Result of resolving a license from config. */
-export interface ResolvedLicense {
-    /** Display name (e.g. "MIT License" or custom name). */
-    name: string
-    /** Raw license text with original placeholders intact. */
-    text: string
-}
-
-/**
  * Resolve the license name and raw text from config.
  *
  * Handles custom licenses (inline or file-based) and SPDX licenses.
  * Returns raw text — rendering is the caller's responsibility.
  */
-export async function resolveLicense(config: LixentConfig): Promise<ResolvedLicense> {
+export async function resolveLicense(config: LixentConfig): Promise<{ name: string, text: string }> {
     if (config.license === "custom") {
         let customText = config.customLicense?.text ?? ""
         if (config.licenseFile != null && config.licenseFile.length > 0) {

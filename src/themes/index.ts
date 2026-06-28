@@ -27,15 +27,10 @@
  * @module
  */
 
-/** Metadata for a single theme. */
-export interface ThemeMeta {
-    /** Unique identifier used in `lixent.config.json` (e.g. `"minimal"`, `"github-dark"`). */
+interface ThemeMeta {
     id: string
-    /** Human-readable display name. */
     name: string
-    /** Short description for the theme picker. */
     description: string
-    /** Whether this is a dark theme (used for UI hints in the demo). */
     dark: boolean
 }
 
@@ -56,7 +51,7 @@ export const THEME_VARIABLES = [
  * Registry of all built-in themes.
  * Each entry maps to a CSS file in `public/themes/{id}.css`.
  */
-export const themes: ThemeMeta[] = [
+const themes: ThemeMeta[] = [
     {
         id: "minimal",
         name: "Minimal",
