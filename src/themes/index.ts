@@ -93,6 +93,7 @@ export const themes: ThemeMeta[] = [
         name: "Terminal Light",
         description: "Retro terminal, green-on-light",
         dark: false,
+        preview: { bg: "#eef0ee", accent: "#1a6b1a", text: "#1a3a1a" },
     },
     {
         id: "newspaper",
@@ -106,6 +107,7 @@ export const themes: ThemeMeta[] = [
         name: "Newspaper Dark",
         description: "NYT/journalism style, dark background",
         dark: true,
+        preview: { bg: "#1a1a1a", accent: "#d4d4d4", text: "#e0e0e0" },
     },
     {
         id: "elegant",
@@ -119,6 +121,7 @@ export const themes: ThemeMeta[] = [
         name: "Elegant Dark",
         description: "High-contrast, refined, dark background",
         dark: true,
+        preview: { bg: "#1c1917", accent: "#f59e0b", text: "#e7e5e4" },
     },
     {
         id: "mono",
@@ -132,6 +135,7 @@ export const themes: ThemeMeta[] = [
         name: "Mono Dark",
         description: "Pure monospace, dark background",
         dark: true,
+        preview: { bg: "#171717", accent: "#e5e5e5", text: "#e5e5e5" },
     },
     {
         id: "serif",
@@ -145,6 +149,7 @@ export const themes: ThemeMeta[] = [
         name: "Serif Dark",
         description: "Traditional book-like, dark background",
         dark: true,
+        preview: { bg: "#1c1612", accent: "#d97706", text: "#e7e0d8" },
     },
     {
         id: "sans",
@@ -158,6 +163,7 @@ export const themes: ThemeMeta[] = [
         name: "Sans Dark",
         description: "Modern sans-serif, dark background",
         dark: true,
+        preview: { bg: "#18181b", accent: "#60a5fa", text: "#e4e4e7" },
     },
 ]
 
