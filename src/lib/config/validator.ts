@@ -47,10 +47,9 @@ export function validateConfig(config: LixentConfig): void {
         }
         assertValidCustomTheme(config.customTheme)
     } else if (!isValidTheme(config.theme) && !config.theme.startsWith("/")) {
-        console.warn(
-            `[lixent] Warning: Unknown built-in theme "${config.theme}". `
-          + `For custom themes use an absolute path starting with "/" (e.g. "/my-theme.css"). `
-          + `The page will attempt to load the CSS from the configured path.`,
+        throw new Error(
+            `[lixent] Unknown theme "${config.theme}". `
+          + `Use a built-in theme ID or an absolute path starting with "/" (e.g. "/my-theme.css").`,
         )
     }
     if (config.font != null) assertValidFont(config.font)
