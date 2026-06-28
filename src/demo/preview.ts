@@ -324,7 +324,7 @@ export function updatePreview(state: {
     const deprecatedWarning = $("deprecated-warning")
     deprecatedWarning.style.display = show ? "inline-flex" : "none"
 
-    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, el.previewLicenseText, el.previewTitle, customLicenseName, customLicenseText)
+    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, el.previewLicenseText, el.previewTitle, customLicenseName, customLicenseText)
 
     updateCopyrightLine(copyright, email, url, yearStart, yearEnd)
     updateGravatar(email, copyright, gravatarToggle.checked)
@@ -337,8 +337,6 @@ export async function fetchAndRender(
     copyright: string,
     yearStart: number,
     yearEnd: number,
-    url: string,
-    email: string,
     previewLicenseText: HTMLElement,
     previewTitle: HTMLElement,
     customLicenseName?: string,
@@ -360,7 +358,7 @@ export async function fetchAndRender(
         const yearStr = yearStart !== yearEnd
             ? `${yearStart}\u2013${yearEnd}`
             : String(yearStart)
-        const rendered = renderLicenseText(rawText, { year: yearStr, name: copyright, url, email })
+        const rendered = renderLicenseText(rawText, { year: yearStr, name: copyright })
         previewTitle.textContent = title
         previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {

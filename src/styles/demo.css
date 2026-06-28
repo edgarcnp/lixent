@@ -852,10 +852,6 @@
     font-size: 0.625rem;
 }
 
-.util-hint-dim {
-    opacity: 0.6;
-}
-
 /* Actions - sticky at bottom */
 .util-actions {
     display: flex;
