@@ -37,7 +37,7 @@ export interface LixentConfig {
 
     /**
      * SPDX license ID (e.g. `"MIT"`, `"Apache-2.0"`, `"GPL-3.0-only"`),
-     * or `"custom"` to use `customLicense.text` instead.
+     * or `"custom"` to use `customLicense.text` or `licenseFile` instead.
      * Validated against the live SPDX list at build time.
      */
     license: string
@@ -47,11 +47,28 @@ export interface LixentConfig {
         /** Display name for the custom license (e.g. "My Custom License"). */
         name: string
         /** Full license text. Supports placeholders: `{{year}}`, `{{name}}`, `{{url}}`, `{{email}}`. */
-        text: string
+        text?: string
     }
 
-    /** Theme ID (e.g. `"minimal"`, `"github-dark"`) or a path to a custom CSS file. */
+    /** Path to a license text file (relative to project root). Only used when `license` is `"custom"`. Supports placeholders. */
+    licenseFile?: string
+
+    /** Theme ID (e.g. `"minimal"`, `"github-dark"`), `"custom"` for inline colors, or a path to a custom CSS file. */
     theme: string
+
+    /** Inline custom theme colors. Only used when `theme` is `"custom"`. */
+    customTheme?: {
+        /** Page background color (e.g. `"#1a1a1a"`). */
+        bg: string
+        /** Primary text color (e.g. `"#e5e5e5"`). */
+        text: string
+        /** Secondary/muted text color (e.g. `"#a3a3a3"`). */
+        textMuted: string
+        /** Links and highlights color (e.g. `"#60a5fa"`). */
+        accent: string
+        /** Borders and dividers color (e.g. `"#404040"`). */
+        border: string
+    }
 
     /**
      * Override any of the 6 theme CSS variables without creating a full theme.
@@ -79,14 +96,8 @@ export interface LixentConfig {
     /** Show a Gravatar avatar next to the copyright line. Requires `email` to be set. */
     gravatar?: boolean
 
-    /** Output format. Reserved for future use. */
-    format?: "html" | "txt" | "json"
-
     /** Base path for subpath deploys (e.g. `"/license"`). Passed to Astro's `base` option. */
     basePath?: string
-
-    /** URL mode for routing. Reserved for future use. */
-    urlMode?: "subpath" | "subdomain"
 
     /** Override the copyright year. Defaults to the current year. */
     year?: number

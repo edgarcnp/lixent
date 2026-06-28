@@ -2,6 +2,28 @@
 
 Thank you for your interest in contributing to Lixent! This document provides guidelines and information for contributors.
 
+## AI Usage Policy
+
+Lixent has strict rules for AI usage. Please see [AI_POLICY.md](AI_POLICY.md) for the full policy.
+
+The most important rule: **you must understand your code.** If you can't explain what your changes do and how they interact with the rest of the codebase without the aid of AI tools, do not contribute to this project.
+
+## AI and Agents
+
+If you're using AI assistance with Lixent, Lixent provides an
+[AGENTS.md file](https://github.com/edgarcnp/lixent/blob/main/AGENTS.md)
+read by most of the popular AI agents to help produce higher quality
+results.
+
+> [!WARNING]
+>
+> All AI assistance usage must be disclosed
+> and we expect contributors to understand the code that is produced and
+> be able to answer questions about it. If you don't understand the
+> code produced, feel free to disclose that, but if it has problems, we
+> may ask you to fix it and close the issue. It isn't a maintainers job to
+> review a PR so broken that it requires significant rework to be acceptable.
+
 ## Getting Started
 
 1. Fork the repository
@@ -21,33 +43,44 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 
 ```
 ├── src/
-│   ├── components/     # Astro components
-│   ├── layouts/       # Page layouts
-│   ├── lib/           # Core utilities (config, types, license, gravatar, year)
-│   ├── pages/         # Route pages
-│   ├── styles/        # CSS files
-│   └── themes/        # Theme registry
-├── public/            # Static assets (theme CSS files, favicons)
-├── tests/             # Test files
-└── dist/              # Build output
+│   ├── components/     # Astro components (LicenseBody)
+│   ├── layouts/        # Page layouts (LicenseLayout)
+│   ├── lib/            # Core utilities
+│   │   ├── config/     # Config loading (coercion, validation, loader)
+│   │   ├── errors.ts   # ConfigError, LicenseError classes
+│   │   ├── font.ts     # Google Fonts URL generation
+│   │   ├── gravatar.ts # Gravatar URL generation
+│   │   ├── license.ts  # License fetching and rendering
+│   │   ├── types.ts    # LixentConfig interface
+│   │   ├── validators.ts # Input validators
+│   │   ├── constants.ts  # Shared validation constants
+│   │   ├── sanitize.ts   # Input sanitization helpers
+│   │   └── year.ts     # Year formatting
+│   ├── pages/          # Route pages (index.astro)
+│   ├── styles/         # CSS files (base.css)
+│   └── themes/         # Theme registry (index.ts)
+├── public/             # Static assets (theme CSS files, favicons)
+├── tests/              # Test files
+└── dist/               # Build output
 ```
 
 ### Commands
 
 ```bash
-bun dev        # Start dev server at localhost:4321
-bun run build  # Build for production
+bun dev         # Start dev server at localhost:4321
+bun run build   # Build for production
 bun run preview # Preview build locally
-bun run lint   # Run ESLint
+bun run lint    # Run ESLint
 bun run lint:fix # Auto-fix lint issues
-bun test       # Run tests
+bun test        # Run tests
 bunx tsc --noEmit  # Type check
+bun run cq      # Lint + typecheck + test (all-in-one)
 ```
 
 ### Adding a Theme
 
 1. Create a new CSS file in `public/themes/` (e.g., `my-theme.css`)
-2. Define all 8 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-border`, `--lx-surface`, `--lx-font-body`, `--lx-font-mono`)
+2. Define all 6 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-divider`, `--lx-font-body`)
 3. Add the theme to `src/themes/index.ts`
 4. Test with `"theme": "my-theme"` in your config
 
@@ -59,12 +92,13 @@ bunx tsc --noEmit  # Type check
 - No semicolons
 - Double quotes
 - 4-space indent
+- All errors use `[lixent]` prefix and throw `ConfigError` or `LicenseError`
 
 ## Pull Requests
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run `bun run lint` and `bun run build` to verify
+3. Run `bun run cq` to verify (lint + typecheck + test)
 4. Submit a pull request
 
 ### PR Guidelines
@@ -78,7 +112,7 @@ bunx tsc --noEmit  # Type check
 
 - Use GitHub Issues for bug reports and feature requests
 - Include steps to reproduce for bugs
-- Specify your Bun version
+- Specify your Bun and Lixent version
 
 ## License
 

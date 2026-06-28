@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { getGoogleFontsUrl, getFontFamily, cssWeightToVariants } from "../src/lib/font.ts"
+import { getGoogleFontsUrl, cssWeightToVariants } from "../src/lib/font.ts"
 
 describe("getGoogleFontsUrl", () => {
     it("returns null for empty family", () => {
@@ -25,16 +25,6 @@ describe("getGoogleFontsUrl", () => {
     it("handles spaces in family name", () => {
         const url = getGoogleFontsUrl("Open Sans")
         assert.ok(url?.includes("family=Open+Sans"))
-    })
-})
-
-describe("getFontFamily", () => {
-    it("wraps family in quotes with sans-serif fallback", () => {
-        assert.equal(getFontFamily("Inter"), '"Inter", sans-serif')
-    })
-
-    it("escapes double quotes", () => {
-        assert.equal(getFontFamily('Foo"Bar'), '"Foo\\"Bar", sans-serif')
     })
 })
 

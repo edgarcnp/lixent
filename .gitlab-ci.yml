@@ -5,6 +5,9 @@ pages:
     stage: deploy
     script:
         - bun install --frozen-lockfile
+        - bunx tsc --noEmit
+        - bun run lint
+        - bun test
         - bun run build
         - mv dist public
     pages: true

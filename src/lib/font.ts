@@ -9,23 +9,13 @@
  * @module
  */
 
-/** A single font family from the Google Fonts catalog. */
-export interface GoogleFont {
-    /** Font family name (e.g. `"Inter"`, `"Merriweather"`). */
-    family: string
-    /** Available variants/weights (e.g. `["regular", "500", "700", "italic"]`). */
-    variants: string[]
-    /** CSS category (e.g. `"sans-serif"`, `"serif"`, `"monospace"`, `"display"`, `"handwriting"`). */
-    category: string
-}
-
 /**
  * Generate a Google Fonts CSS2 URL for a given font family and variants.
  *
  * @param family   - Font family name (e.g. `"Inter"`).
  * @param variants - Available variants from the catalog (e.g. `["regular", "500", "700"]`).
  *                   Defaults to `["regular"]`.
- * @returns A `https://fonts.googleapis.com/css2?...` URL, or `null` if family is empty.
+ * @returns A `https://fonts.googleapis.com/css2?...` URL, or `null` if family is empty or contains invalid characters.
  *
  * @example
  * ```ts
@@ -51,17 +41,6 @@ export function getGoogleFontsUrl(family: string, variants: string[] = ["regular
     }
 
     return `https://fonts.googleapis.com/css2?family=${familyName}:wght@${weights.join(";")}&display=swap`
-}
-
-/**
- * Wrap a font family name for use in a CSS `font-family` value.
- *
- * @param family - Font family name (e.g. `"Inter"`).
- * @returns CSS font-family string (e.g. `"Inter", sans-serif`).
- */
-export function getFontFamily(family: string): string {
-    const safe = family.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
-    return `"${safe}", sans-serif`
 }
 
 /**

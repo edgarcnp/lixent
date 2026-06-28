@@ -57,7 +57,7 @@ main {
 .license-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 0.5px solid var(--lx-border);
+  border-bottom: 0.5px solid var(--lx-divider);
 }
 
 .gravatar-inline {

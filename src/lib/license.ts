@@ -20,25 +20,18 @@
  */
 
 import type { LixentConfig } from "./types.ts"
+import { LicenseError } from "./errors.ts"
 
-/** URL for the full SPDX license list (JSON format). */
-export const SPDX_LIST_URL = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
+const SPDX_LIST_URL = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
+const SPDX_TEXT_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
 
-/** Base URL for individual SPDX license text files. Append `{licenseId}.txt`. */
-export const SPDX_TEXT_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
-
-/** A single entry from the SPDX license list. */
-export interface SpdxLicense {
-    /** SPDX identifier (e.g. `"MIT"`, `"Apache-2.0"`). */
+interface SpdxLicense {
     licenseId: string
-    /** Human-readable name (e.g. "MIT License"). */
     name: string
-    /** Whether this license ID is deprecated in the SPDX standard. */
     isDeprecatedLicenseId: boolean
 }
 
-/** Response shape from the SPDX licenses.json endpoint. */
-export interface SpdxLicenseList {
+interface SpdxLicenseList {
     licenses: SpdxLicense[]
 }
 
@@ -48,10 +41,13 @@ export interface SpdxLicenseList {
  * Uses a 15-second timeout. Throws if the network request fails.
  * Called at build time in `index.astro` and at runtime in the demo.
  */
-export async function fetchLicenseList(): Promise<SpdxLicense[]> {
+async function fetchLicenseList(): Promise<SpdxLicense[]> {
     const response = await fetch(SPDX_LIST_URL, { signal: AbortSignal.timeout(15_000) })
     if (!response.ok) {
-        throw new Error(`Failed to fetch SPDX license list: ${response.statusText}`)
+        throw new LicenseError(
+            `[lixent] Failed to fetch SPDX license list: ${response.statusText}`,
+            { code: "FETCH_FAILED" },
+        )
     }
     const data = await response.json() as SpdxLicenseList
     return data.licenses
@@ -63,16 +59,23 @@ export async function fetchLicenseList(): Promise<SpdxLicense[]> {
  * @param id     - SPDX license identifier (e.g. `"MIT"`, `"GPL-3.0-only"`).
  * @param signal - Optional AbortSignal. Defaults to a 15-second timeout.
  * @returns The raw license text with original placeholders intact.
+ * @throws {LicenseError} If the license ID is invalid or the fetch fails.
  */
-export async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
+async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {
-        throw new Error(`Invalid license ID: ${id}`)
+        throw new LicenseError(
+            `[lixent] Invalid license ID: ${id}`,
+            { code: "INVALID_ID", licenseId: id },
+        )
     }
     const response = await fetch(`${SPDX_TEXT_BASE}${id}.txt`, {
         signal: signal ?? AbortSignal.timeout(15_000),
     })
     if (!response.ok) {
-        throw new Error(`Failed to fetch license ${id}: ${response.statusText}`)
+        throw new LicenseError(
+            `[lixent] Failed to fetch license ${id}: ${response.statusText}`,
+            { code: "FETCH_FAILED", licenseId: id },
+        )
     }
     return response.text()
 }
@@ -80,9 +83,9 @@ export async function fetchLicenseText(id: string, signal?: AbortSignal): Promis
 /**
  * Convert all SPDX placeholder formats to canonical `{{year}}` / `{{name}}` form.
  *
- * Handles 14 placeholder patterns across different license families:
- * - MIT-style: `<year>`, `<copyright holders>`, `<name of copyright holder>`
- * - GPL-style: `<name of author>`, `<program>`, `<owner>`, `<COPYRIGHT HOLDER>`, `<YEAR>`
+ * Handles 12 placeholder patterns across different license families:
+ * - MIT-style: `<year>`, `<copyright holders>`, `<name of copyright holder>`, `<copyright holder>`
+ * - GPL-style: `<name of author>`, `<program>`, `<owner>`
  * - Apache-style: `[yyyy]`, `[year]`, `[fullname]`, `[copyright holders]`, `[name of copyright owner]`
  *
  * Angle brackets that don't match any placeholder (e.g. `<https://gnu.org>`)
@@ -91,7 +94,7 @@ export async function fetchLicenseText(id: string, signal?: AbortSignal): Promis
  * @param text - Raw license text from SPDX.
  * @returns License text with canonical `{{year}}` / `{{name}}` placeholders.
  */
-export function convertPlaceholders(text: string): string {
+function convertPlaceholders(text: string): string {
     return text
         .replace(/<year>/gi, "{{year}}")
         .replace(/<copyright holders>/gi, "{{name}}")
@@ -129,13 +132,48 @@ export function renderLicenseText(
 }
 
 /**
- * Get the display name of the configured license.
+ * Resolve the license name and raw text from config.
  *
- * @returns The `customLicense.name` if license is `"custom"`, otherwise the SPDX ID.
+ * Handles custom licenses (inline or file-based) and SPDX licenses.
+ * Returns raw text — rendering is the caller's responsibility.
+ *
+ * @throws {LicenseError} If the license ID is unknown, the text is missing, or the fetch fails.
  */
-export function getLicenseName(config: LixentConfig): string {
-    if (config.license === "custom" && config.customLicense) {
-        return config.customLicense.name
+export async function resolveLicense(config: LixentConfig): Promise<{ name: string, text: string }> {
+    if (config.license === "custom") {
+        let customText = config.customLicense?.text ?? ""
+        if (config.licenseFile != null && config.licenseFile.length > 0) {
+            const { readFileSync: readFile } = await import("node:fs")
+            const { resolve: resolvePath } = await import("node:path")
+            customText = readFile(resolvePath(config.licenseFile), "utf-8")
+        }
+        if (!customText) {
+            throw new LicenseError(
+                '[lixent] License is "custom" but no license text was found. Set customLicense.text or licenseFile.',
+                { code: "MISSING_TEXT" },
+            )
+        }
+        return {
+            name: config.customLicense?.name ?? "Custom License",
+            text: customText,
+        }
     }
-    return config.license
+
+    const [licenses, rawText] = await Promise.all([
+        fetchLicenseList(),
+        fetchLicenseText(config.license),
+    ])
+
+    const match = licenses.find((l) => l.licenseId === config.license)
+    if (!match) {
+        throw new LicenseError(
+            `[lixent] Unknown license "${config.license}". Check your lixent.config.json.`,
+            { code: "NOT_FOUND", licenseId: config.license },
+        )
+    }
+
+    return {
+        name: match.name,
+        text: rawText,
+    }
 }
