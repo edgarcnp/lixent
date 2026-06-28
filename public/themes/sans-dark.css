@@ -1,0 +1,8 @@
+:root {
+  --lx-bg: #18181b;
+  --lx-text: #e4e4e7;
+  --lx-text-muted: #a1a1aa;
+  --lx-accent: #60a5fa;
+  --lx-divider: #3f3f46;
+  --lx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}

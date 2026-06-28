@@ -89,11 +89,23 @@ export const themes: ThemeMeta[] = [
         preview: { bg: "#0a0a0a", accent: "#33ff33", text: "#33ff33" },
     },
     {
+        id: "terminal-light",
+        name: "Terminal Light",
+        description: "Retro terminal, green-on-light",
+        dark: false,
+    },
+    {
         id: "newspaper",
         name: "Newspaper",
         description: "NYT/journalism style",
         dark: false,
         preview: { bg: "#ffffff", accent: "#1a1a1a", text: "#1a1a1a" },
+    },
+    {
+        id: "newspaper-dark",
+        name: "Newspaper Dark",
+        description: "NYT/journalism style, dark background",
+        dark: true,
     },
     {
         id: "elegant",
@@ -103,11 +115,23 @@ export const themes: ThemeMeta[] = [
         preview: { bg: "#fafaf9", accent: "#b45309", text: "#1c1917" },
     },
     {
+        id: "elegant-dark",
+        name: "Elegant Dark",
+        description: "High-contrast, refined, dark background",
+        dark: true,
+    },
+    {
         id: "mono",
         name: "Mono",
         description: "Pure monospace, no decoration",
         dark: false,
         preview: { bg: "#ffffff", accent: "#171717", text: "#171717" },
+    },
+    {
+        id: "mono-dark",
+        name: "Mono Dark",
+        description: "Pure monospace, dark background",
+        dark: true,
     },
     {
         id: "serif",
@@ -117,11 +141,23 @@ export const themes: ThemeMeta[] = [
         preview: { bg: "#fffbf5", accent: "#92400e", text: "#292524" },
     },
     {
+        id: "serif-dark",
+        name: "Serif Dark",
+        description: "Traditional book-like, dark background",
+        dark: true,
+    },
+    {
         id: "sans",
         name: "Sans",
         description: "Modern sans-serif",
         dark: false,
         preview: { bg: "#ffffff", accent: "#2563eb", text: "#18181b" },
+    },
+    {
+        id: "sans-dark",
+        name: "Sans Dark",
+        description: "Modern sans-serif, dark background",
+        dark: true,
     },
 ]
 
