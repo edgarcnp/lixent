@@ -15,6 +15,7 @@
 import { readFileSync, existsSync } from "node:fs"
 import { resolve } from "node:path"
 import type { LixentConfig } from "../types.ts"
+import { ConfigError } from "../errors.ts"
 import { coerceConfig } from "./coercion.ts"
 import { validateConfig } from "./validator.ts"
 
@@ -40,7 +41,7 @@ function loadFromPackageJson(root: string): LixentConfig | null {
     const lixent = pkg.lixent as Record<string, unknown>
     const copyright = lixent.copyright ?? pkg.name
     if (copyright == null || copyright === "") {
-        throw new Error(
+        throw new ConfigError(
             '[lixent] copyright is required. Set it in lixent field or provide a "name" field in package.json.',
         )
     }

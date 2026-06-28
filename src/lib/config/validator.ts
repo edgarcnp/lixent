@@ -8,6 +8,7 @@
  */
 
 import type { LixentConfig } from "../types.ts"
+import { ConfigError } from "../errors.ts"
 import { isValidTheme, THEME_VARIABLES } from "../../themes/index.ts"
 import {
     assertValidUrl,
@@ -32,7 +33,7 @@ export function validateConfig(config: LixentConfig): void {
         const hasText = config.customLicense?.text != null && config.customLicense.text.length > 0
         const hasFile = config.licenseFile != null && config.licenseFile.length > 0
         if (!hasText && !hasFile) {
-            throw new Error(
+            throw new ConfigError(
                 '[lixent] License is "custom" but neither customLicense.text nor licenseFile is set.',
             )
         }
@@ -43,11 +44,11 @@ export function validateConfig(config: LixentConfig): void {
     if (config.email != null) assertValidEmail(config.email)
     if (config.theme === "custom") {
         if (config.customTheme == null) {
-            throw new Error('[lixent] Theme is "custom" but customTheme is not set.')
+            throw new ConfigError('[lixent] Theme is "custom" but customTheme is not set.')
         }
         assertValidCustomTheme(config.customTheme)
     } else if (!isValidTheme(config.theme) && !config.theme.startsWith("/")) {
-        throw new Error(
+        throw new ConfigError(
             `[lixent] Unknown theme "${config.theme}". `
           + `Use a built-in theme ID or an absolute path starting with "/" (e.g. "/my-theme.css").`,
         )
@@ -62,14 +63,14 @@ export function validateConfig(config: LixentConfig): void {
         assertValidYear(config.yearRange.start)
         assertValidYear(config.yearRange.end)
         if (config.yearRange.start > config.yearRange.end) {
-            throw new Error(
+            throw new ConfigError(
                 `[lixent] yearRange.start (${config.yearRange.start}) must not exceed `
               + `yearRange.end (${config.yearRange.end})`,
             )
         }
     }
     if (config.year != null && config.yearRange != null) {
-        throw new Error("[lixent] Both `year` and `yearRange` are set. Use only one.")
+        throw new ConfigError("[lixent] Both `year` and `yearRange` are set. Use only one.")
     }
     if (config.customLicense?.name != null) assertValidCustomName(config.customLicense.name)
     if (config.customLicense?.text != null) assertValidCustomText(config.customLicense.text)

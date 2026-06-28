@@ -2,7 +2,7 @@
  * Input validation for user-provided configuration values.
  *
  * All validators follow the `assert` pattern: they return `void` on success
- * and throw an `Error` with a descriptive message on failure. Empty strings
+ * and throw a {@link ConfigError} with a descriptive message on failure. Empty strings
  * are treated as "not provided" and pass validation (except for required
  * fields like `customLicense.name`).
  *
@@ -18,6 +18,8 @@
  *
  * @module
  */
+
+import { ConfigError } from "./errors.ts"
 
 /** Maximum byte length for the copyright field. */
 const MAX_COPYRIGHT_BYTES = 256
@@ -51,10 +53,10 @@ export function assertValidUrl(raw: string): void {
     try {
         parsed = new URL(raw)
     } catch {
-        throw new Error(`[lixent] Invalid URL: ${raw}`)
+        throw new ConfigError(`[lixent] Invalid URL: ${raw}`)
     }
     if (!ALLOWED_SCHEMES.includes(parsed.protocol)) {
-        throw new Error(`[lixent] URL must use http: or https: protocol, got ${parsed.protocol}`)
+        throw new ConfigError(`[lixent] URL must use http: or https: protocol, got ${parsed.protocol}`)
     }
 }
 
@@ -69,7 +71,7 @@ export function assertValidUrl(raw: string): void {
 export function assertValidEmail(raw: string): void {
     if (raw.length === 0) return
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) || /[<>"]/.test(raw)) {
-        throw new Error(`[lixent] Invalid email: ${raw}`)
+        throw new ConfigError(`[lixent] Invalid email: ${raw}`)
     }
 }
 
@@ -84,10 +86,10 @@ export function assertValidEmail(raw: string): void {
 export function assertValidFont(raw: string): void {
     if (raw.length === 0) return
     if (raw.length > MAX_FONT_BYTES) {
-        throw new Error(`[lixent] Font value exceeds ${MAX_FONT_BYTES} bytes`)
+        throw new ConfigError(`[lixent] Font value exceeds ${MAX_FONT_BYTES} bytes`)
     }
     if (CSS_DANGEROUS_PATTERN.test(raw)) {
-        throw new Error(`[lixent] Font value contains unsafe characters: ${raw}`)
+        throw new ConfigError(`[lixent] Font value contains unsafe characters: ${raw}`)
     }
 }
 
@@ -102,13 +104,13 @@ export function assertValidFont(raw: string): void {
  */
 export function assertValidCopyright(raw: string): void {
     if (raw.length === 0) {
-        throw new Error("[lixent] Copyright cannot be empty")
+        throw new ConfigError("[lixent] Copyright cannot be empty")
     }
     if (raw.length > MAX_COPYRIGHT_BYTES) {
-        throw new Error(`[lixent] Copyright exceeds ${MAX_COPYRIGHT_BYTES} bytes`)
+        throw new ConfigError(`[lixent] Copyright exceeds ${MAX_COPYRIGHT_BYTES} bytes`)
     }
     if (/<[a-z/]/i.test(raw)) {
-        throw new Error(`[lixent] Copyright contains HTML tags`)
+        throw new ConfigError(`[lixent] Copyright contains HTML tags`)
     }
 }
 
@@ -121,13 +123,13 @@ export function assertValidCopyright(raw: string): void {
  */
 export function assertValidYear(raw: number): void {
     if (!Number.isFinite(raw)) {
-        throw new Error(`[lixent] Year must be a finite number, got ${raw}`)
+        throw new ConfigError(`[lixent] Year must be a finite number, got ${raw}`)
     }
     if (raw !== Math.floor(raw)) {
-        throw new Error(`[lixent] Year must be an integer, got ${raw}`)
+        throw new ConfigError(`[lixent] Year must be an integer, got ${raw}`)
     }
     if (raw < 1900 || raw > 2100) {
-        throw new Error(`[lixent] Year must be between 1900 and 2100, got ${raw}`)
+        throw new ConfigError(`[lixent] Year must be between 1900 and 2100, got ${raw}`)
     }
 }
 
@@ -141,13 +143,13 @@ export function assertValidYear(raw: number): void {
  */
 export function assertValidCustomName(raw: string): void {
     if (raw.length === 0) {
-        throw new Error("[lixent] Custom license name cannot be empty")
+        throw new ConfigError("[lixent] Custom license name cannot be empty")
     }
     if (raw.length > MAX_CUSTOM_NAME_BYTES) {
-        throw new Error(`[lixent] Custom license name exceeds ${MAX_CUSTOM_NAME_BYTES} bytes`)
+        throw new ConfigError(`[lixent] Custom license name exceeds ${MAX_CUSTOM_NAME_BYTES} bytes`)
     }
     if (/<[a-z/]/i.test(raw)) {
-        throw new Error(`[lixent] Custom license name contains HTML tags`)
+        throw new ConfigError(`[lixent] Custom license name contains HTML tags`)
     }
 }
 
@@ -161,13 +163,13 @@ export function assertValidCustomName(raw: string): void {
  */
 export function assertValidCustomText(raw: string): void {
     if (raw.length === 0) {
-        throw new Error("[lixent] Custom license text cannot be empty")
+        throw new ConfigError("[lixent] Custom license text cannot be empty")
     }
     if (raw.length > MAX_CUSTOM_TEXT_BYTES) {
-        throw new Error(`[lixent] Custom license text exceeds ${MAX_CUSTOM_TEXT_BYTES} bytes`)
+        throw new ConfigError(`[lixent] Custom license text exceeds ${MAX_CUSTOM_TEXT_BYTES} bytes`)
     }
     if (/<[a-z/]/i.test(raw)) {
-        throw new Error("[lixent] Custom license text contains HTML tags")
+        throw new ConfigError("[lixent] Custom license text contains HTML tags")
     }
 }
 
@@ -187,13 +189,13 @@ export function assertValidThemeOverrides(
 ): void {
     for (const [key, value] of Object.entries(overrides)) {
         if (!allowedKeys.includes(key)) {
-            throw new Error(`[lixent] Disallowed CSS variable in themeOverrides: ${key}`)
+            throw new ConfigError(`[lixent] Disallowed CSS variable in themeOverrides: ${key}`)
         }
         if (value.length === 0) {
-            throw new Error(`[lixent] Empty value for ${key} in themeOverrides`)
+            throw new ConfigError(`[lixent] Empty value for ${key} in themeOverrides`)
         }
         if (CSS_DANGEROUS_PATTERN.test(value)) {
-            throw new Error(`[lixent] Unsafe value in themeOverrides for ${key}: ${value}`)
+            throw new ConfigError(`[lixent] Unsafe value in themeOverrides for ${key}: ${value}`)
         }
     }
 }
@@ -213,13 +215,13 @@ const CSS_VALUE_PATTERN = /^[a-zA-Z0-9 .%,+\-/()]+$/
 export function assertValidCssValue(value: string, field: string): void {
     if (value.length === 0) return
     if (value.length > 64) {
-        throw new Error(`[lixent] ${field} exceeds 64 characters`)
+        throw new ConfigError(`[lixent] ${field} exceeds 64 characters`)
     }
     if (CSS_DANGEROUS_PATTERN.test(value)) {
-        throw new Error(`[lixent] ${field} contains unsafe characters`)
+        throw new ConfigError(`[lixent] ${field} contains unsafe characters`)
     }
     if (!CSS_VALUE_PATTERN.test(value)) {
-        throw new Error(`[lixent] ${field} contains invalid characters`)
+        throw new ConfigError(`[lixent] ${field} contains invalid characters`)
     }
 }
 
@@ -240,18 +242,18 @@ export function assertValidCustomTheme(
 ): void {
     for (const key of Object.keys(customTheme)) {
         if (!(CUSTOM_THEME_KEYS as readonly string[]).includes(key)) {
-            throw new Error(`[lixent] Disallowed key in customTheme: "${key}". Allowed: ${CUSTOM_THEME_KEYS.join(", ")}`)
+            throw new ConfigError(`[lixent] Disallowed key in customTheme: "${key}". Allowed: ${CUSTOM_THEME_KEYS.join(", ")}`)
         }
     }
     for (const [key, value] of Object.entries(customTheme)) {
         if (typeof value !== "string" || value.length === 0) {
-            throw new Error(`[lixent] customTheme.${key} must be a non-empty string`)
+            throw new ConfigError(`[lixent] customTheme.${key} must be a non-empty string`)
         }
         if (value.length > 64) {
-            throw new Error(`[lixent] customTheme.${key} exceeds 64 characters`)
+            throw new ConfigError(`[lixent] customTheme.${key} exceeds 64 characters`)
         }
         if (CSS_DANGEROUS_PATTERN.test(value)) {
-            throw new Error(`[lixent] customTheme.${key} contains unsafe characters: ${value}`)
+            throw new ConfigError(`[lixent] customTheme.${key} contains unsafe characters: ${value}`)
         }
     }
 }
