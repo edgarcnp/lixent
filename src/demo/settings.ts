@@ -1,4 +1,5 @@
 import { isValidUrl } from "./helpers.ts"
+import { FONT_FALLBACK } from "../lib/font.ts"
 
 export const DEFAULTS = {
     theme: "minimal-dark",
@@ -6,7 +7,7 @@ export const DEFAULTS = {
     license: "MIT",
     fontSize: "18px",
     lineHeight: "1.7",
-    fontFallback: "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+    fontFallback: FONT_FALLBACK,
 } as const
 
 export const CUSTOM_THEME_DEFAULTS = {

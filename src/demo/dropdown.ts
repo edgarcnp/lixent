@@ -171,6 +171,12 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
 
     function selectOption(value: string): void {
         currentValue = value
+        applyLabel(value)
+        close()
+        config.onSelect(value)
+    }
+
+    function applyLabel(value: string): void {
         const opt = currentOptions.find((o) => o.value === value)
         const label = trigger.querySelector<HTMLElement>(".trigger-label")
         if (!label) return
@@ -183,8 +189,6 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
             label.classList.add("placeholder")
             label.style.fontFamily = ""
         }
-        close()
-        config.onSelect(value)
     }
 
     function positionPanel(): void {
@@ -295,18 +299,7 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     return {
         setValue: (value: string) => {
             currentValue = value
-            const opt = currentOptions.find((o) => o.value === value)
-            const label = trigger.querySelector<HTMLElement>(".trigger-label")
-            if (!label) return
-            if (opt) {
-                label.textContent = opt.label
-                label.classList.remove("placeholder")
-                label.style.fontFamily = opt.fontPreview ?? ""
-            } else {
-                label.textContent = config.placeholder ?? "Select..."
-                label.classList.add("placeholder")
-                label.style.fontFamily = ""
-            }
+            applyLabel(value)
         },
         getValue: () => currentValue,
         setOptions: (options: DropdownOption[]) => {

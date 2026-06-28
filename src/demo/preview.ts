@@ -27,6 +27,7 @@ let el: {
     summaryFontStyling: HTMLElement
     summaryLicense: HTMLElement
     summaryIdentity: HTMLElement
+    deprecatedWarning: HTMLElement
 } | null = null
 
 let gravatarInline: HTMLImageElement | null = null
@@ -44,15 +45,16 @@ export function initPreviewElements(): void {
         summaryFontStyling: $("summary-font-styling"),
         summaryLicense: $("summary-license"),
         summaryIdentity: $("summary-identity"),
+        deprecatedWarning: $("deprecated-warning"),
     }
 }
 
-export function getLicenseName(id: string): string {
+function getLicenseName(id: string): string {
     const match = allLicenses.find((l) => l.licenseId === id)
     return match != null ? match.name : id
 }
 
-export function isDeprecated(id: string): boolean {
+function isDeprecated(id: string): boolean {
     const match = allLicenses.find((l) => l.licenseId === id)
     return match?.isDeprecatedLicenseId === true
 }
@@ -74,7 +76,7 @@ export function fontToOption(font: GoogleFont): DropdownOption {
     }
 }
 
-export function loadGoogleFont(family: string): void {
+function loadGoogleFont(family: string): void {
     if (family.length === 0) {
         activeGoogleFontLink?.remove()
         activeGoogleFontLink = null
@@ -120,18 +122,22 @@ export function setAllFonts(fonts: GoogleFont[]): void {
 
 let licenseAbort: AbortController | null = null
 
+function applyThemeStyle(css: string): void {
+    if (!previewThemeStyle) {
+        previewThemeStyle = document.createElement("style")
+        previewThemeStyle.id = "preview-theme"
+        const old = $("preview-theme") as HTMLLinkElement
+        old.replaceWith(previewThemeStyle)
+    }
+    previewThemeStyle.textContent = css
+}
+
 function updateTheme(theme: string): void {
     if (!el) return
-    const previewTheme = $("preview-theme") as HTMLLinkElement
     const newHref = `${BASE_URL}themes/${theme}.css`
     const cached = themeCache.get(newHref)
     if (cached != null) {
-        if (!previewThemeStyle) {
-            previewThemeStyle = document.createElement("style")
-            previewThemeStyle.id = "preview-theme"
-            previewTheme.replaceWith(previewThemeStyle)
-        }
-        previewThemeStyle.textContent = cached
+        applyThemeStyle(cached)
     } else {
         themeAbort?.abort()
         themeAbort = new AbortController()
@@ -139,12 +145,7 @@ function updateTheme(theme: string): void {
             .then((r) => r.text())
             .then((css) => {
                 themeCache.set(newHref, css)
-                if (!previewThemeStyle) {
-                    previewThemeStyle = document.createElement("style")
-                    previewThemeStyle.id = "preview-theme"
-                    previewTheme.replaceWith(previewThemeStyle)
-                }
-                previewThemeStyle.textContent = css
+                applyThemeStyle(css)
             })
             .catch((e: unknown) => { if (e instanceof Error && e.name !== "AbortError") console.warn(e) })
     }
@@ -339,8 +340,7 @@ export function updatePreview(state: {
     updateTypography({ fontSizeInput, fontWeightInput, lineHeightInput, letterSpacingInput })
 
     const show = isDeprecated(licenseId)
-    const deprecatedWarning = $("deprecated-warning")
-    deprecatedWarning.style.display = show ? "inline-flex" : "none"
+    el.deprecatedWarning.style.display = show ? "inline-flex" : "none"
 
     void fetchAndRender(licenseId, copyright, yearStart, yearEnd, el.previewLicenseText, el.previewTitle, customLicenseName, customLicenseText)
 

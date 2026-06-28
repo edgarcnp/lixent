@@ -31,8 +31,8 @@ export async function loadLicenseText(licenseId: string, signal?: AbortSignal): 
     return response.text()
 }
 
-export function renderLicenseText(text: string, config: LixentConfig): string {
-    return _renderLicenseText(text, config)
+export function renderLicenseText(text: string, values: { year: string, name: string }): string {
+    return _renderLicenseText(text, values)
 }
 
 export async function loadProjectConfig(): Promise<ProjectConfig> {

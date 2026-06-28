@@ -186,7 +186,11 @@ export async function initDemo(): Promise<void> {
         loadLicenses(),
         fetch("/fonts.json", { signal: AbortSignal.timeout(15_000) })
             .then((r) => { if (!r.ok) throw new Error(`fonts.json: ${r.status}`); return r.json() })
-            .then((d) => (d as { items: GoogleFont[] }).items),
+            .then((d) => {
+                const data = d as Record<string, unknown>
+                const items = data.items
+                return Array.isArray(items) ? items as GoogleFont[] : []
+            }),
     ])
 
     const projectConfig = projectResult.status === "fulfilled" ? projectResult.value : {}
@@ -295,6 +299,8 @@ export async function initDemo(): Promise<void> {
         const json = JSON.stringify(config, null, 2)
         void navigator.clipboard.writeText(json).then(() => {
             flashButton(utilCopy, utilCopyLabel, utilCopyCheck, "Copied!", copyTimer)
+        }).catch(() => {
+            flashButton(utilCopy, utilCopyLabel, utilCopyCheck, "Failed", copyTimer)
         })
     })
 
