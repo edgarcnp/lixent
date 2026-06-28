@@ -3,6 +3,7 @@ import { Image } from "astro:assets"
 import { getGravatarUrl } from "../lib/gravatar.ts"
 import { getGoogleFontsUrl, cssWeightToVariants } from "../lib/font.ts"
 import { getTheme, THEME_VARIABLES } from "../themes/index.ts"
+import { stripCssUrl } from "../lib/sanitize.ts"
 import type { LixentConfig } from "../lib/types.ts"
 import "../styles/base.css"
 
@@ -22,15 +23,11 @@ const themePath
         ? `${base}/themes/${config.theme}.css`
         : config.theme
 
-function sanitizeCssValue(v: string): string {
-    return v.replace(/url\s*\(/gi, "")
-}
-
 const themeOverrides
     = config.themeOverrides != null
         ? Object.entries(config.themeOverrides)
             .filter(([k]) => THEME_VARIABLES.includes(k))
-            .map(([k, v]) => `${k}: ${sanitizeCssValue(v)};`)
+            .map(([k, v]) => `${k}: ${stripCssUrl(v)};`)
             .join(" ")
         : ""
 
@@ -39,7 +36,7 @@ const CUSTOM_THEME_MAP: Partial<Record<string, string>> = {
     text: "--lx-text",
     textMuted: "--lx-text-muted",
     accent: "--lx-accent",
-    divider: "--lx-divider",
+    border: "--lx-divider",
 }
 
 const customThemeVars
@@ -48,7 +45,7 @@ const customThemeVars
             .map(([k, v]) => {
                 const cssVar = CUSTOM_THEME_MAP[k]
                 return cssVar != null
-                    ? `${cssVar}: ${sanitizeCssValue(v)};`
+                    ? `${cssVar}: ${stripCssUrl(v)};`
                     : ""
             })
             .join(" ")
@@ -56,7 +53,7 @@ const customThemeVars
 
 const rawFont = config.font
 const fontValue = rawFont != null && rawFont.length > 0
-    ? sanitizeCssValue(rawFont)
+    ? stripCssUrl(rawFont)
     : ""
 
 const fontOverrideParts: string[] = []

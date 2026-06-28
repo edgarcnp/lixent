@@ -12,7 +12,7 @@
  * forms, or user sessions. The attack surface is limited to:
  *
  * 1. **CSS injection** via `themeOverrides`, `font`, or custom CSS values.
- *    Mitigated by: `CSS_DANGEROUS_PATTERN` blocks `url()` which could exfiltrate data.
+ *    Mitigated by: `hasCssUrl()` blocks `url()` which could exfiltrate data.
  * 2. **XSS via copyright** — mitigated by blocking HTML tags.
  * 3. **URL scheme abuse** — mitigated by allowing only `http:` / `https:`.
  *
@@ -20,6 +20,7 @@
  */
 
 import { ConfigError } from "./errors.ts"
+import { hasCssUrl, hasHtmlTags } from "./sanitize.ts"
 
 /** Maximum byte length for the copyright field. */
 const MAX_COPYRIGHT_BYTES = 256
@@ -31,12 +32,6 @@ const MAX_CUSTOM_NAME_BYTES = 256
 const MAX_CUSTOM_TEXT_BYTES = 50 * 1024
 /** Only http and https protocols are allowed in URLs. */
 const ALLOWED_SCHEMES = ["http:", "https:"]
-
-/**
- * Pattern that detects potentially dangerous CSS injection vectors.
- * Blocks `url()` function calls which could be used for data exfiltration.
- */
-export const CSS_DANGEROUS_PATTERN = /url\s*\(/i
 
 /**
  * Validate a URL string.
@@ -87,7 +82,7 @@ export function assertValidFont(raw: string): void {
     if (raw.length > MAX_FONT_BYTES) {
         throw new ConfigError(`[lixent] Font value exceeds ${MAX_FONT_BYTES} bytes`)
     }
-    if (CSS_DANGEROUS_PATTERN.test(raw)) {
+    if (hasCssUrl(raw)) {
         throw new ConfigError(`[lixent] Font value contains unsafe characters: ${raw}`)
     }
 }
@@ -108,7 +103,7 @@ export function assertValidCopyright(raw: string): void {
     if (raw.length > MAX_COPYRIGHT_BYTES) {
         throw new ConfigError(`[lixent] Copyright exceeds ${MAX_COPYRIGHT_BYTES} bytes`)
     }
-    if (/<[a-z/]/i.test(raw)) {
+    if (hasHtmlTags(raw)) {
         throw new ConfigError(`[lixent] Copyright contains HTML tags`)
     }
 }
@@ -147,7 +142,7 @@ export function assertValidCustomName(raw: string): void {
     if (raw.length > MAX_CUSTOM_NAME_BYTES) {
         throw new ConfigError(`[lixent] Custom license name exceeds ${MAX_CUSTOM_NAME_BYTES} bytes`)
     }
-    if (/<[a-z/]/i.test(raw)) {
+    if (hasHtmlTags(raw)) {
         throw new ConfigError(`[lixent] Custom license name contains HTML tags`)
     }
 }
@@ -167,7 +162,7 @@ export function assertValidCustomText(raw: string): void {
     if (raw.length > MAX_CUSTOM_TEXT_BYTES) {
         throw new ConfigError(`[lixent] Custom license text exceeds ${MAX_CUSTOM_TEXT_BYTES} bytes`)
     }
-    if (/<[a-z/]/i.test(raw)) {
+    if (hasHtmlTags(raw)) {
         throw new ConfigError("[lixent] Custom license text contains HTML tags")
     }
 }
@@ -193,7 +188,7 @@ export function assertValidThemeOverrides(
         if (value.length === 0) {
             throw new ConfigError(`[lixent] Empty value for ${key} in themeOverrides`)
         }
-        if (CSS_DANGEROUS_PATTERN.test(value)) {
+        if (hasCssUrl(value)) {
             throw new ConfigError(`[lixent] Unsafe value in themeOverrides for ${key}: ${value}`)
         }
     }
@@ -216,7 +211,7 @@ export function assertValidCssValue(value: string, field: string): void {
     if (value.length > 64) {
         throw new ConfigError(`[lixent] ${field} exceeds 64 characters`)
     }
-    if (CSS_DANGEROUS_PATTERN.test(value)) {
+    if (hasCssUrl(value)) {
         throw new ConfigError(`[lixent] ${field} contains unsafe characters`)
     }
     if (!CSS_VALUE_PATTERN.test(value)) {
@@ -251,7 +246,7 @@ export function assertValidCustomTheme(
         if (value.length > 64) {
             throw new ConfigError(`[lixent] customTheme.${key} exceeds 64 characters`)
         }
-        if (CSS_DANGEROUS_PATTERN.test(value)) {
+        if (hasCssUrl(value)) {
             throw new ConfigError(`[lixent] customTheme.${key} contains unsafe characters: ${value}`)
         }
     }
