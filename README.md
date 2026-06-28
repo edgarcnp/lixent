@@ -30,14 +30,14 @@ Lixent generates a static HTML page displaying your software license. Users fork
 
 ## Documentation
 
-Full documentation is in the [Wiki](../../wiki):
+Full documentation is in the [Wiki](https://github.com/edgarcnp/lixent/wiki):
 
-- [Configuration](../../wiki/Configuration) — all fields, types, and examples
-- [Custom Licenses](../../wiki/Custom-Licenses) — inline text, file-based, placeholders
-- [Themes](../../wiki/Themes) — built-in themes, overrides, custom themes
-- [Error Handling](../../wiki/Error-Handling) — error codes, catching, common messages
-- [Deployment](../../wiki/Deployment) — all platforms with server configs
-- [Contributing](../../wiki/Contributing) — project structure, conventions, AI usage
+- [Configuration](https://github.com/edgarcnp/lixent/wiki/Configuration) — all fields, types, and examples
+- [Custom Licenses](https://github.com/edgarcnp/lixent/wiki/Custom-Licenses) — inline text, file-based, placeholders
+- [Themes](https://github.com/edgarcnp/lixent/wiki/Themes) — built-in themes, overrides, custom themes
+- [Error Handling](https://github.com/edgarcnp/lixent/wiki/Error-Handling) — error codes, catching, common messages
+- [Deployment](https://github.com/edgarcnp/lixent/wiki/Deployment) — all platforms with server configs
+- [Contributing](https://github.com/edgarcnp/lixent/wiki/Contributing) — project structure, conventions, AI usage
 
 ## Development
 
