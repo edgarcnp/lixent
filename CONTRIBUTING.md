@@ -8,6 +8,22 @@ Lixent has strict rules for AI usage. Please see [AI_POLICY.md](AI_POLICY.md) fo
 
 The most important rule: **you must understand your code.** If you can't explain what your changes do and how they interact with the rest of the codebase without the aid of AI tools, do not contribute to this project.
 
+## AI and Agents
+
+If you're using AI assistance with Lixent, Lixent provides an
+[AGENTS.md file](https://github.com/edgarcnp/lixent/blob/main/AGENTS.md)
+read by most of the popular AI agents to help produce higher quality
+results.
+
+> [!WARNING]
+>
+> All AI assistance usage must be disclosed
+> and we expect contributors to understand the code that is produced and
+> be able to answer questions about it. If you don't understand the
+> code produced, feel free to disclose that, but if it has problems, we
+> may ask you to fix it and close the issue. It isn't a maintainers job to
+> review a PR so broken that it requires significant rework to be acceptable.
+
 ## Getting Started
 
 1. Fork the repository
