@@ -30,7 +30,9 @@ Thank you for your interest in contributing to Lixent! This document provides gu
 │   │   ├── gravatar.ts # Gravatar URL generation
 │   │   ├── license.ts  # License fetching and rendering
 │   │   ├── types.ts    # LixentConfig interface
-│   │   ├── validation.ts # Input validators
+│   │   ├── validators.ts # Input validators
+│   │   ├── constants.ts  # Shared validation constants
+│   │   ├── sanitize.ts   # Input sanitization helpers
 │   │   └── year.ts     # Year formatting
 │   ├── pages/          # Route pages (index.astro)
 │   ├── styles/         # CSS files (base.css)
@@ -89,6 +91,22 @@ bun run cq      # Lint + typecheck + test (all-in-one)
 - Use GitHub Issues for bug reports and feature requests
 - Include steps to reproduce for bugs
 - Specify your Bun and Lixent version
+
+## AI Usage Policy
+
+### The Critical Rule
+
+You must understand your code. If you can't explain what your changes do and how they interact with the rest of the codebase without the aid of AI tools, do not contribute to this project.
+
+Using AI to write code is fine. You can gain understanding by interrogating an agent with access to the codebase until you grasp all edge cases and effects of your changes. What's not fine is submitting agent-generated code without that understanding.
+
+### Guidelines
+
+- **Read and understand every line** you submit. If an AI tool generated it, review it line by line before committing.
+- **Be able to explain your changes** in the PR description without copy-pasting AI output. If asked "why did you do it this way?", you should have a real answer.
+- **Run the test suite** (`bun run cq`) on every change. Don't trust that AI-generated code works — verify it.
+- **Know the security model.** Lixent sanitizes user input for CSS injection and XSS. If your change touches user-facing input, you must understand why the existing guards exist and whether your change needs new ones.
+- **Don't submit slop.** Bulk-generated code that doesn't account for project conventions, error handling patterns, or the existing module structure will be rejected.
 
 ## License
 
