@@ -122,6 +122,15 @@ export function setAllFonts(fonts: GoogleFont[]): void {
 
 let licenseAbort: AbortController | null = null
 
+function clearInlineThemeVars(): void {
+    const previewContent = document.getElementById("preview-content")
+    if (previewContent) {
+        for (const key of ["--lx-bg", "--lx-text", "--lx-text-muted", "--lx-accent", "--lx-divider"]) {
+            previewContent.style.removeProperty(key)
+        }
+    }
+}
+
 function applyThemeStyle(css: string): void {
     if (!previewThemeStyle) {
         previewThemeStyle = document.createElement("style")
@@ -134,6 +143,7 @@ function applyThemeStyle(css: string): void {
 
 function updateTheme(theme: string): void {
     if (!el) return
+    if (theme !== "custom") clearInlineThemeVars()
     const newHref = `${BASE_URL}themes/${theme}.css`
     const cached = themeCache.get(newHref)
     if (cached != null) {
