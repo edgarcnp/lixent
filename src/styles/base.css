@@ -69,6 +69,17 @@ main {
   top: -0.05em;
 }
 
+.gravatar-fallback {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  background: var(--lx-divider, #e5e7eb);
+  color: var(--lx-text, #1a1a1a);
+}
+
 h1 {
   font-size: clamp(2.5rem, 2rem + 2.5vw, 4rem);
   font-weight: 700;

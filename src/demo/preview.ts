@@ -30,6 +30,7 @@ let el: {
 } | null = null
 
 let gravatarInline: HTMLImageElement | null = null
+let gravatarFallback: HTMLElement | null = null
 
 export function initPreviewElements(): void {
     el = {
@@ -239,16 +240,33 @@ function updateGravatar(email: string, copyright: string, showGravatar: boolean)
             gravatarInline.className = "gravatar-inline"
             gravatarInline.width = 24
             gravatarInline.height = 24
+            gravatarInline.onerror = () => {
+                if (!gravatarInline || !el) return
+                gravatarInline.style.display = "none"
+                if (!gravatarFallback) {
+                    gravatarFallback = document.createElement("span")
+                    gravatarFallback.className = "gravatar-inline gravatar-fallback"
+                    gravatarFallback.textContent = copyright.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+                    gravatarInline.parentNode?.insertBefore(gravatarFallback, gravatarInline.nextSibling)
+                }
+            }
             el.previewCopyright.prepend(gravatarInline)
         }
         const newSrc = getGravatarUrl(email, 24)
         if (gravatarInline.src !== newSrc) {
             gravatarInline.src = newSrc
             gravatarInline.alt = copyright
+            if (gravatarFallback) {
+                gravatarFallback.remove()
+                gravatarFallback = null
+            }
+            gravatarInline.style.display = ""
         }
     } else if (gravatarInline) {
         gravatarInline.remove()
         gravatarInline = null
+        gravatarFallback?.remove()
+        gravatarFallback = null
     }
 }
 
