@@ -67,7 +67,12 @@ function loadFromPackageJson(root: string): LixentConfig | null {
 
     const lixentRaw = pkg.lixent as Record<string, unknown>
     if (lixentRaw.copyright == null || lixentRaw.copyright === "") {
-        lixentRaw.copyright = pkg.name ?? ""
+        if (pkg.name == null || pkg.name === "") {
+            throw new Error(
+                '[lixent] copyright is required. Set it in lixent field or provide a "name" field in package.json.',
+            )
+        }
+        lixentRaw.copyright = pkg.name
     }
     lixentRaw.license ??= "MIT"
     lixentRaw.theme ??= "minimal"

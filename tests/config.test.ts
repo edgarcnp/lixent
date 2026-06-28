@@ -116,6 +116,15 @@ describe("loadConfig edge cases", () => {
         assert.equal(loaded.license, "MIT")
         assert.equal(loaded.theme, "minimal")
     })
+
+    it("throws when copyright and package name are both missing", () => {
+        const pkg = { lixent: { license: "MIT" } }
+        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
+        assert.throws(
+            () => loadConfig(TMP_DIR),
+            /copyright is required/,
+        )
+    })
 })
 
 describe("loadConfig custom theme", () => {
