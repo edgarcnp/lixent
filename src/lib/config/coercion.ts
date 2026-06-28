@@ -10,36 +10,38 @@
 import type { LixentConfig } from "../types.ts"
 import { ConfigError } from "../errors.ts"
 
+function coerceYear(value: unknown, field: string): number {
+    if (typeof value === "number") return value
+    if (typeof value === "string") {
+        const n = Number(value)
+        if (!Number.isFinite(n)) {
+            throw new ConfigError(`[lixent] ${field} must be a number, got "${value}"`)
+        }
+        return n
+    }
+    throw new ConfigError(`[lixent] ${field} must be a number, got ${String(value)}`)
+}
+
 /**
  * Coerce a raw parsed JSON value into a LixentConfig shape.
  *
- * @throws {Error} If a string value cannot be converted to a number.
+ * @throws {ConfigError} If a string value cannot be converted to a number.
  */
 export function coerceConfig(raw: Record<string, unknown>): LixentConfig {
-    const config = { ...raw } as unknown as LixentConfig
-    if (typeof raw.year === "string") {
-        const n = Number(raw.year)
-        if (!Number.isFinite(n)) {
-            throw new ConfigError(`[lixent] year must be a number, got "${raw.year}"`)
-        }
-        config.year = n
-    }
+    const year = raw.year != null ? coerceYear(raw.year, "year") : undefined
+
+    let yearRange: LixentConfig["yearRange"]
     if (raw.yearRange != null && typeof raw.yearRange === "object") {
         const yr = raw.yearRange as Record<string, unknown>
-        if (typeof yr.start === "string") {
-            const n = Number(yr.start)
-            if (!Number.isFinite(n)) {
-                throw new ConfigError(`[lixent] yearRange.start must be a number, got "${yr.start}"`)
-            }
-            ;(config.yearRange as Record<string, unknown>).start = n
-        }
-        if (typeof yr.end === "string") {
-            const n = Number(yr.end)
-            if (!Number.isFinite(n)) {
-                throw new ConfigError(`[lixent] yearRange.end must be a number, got "${yr.end}"`)
-            }
-            ;(config.yearRange as Record<string, unknown>).end = n
+        yearRange = {
+            start: coerceYear(yr.start, "yearRange.start"),
+            end: coerceYear(yr.end, "yearRange.end"),
         }
     }
-    return config
+
+    return {
+        ...raw,
+        year,
+        yearRange,
+    } as LixentConfig
 }

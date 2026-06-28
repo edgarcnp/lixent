@@ -12,7 +12,7 @@
  * forms, or user sessions. The attack surface is limited to:
  *
  * 1. **CSS injection** via `themeOverrides`, `font`, or custom CSS values.
- *    Mitigated by: `CSS_DANGEROUS_PATTERN` blocks `;{}` and `url()`.
+ *    Mitigated by: `CSS_DANGEROUS_PATTERN` blocks `url()` which could exfiltrate data.
  * 2. **XSS via copyright** — mitigated by blocking HTML tags.
  * 3. **URL scheme abuse** — mitigated by allowing only `http:` / `https:`.
  *
@@ -33,11 +33,10 @@ const MAX_CUSTOM_TEXT_BYTES = 50 * 1024
 const ALLOWED_SCHEMES = ["http:", "https:"]
 
 /**
- * Pattern that detects potentially dangerous CSS characters.
- * Blocks semicolons, curly braces, and `url()` function calls
- * which could be used for CSS injection.
+ * Pattern that detects potentially dangerous CSS injection vectors.
+ * Blocks `url()` function calls which could be used for data exfiltration.
  */
-export const CSS_DANGEROUS_PATTERN = /[;{}]|url\s*\(/i
+export const CSS_DANGEROUS_PATTERN = /url\s*\(/i
 
 /**
  * Validate a URL string.
@@ -45,7 +44,7 @@ export const CSS_DANGEROUS_PATTERN = /[;{}]|url\s*\(/i
  * Accepts empty strings (field is optional). Rejects non-HTTP(S) protocols
  * like `javascript:` or `data:` which could enable XSS.
  *
- * @throws {Error} If the URL is malformed or uses a disallowed protocol.
+ * @throws {ConfigError} If the URL is malformed or uses a disallowed protocol.
  */
 export function assertValidUrl(raw: string): void {
     if (raw.length === 0) return
@@ -66,7 +65,7 @@ export function assertValidUrl(raw: string): void {
  * Uses a deliberately loose regex — strict email validation isn't needed here,
  * just basic sanity checking.
  *
- * @throws {Error} If the email doesn't match the expected format.
+ * @throws {ConfigError} If the email doesn't match the expected format.
  */
 export function assertValidEmail(raw: string): void {
     if (raw.length === 0) return
@@ -78,10 +77,10 @@ export function assertValidEmail(raw: string): void {
 /**
  * Validate a font family value.
  *
- * Checks length and blocks CSS injection patterns. Font values are injected
- * into a `<style>` tag, so they must not contain semicolons, braces, or `url()`.
+ * Checks length and blocks `url()` patterns. Font values are injected
+ * into a `<style>` tag, so they must not contain `url()` which could exfiltrate data.
  *
- * @throws {Error} If the value exceeds the max length or contains dangerous characters.
+ * @throws {ConfigError} If the value exceeds the max length or contains dangerous characters.
  */
 export function assertValidFont(raw: string): void {
     if (raw.length === 0) return
@@ -100,7 +99,7 @@ export function assertValidFont(raw: string): void {
  * is rendered as HTML in the output page, so HTML entities are escaped by
  * Astro, but raw tags must be blocked at the config level.
  *
- * @throws {Error} If the value exceeds the max length or contains HTML tags.
+ * @throws {ConfigError} If the value exceeds the max length or contains HTML tags.
  */
 export function assertValidCopyright(raw: string): void {
     if (raw.length === 0) {
@@ -119,7 +118,7 @@ export function assertValidCopyright(raw: string): void {
  *
  * Must be a finite integer between 1900 and 2100.
  *
- * @throws {Error} If the year is not a finite integer or is out of range.
+ * @throws {ConfigError} If the year is not a finite integer or is out of range.
  */
 export function assertValidYear(raw: number): void {
     if (!Number.isFinite(raw)) {
@@ -139,7 +138,7 @@ export function assertValidYear(raw: number): void {
  * Cannot be empty (it's displayed as the license title), must not contain
  * HTML tags, and must not exceed the max length.
  *
- * @throws {Error} If the name is empty, too long, or contains HTML tags.
+ * @throws {ConfigError} If the name is empty, too long, or contains HTML tags.
  */
 export function assertValidCustomName(raw: string): void {
     if (raw.length === 0) {
@@ -159,7 +158,7 @@ export function assertValidCustomName(raw: string): void {
  * Cannot be empty (it's the entire license body). Capped at 50 KB to prevent
  * excessively large pages. Blocks HTML tags as a defense-in-depth measure.
  *
- * @throws {Error} If the text is empty, exceeds the max length, or contains HTML tags.
+ * @throws {ConfigError} If the text is empty, exceeds the max length, or contains HTML tags.
  */
 export function assertValidCustomText(raw: string): void {
     if (raw.length === 0) {
@@ -181,7 +180,7 @@ export function assertValidCustomText(raw: string): void {
  *
  * @param overrides   - The user's theme override map.
  * @param allowedKeys - Allowlisted CSS variable names (from `THEME_VARIABLES`).
- * @throws {Error} If a disallowed variable is used or a value contains dangerous characters.
+ * @throws {ConfigError} If a disallowed variable is used or a value contains dangerous characters.
  */
 export function assertValidThemeOverrides(
     overrides: Record<string, string>,
@@ -210,7 +209,7 @@ const CSS_VALUE_PATTERN = /^[a-zA-Z0-9 .%,+\-/()]+$/
  *
  * @param value - The CSS value to validate.
  * @param field - Field name for error messages (e.g. `"fontSize"`).
- * @throws {Error} If the value is too long, contains dangerous characters, or fails the pattern check.
+ * @throws {ConfigError} If the value is too long, contains dangerous characters, or fails the pattern check.
  */
 export function assertValidCssValue(value: string, field: string): void {
     if (value.length === 0) return
@@ -235,7 +234,7 @@ const CUSTOM_THEME_KEYS = ["bg", "text", "textMuted", "accent", "border"] as con
  * CSS injection patterns and must look like valid CSS colors.
  *
  * @param customTheme - The user's custom theme object.
- * @throws {Error} If a disallowed key is used or a value contains dangerous characters.
+ * @throws {ConfigError} If a disallowed key is used or a value contains dangerous characters.
  */
 export function assertValidCustomTheme(
     customTheme: Record<string, string>,

@@ -26,7 +26,7 @@ import {
 /**
  * Validates a config object against security constraints.
  *
- * @throws {Error} If any validation check fails.
+ * @throws {ConfigError} If any validation check fails.
  */
 export function validateConfig(config: LixentConfig): void {
     if (config.license === "custom") {

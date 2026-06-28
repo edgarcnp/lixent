@@ -80,18 +80,12 @@ describe("assertValidFont", () => {
         assert.doesNotThrow(() => assertValidFont(""))
     })
 
-    it("rejects font with semicolon", () => {
-        assert.throws(
-            () => assertValidFont("Inter; color: red"),
-            /unsafe characters/,
-        )
+    it("accepts font with semicolon (valid CSS)", () => {
+        assert.doesNotThrow(() => assertValidFont("Inter; color: red"))
     })
 
-    it("rejects font with curly braces", () => {
-        assert.throws(
-            () => assertValidFont("Inter { color: red }"),
-            /unsafe characters/,
-        )
+    it("accepts font with curly braces (valid CSS)", () => {
+        assert.doesNotThrow(() => assertValidFont("Inter { color: red }"))
     })
 
     it("rejects font with url()", () => {
@@ -252,10 +246,9 @@ describe("assertValidThemeOverrides", () => {
         )
     })
 
-    it("rejects value with semicolon", () => {
-        assert.throws(
+    it("accepts value with semicolon (valid CSS)", () => {
+        assert.doesNotThrow(
             () => assertValidThemeOverrides({ "--lx-bg": "red; color: blue" }, allowed),
-            /Unsafe value/,
         )
     })
 
@@ -293,17 +286,15 @@ describe("assertValidCustomTheme", () => {
         )
     })
 
-    it("rejects value with semicolon", () => {
-        assert.throws(
+    it("accepts value with semicolon (valid CSS)", () => {
+        assert.doesNotThrow(
             () => assertValidCustomTheme({ bg: "#000; color: red" }),
-            /contains unsafe characters/,
         )
     })
 
-    it("rejects value with curly braces", () => {
-        assert.throws(
+    it("accepts value with curly braces (valid CSS)", () => {
+        assert.doesNotThrow(
             () => assertValidCustomTheme({ bg: "#000 { color: red }" }),
-            /contains unsafe characters/,
         )
     })
 

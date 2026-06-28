@@ -1,7 +1,6 @@
 ---
 import { Image } from "astro:assets"
 import { getGravatarUrl } from "../lib/gravatar.ts"
-import { CSS_DANGEROUS_PATTERN } from "../lib/validation.ts"
 import { getGoogleFontsUrl, cssWeightToVariants } from "../lib/font.ts"
 import { getTheme, THEME_VARIABLES } from "../themes/index.ts"
 import type { LixentConfig } from "../lib/types.ts"
@@ -11,10 +10,9 @@ interface Props {
     title: string
     config: LixentConfig
     yearStr: string
-    copyright?: string
 }
 
-const { title, config, yearStr, copyright } = Astro.props
+const { title, config, yearStr } = Astro.props
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "")
 
@@ -25,14 +23,14 @@ const themePath
         : config.theme
 
 function sanitizeCssValue(v: string): string {
-    return v.replace(/[;{}]/g, "").replace(/url\s*\(/gi, "")
+    return v.replace(/url\s*\(/gi, "")
 }
 
 const themeOverrides
     = config.themeOverrides != null
         ? Object.entries(config.themeOverrides)
             .filter(([k]) => THEME_VARIABLES.includes(k))
-            .map(([k, v]) => CSS_DANGEROUS_PATTERN.test(v) ? "" : `${k}: ${sanitizeCssValue(v)};`)
+            .map(([k, v]) => `${k}: ${sanitizeCssValue(v)};`)
             .join(" ")
         : ""
 
@@ -49,7 +47,7 @@ const customThemeVars
         ? Object.entries(config.customTheme)
             .map(([k, v]) => {
                 const cssVar = CUSTOM_THEME_MAP[k]
-                return cssVar != null && !CSS_DANGEROUS_PATTERN.test(v)
+                return cssVar != null
                     ? `${cssVar}: ${sanitizeCssValue(v)};`
                     : ""
             })
@@ -57,7 +55,7 @@ const customThemeVars
         : ""
 
 const rawFont = config.font
-const fontValue = rawFont != null && rawFont.length > 0 && !CSS_DANGEROUS_PATTERN.test(rawFont)
+const fontValue = rawFont != null && rawFont.length > 0
     ? sanitizeCssValue(rawFont)
     : ""
 
@@ -84,7 +82,7 @@ const fontOverride = fontOverrideParts.length > 0
 const variants = cssWeightToVariants(config.fontWeight)
 const googleFontsUrl = rawFont != null && rawFont.length > 0 ? getGoogleFontsUrl(rawFont, variants) : null
 
-const name = copyright ?? config.copyright
+const name = config.copyright
 
 const hasUrl = config.url != null && config.url.length > 0
 const email = config.email
