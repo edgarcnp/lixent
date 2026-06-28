@@ -15,7 +15,7 @@
  * @param family   - Font family name (e.g. `"Inter"`).
  * @param variants - Available variants from the catalog (e.g. `["regular", "500", "700"]`).
  *                   Defaults to `["regular"]`.
- * @returns A `https://fonts.googleapis.com/css2?...` URL, or `null` if family is empty.
+ * @returns A `https://fonts.googleapis.com/css2?...` URL, or `null` if family is empty or contains invalid characters.
  *
  * @example
  * ```ts

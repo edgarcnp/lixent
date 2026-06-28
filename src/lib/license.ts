@@ -56,6 +56,7 @@ async function fetchLicenseList(): Promise<SpdxLicense[]> {
  * @param id     - SPDX license identifier (e.g. `"MIT"`, `"GPL-3.0-only"`).
  * @param signal - Optional AbortSignal. Defaults to a 15-second timeout.
  * @returns The raw license text with original placeholders intact.
+ * @throws {LicenseError} If the license ID is invalid or the fetch fails.
  */
 async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<string> {
     if (!/^[A-Za-z0-9._-]+$/.test(id)) {
@@ -73,9 +74,9 @@ async function fetchLicenseText(id: string, signal?: AbortSignal): Promise<strin
 /**
  * Convert all SPDX placeholder formats to canonical `{{year}}` / `{{name}}` form.
  *
- * Handles 14 placeholder patterns across different license families:
- * - MIT-style: `<year>`, `<copyright holders>`, `<name of copyright holder>`
- * - GPL-style: `<name of author>`, `<program>`, `<owner>`, `<COPYRIGHT HOLDER>`, `<YEAR>`
+ * Handles 12 placeholder patterns across different license families:
+ * - MIT-style: `<year>`, `<copyright holders>`, `<name of copyright holder>`, `<copyright holder>`
+ * - GPL-style: `<name of author>`, `<program>`, `<owner>`
  * - Apache-style: `[yyyy]`, `[year]`, `[fullname]`, `[copyright holders]`, `[name of copyright owner]`
  *
  * Angle brackets that don't match any placeholder (e.g. `<https://gnu.org>`)
@@ -126,6 +127,8 @@ export function renderLicenseText(
  *
  * Handles custom licenses (inline or file-based) and SPDX licenses.
  * Returns raw text — rendering is the caller's responsibility.
+ *
+ * @throws {LicenseError} If the license ID is unknown, the text is missing, or the fetch fails.
  */
 export async function resolveLicense(config: LixentConfig): Promise<{ name: string, text: string }> {
     if (config.license === "custom") {

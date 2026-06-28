@@ -130,7 +130,7 @@ export function getTheme(id: string): ThemeMeta | undefined {
  * Check if a theme ID is valid.
  *
  * @param id - Theme identifier to check.
- * @returns `true` if the ID exists in the theme registry.
+ * @returns `true` if the ID is a built-in theme or the literal string `"custom"`.
  */
 export function isValidTheme(id: string): boolean {
     return id === "custom" || THEME_MAP.has(id)

@@ -2,7 +2,7 @@
  * Config validation.
  *
  * Validates a fully-coerced LixentConfig against security constraints.
- * Throws on invalid values, warns on non-critical issues.
+ * Throws ConfigError on any validation failure.
  *
  * @module
  */

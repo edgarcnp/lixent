@@ -29,6 +29,8 @@ interface PackageJson {
 /**
  * Attempts to load config from the `"lixent"` field in `package.json`.
  * Returns `null` if no `package.json` exists or it has no `lixent` field.
+ *
+ * @throws {ConfigError} If copyright is missing and cannot be inferred from `package.json` name.
  */
 function loadFromPackageJson(root: string): LixentConfig | null {
     const pkgPath = resolve(root, "package.json")
@@ -67,7 +69,7 @@ function loadFromPackageJson(root: string): LixentConfig | null {
  * @param root - Project root directory. Defaults to `process.cwd()`.
  * @returns A fully resolved, validated {@link LixentConfig}.
  * @throws {SyntaxError} If the config file contains invalid JSON.
- * @throws {Error} If any validation check fails.
+ * @throws {ConfigError} If any validation check fails.
  */
 export function loadConfig(root: string = process.cwd()): LixentConfig {
     const configPath = resolve(root, CONFIG_FILE)

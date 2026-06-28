@@ -4,7 +4,7 @@
  * All validators follow the `assert` pattern: they return `void` on success
  * and throw a {@link ConfigError} with a descriptive message on failure. Empty strings
  * are treated as "not provided" and pass validation (except for required
- * fields like `customLicense.name`).
+ * fields like `copyright`, `customLicense.name`, and `customLicense.text`).
  *
  * ## Security model
  *
@@ -231,7 +231,7 @@ const CUSTOM_THEME_KEYS = ["bg", "text", "textMuted", "accent", "border"] as con
  * Validate a custom theme object.
  *
  * Only allows the 5 predefined color keys. Values are checked for
- * CSS injection patterns and must look like valid CSS colors.
+ * CSS injection patterns and must not exceed 64 characters.
  *
  * @param customTheme - The user's custom theme object.
  * @throws {ConfigError} If a disallowed key is used or a value contains dangerous characters.

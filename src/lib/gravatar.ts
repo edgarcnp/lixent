@@ -18,7 +18,7 @@
  * @param defaultType - Fallback avatar type when no Gravatar is set.
  *                     `"mp"` (mystery person), `"identicon"`, `"monsterid"`,
  *                     `"wavatar"`, `"retro"`, `"robohash"`, or `"blank"`.
- * @returns Full Gravatar URL (e.g. `https://www.gravatar.com/avatar/...?s=64&d=mp`).
+ * @returns Full Gravatar URL (e.g. `https://www.gravatar.com/avatar/...?s=80&d=mp`).
  */
 export async function getGravatarUrl(
     email: string,
