@@ -143,10 +143,10 @@ function applyThemeStyle(css: string): void {
 
 function updateTheme(theme: string): void {
     if (!el) return
-    if (theme !== "custom") clearInlineThemeVars()
     const newHref = `${BASE_URL}themes/${theme}.css`
     const cached = themeCache.get(newHref)
     if (cached != null) {
+        if (theme !== "custom") clearInlineThemeVars()
         applyThemeStyle(cached)
     } else {
         themeAbort?.abort()
@@ -155,6 +155,7 @@ function updateTheme(theme: string): void {
             .then((r) => r.text())
             .then((css) => {
                 themeCache.set(newHref, css)
+                if (theme !== "custom") clearInlineThemeVars()
                 applyThemeStyle(css)
             })
             .catch((e: unknown) => { if (e instanceof Error && e.name !== "AbortError") console.warn(e) })
