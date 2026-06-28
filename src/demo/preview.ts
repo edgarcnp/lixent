@@ -291,11 +291,14 @@ export function updatePreview(state: {
     yearMode: "single" | "range"
     gravatarToggle: HTMLInputElement
     currentYear: number
+    customLicenseName?: string
+    customLicenseText?: string
 }): void {
     const {
         getSelectedTheme, fontDropdown, fontSizeInput, fontWeightInput,
         lineHeightInput, letterSpacingInput, licenseDropdown, copyrightInput,
         emailInput, urlInput, yearInput, yearStartInput, yearEndInput, yearMode, gravatarToggle, currentYear,
+        customLicenseName, customLicenseText,
     } = state
 
     const theme = getSelectedTheme()
@@ -321,7 +324,7 @@ export function updatePreview(state: {
     const deprecatedWarning = $("deprecated-warning")
     deprecatedWarning.style.display = show ? "inline-flex" : "none"
 
-    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, el.previewLicenseText, el.previewTitle)
+    void fetchAndRender(licenseId, copyright, yearStart, yearEnd, url, email, el.previewLicenseText, el.previewTitle, customLicenseName, customLicenseText)
 
     updateCopyrightLine(copyright, email, url, yearStart, yearEnd)
     updateGravatar(email, copyright, gravatarToggle.checked)
@@ -338,17 +341,27 @@ export async function fetchAndRender(
     email: string,
     previewLicenseText: HTMLElement,
     previewTitle: HTMLElement,
+    customLicenseName?: string,
+    customLicenseText?: string,
 ): Promise<void> {
     licenseAbort?.abort()
     const controller = new AbortController()
     licenseAbort = controller
     try {
-        const rawText = await loadLicenseText(licenseId, controller.signal)
+        let rawText: string
+        let title: string
+        if (licenseId === "custom") {
+            rawText = customLicenseText ?? ""
+            title = customLicenseName || "Custom License"
+        } else {
+            rawText = await loadLicenseText(licenseId, controller.signal)
+            title = getLicenseName(licenseId)
+        }
         const yearStr = yearStart !== yearEnd
             ? `${yearStart}\u2013${yearEnd}`
             : String(yearStart)
         const rendered = renderLicenseText(rawText, { year: yearStr, name: copyright, url, email })
-        previewTitle.textContent = getLicenseName(licenseId)
+        previewTitle.textContent = title
         previewLicenseText.innerHTML = formatParagraphs(escapeHtml(rendered))
     } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return

@@ -25,8 +25,8 @@ export async function loadLicenses(): Promise<SpdxLicense[]> {
     return data.licenses
 }
 
-export async function loadLicenseText(licenseId: string): Promise<string> {
-    const response = await fetch(`${SPDX_TEXT_BASE}${licenseId}.txt`, { signal: AbortSignal.timeout(15_000) })
+export async function loadLicenseText(licenseId: string, signal?: AbortSignal): Promise<string> {
+    const response = await fetch(`${SPDX_TEXT_BASE}${licenseId}.txt`, { signal: signal ?? AbortSignal.timeout(15_000) })
     if (!response.ok) throw new Error(`Failed to fetch license text for ${licenseId}: ${response.status}`)
     return response.text()
 }

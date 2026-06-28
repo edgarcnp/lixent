@@ -127,6 +127,8 @@ export async function initDemo(): Promise<void> {
             yearMode: getYearMode(),
             gravatarToggle,
             currentYear,
+            customLicenseName: customLicenseName.value,
+            customLicenseText: customLicenseText.value,
         })
     }
 
