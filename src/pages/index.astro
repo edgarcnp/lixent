@@ -79,6 +79,47 @@ const themeList = themes
                                                 <span class="theme-check"><IconCheck /></span>
                                             </button>
                                         ))}
+                                        <button
+                                            class="theme-card"
+                                            data-theme="custom"
+                                            data-mode="dark"
+                                            type="button"
+                                            aria-label="Custom theme"
+                                        >
+                                            <div class="theme-color-strip">
+                                                <span style="background: #1a1a1a"></span>
+                                                <span style="background: #60a5fa"></span>
+                                                <span style="background: #e5e5e5"></span>
+                                            </div>
+                                            <span class="theme-card-name">Custom</span>
+                                            <span class="theme-check"><IconCheck /></span>
+                                        </button>
+                                    </div>
+                                    <div class="custom-theme-inputs" id="custom-theme-inputs" style="display:none;">
+                                        <div class="field-row">
+                                            <div class="util-section">
+                                                <label for="custom-theme-bg">Background</label>
+                                                <input type="text" id="custom-theme-bg" placeholder="#1a1a1a" />
+                                            </div>
+                                            <div class="util-section">
+                                                <label for="custom-theme-text">Text</label>
+                                                <input type="text" id="custom-theme-text" placeholder="#e5e5e5" />
+                                            </div>
+                                        </div>
+                                        <div class="field-row">
+                                            <div class="util-section">
+                                                <label for="custom-theme-text-muted">Text Muted</label>
+                                                <input type="text" id="custom-theme-text-muted" placeholder="#a3a3a3" />
+                                            </div>
+                                            <div class="util-section">
+                                                <label for="custom-theme-accent">Accent</label>
+                                                <input type="text" id="custom-theme-accent" placeholder="#60a5fa" />
+                                            </div>
+                                        </div>
+                                        <div class="util-section">
+                                            <label for="custom-theme-border">Border</label>
+                                            <input type="text" id="custom-theme-border" placeholder="#404040" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -139,6 +180,16 @@ const themeList = themes
                                     <span class="util-warn-icon" id="deprecated-warning" style="display:none;" data-tip="This license is deprecated">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
                                     </span>
+                                </div>
+                                <div class="custom-license-inputs" id="custom-license-inputs" style="display:none;">
+                                    <div class="util-section">
+                                        <label for="custom-license-name">License Name</label>
+                                        <input type="text" id="custom-license-name" placeholder="My Custom License" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="custom-license-text">License Text</label>
+                                        <textarea id="custom-license-text" rows="6" placeholder="Copyright (c) {{year}} {{name}}&#10;&#10;Permission is hereby granted..."></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -72,3 +72,10 @@ export function cssWeightToVariants(fontWeight?: string): string[] {
     }
     return normalized === "400" ? ["regular"] : ["regular", normalized]
 }
+
+const FONT_FALLBACK = "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+
+export function getFontFamily(family: string): string {
+    if (family.length === 0) return FONT_FALLBACK
+    return `"${family}", ${FONT_FALLBACK}`
+}

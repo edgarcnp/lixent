@@ -9,8 +9,10 @@ export function createThemeSelect(
     themeGallery: HTMLElement,
     themeModeToggle: HTMLElement | null,
     onChange: () => void,
+    onCustomChange?: () => void,
 ): ThemeSelect {
     let selectedTheme: string = DEFAULTS.theme
+    const customThemeInputs = document.getElementById("custom-theme-inputs")
 
     function getSelectedTheme(): string {
         return selectedTheme
@@ -21,6 +23,12 @@ export function createThemeSelect(
         themeGallery.querySelectorAll(".theme-card").forEach((card) => {
             card.classList.toggle("selected", (card as HTMLElement).dataset.theme === id)
         })
+        if (id === "custom") {
+            if (customThemeInputs) customThemeInputs.style.display = ""
+            onCustomChange?.()
+            return
+        }
+        if (customThemeInputs) customThemeInputs.style.display = "none"
         const mode = id.endsWith("-light") ? "light" : "dark"
         themeGallery.dataset.mode = mode
         themeModeToggle?.querySelectorAll(".theme-mode-btn").forEach((btn) => {
@@ -46,6 +54,8 @@ export function createThemeSelect(
 
             const mode = btn.dataset.mode
             themeGallery.dataset.mode = mode
+
+            if (selectedTheme === "custom") return
 
             const currentBase = selectedTheme.replace(/-dark$|-light$/, "")
             const targetId = `${currentBase}-${mode}`

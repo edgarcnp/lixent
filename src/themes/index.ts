@@ -58,7 +58,7 @@ export const THEME_VARIABLES = [
     "--lx-surface",
 ]
 
-const THEMES_DIR = join(import.meta.dirname, "../../public/themes")
+const THEMES_DIR = join(process.cwd(), "public", "themes")
 
 function parseCssVar(css: string, variable: string): string {
     const match = new RegExp(`${variable}:\\s*([^;]+)`).exec(css)

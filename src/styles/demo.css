@@ -817,6 +817,24 @@
     min-width: 0;
 }
 
+/* Custom license/theme inputs */
+.custom-license-inputs,
+.custom-theme-inputs {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--demo-border);
+}
+
+.custom-license-inputs textarea,
+.custom-theme-inputs textarea {
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
 /* Actions - sticky at bottom */
 .util-actions {
     display: flex;

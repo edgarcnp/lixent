@@ -4,7 +4,7 @@ import type { GoogleFont } from "../lib/font.ts"
 import { $, debounce, getPreferredMode } from "./helpers.ts"
 import { createDropdown } from "./dropdown.ts"
 import { setAllLicenses, setAllFonts, fontToOption, licenseToOption, updatePreview, initPreviewElements, preloadGoogleFont } from "./preview.ts"
-import { buildConfigJson, DEFAULTS } from "./settings.ts"
+import { buildConfigJson, DEFAULTS, CUSTOM_THEME_DEFAULTS } from "./settings.ts"
 import { applyMode, toggleMode } from "./mode.ts"
 import { createWarnings } from "./warnings.ts"
 import { createThemeSelect } from "./theme-select.ts"
@@ -34,15 +34,29 @@ export async function initDemo(): Promise<void> {
     if (!utilMenu) throw new Error("Element .util-menu not found")
     const modeToggle = $("mode-toggle")
 
+    const customLicenseInputs = $("custom-license-inputs")
+    const customLicenseName = $("custom-license-name") as HTMLInputElement
+    const customLicenseText = $("custom-license-text") as HTMLTextAreaElement
+    const customThemeBg = $("custom-theme-bg") as HTMLInputElement
+    const customThemeText = $("custom-theme-text") as HTMLInputElement
+    const customThemeTextMuted = $("custom-theme-text-muted") as HTMLInputElement
+    const customThemeAccent = $("custom-theme-accent") as HTMLInputElement
+    const customThemeBorder = $("custom-theme-border") as HTMLInputElement
+
     const currentYear = new Date().getFullYear()
 
     const warnings = createWarnings(emailInput, urlInput, gravatarToggle)
     const { updateGravatarWarning, updateGravatarProfileWarning, updateUrlWarning } = warnings
 
+    function onCustomThemeChange(): void {
+        applyCustomThemePreview()
+    }
+
     const { getSelectedTheme, setSelectedTheme } = createThemeSelect(
         themeGallery,
         themeModeToggle,
         onControlChange,
+        onCustomThemeChange,
     )
 
     const { getYearMode, applyConfig: applyYearConfig } = createYearInput(
@@ -61,7 +75,11 @@ export async function initDemo(): Promise<void> {
         options: [],
         placeholder: "Select license...",
         searchPlaceholder: "Search licenses...",
-        onSelect: () => onControlChange(),
+        onSelect: () => {
+            const isCustom = licenseDropdown.getValue() === "custom"
+            customLicenseInputs.style.display = isCustom ? "" : "none"
+            onControlChange()
+        },
     })
 
     const fontDropdown = createDropdown({
@@ -72,6 +90,24 @@ export async function initDemo(): Promise<void> {
         onSelect: () => onControlChange(),
         loadFont: preloadGoogleFont,
     })
+
+    function applyCustomThemePreview(): void {
+        const theme = getSelectedTheme()
+        if (theme !== "custom") return
+        const vars = {
+            "--lx-bg": customThemeBg.value || CUSTOM_THEME_DEFAULTS.bg,
+            "--lx-text": customThemeText.value || CUSTOM_THEME_DEFAULTS.text,
+            "--lx-text-muted": customThemeTextMuted.value || CUSTOM_THEME_DEFAULTS.textMuted,
+            "--lx-accent": customThemeAccent.value || CUSTOM_THEME_DEFAULTS.accent,
+            "--lx-divider": customThemeBorder.value || CUSTOM_THEME_DEFAULTS.border,
+        }
+        const previewContent = document.getElementById("preview-content")
+        if (previewContent) {
+            for (const [key, val] of Object.entries(vars)) {
+                previewContent.style.setProperty(key, val)
+            }
+        }
+    }
 
     function runUpdatePreview(): void {
         updatePreview({
@@ -120,6 +156,13 @@ export async function initDemo(): Promise<void> {
             yearEnd: yearEndInput.value,
             yearMode: getYearMode(),
             gravatar: gravatarToggle.checked,
+            customLicenseName: customLicenseName.value,
+            customLicenseText: customLicenseText.value,
+            customThemeBg: customThemeBg.value,
+            customThemeText: customThemeText.value,
+            customThemeTextMuted: customThemeTextMuted.value,
+            customThemeAccent: customThemeAccent.value,
+            customThemeBorder: customThemeBorder.value,
         }
     }
 
@@ -150,9 +193,14 @@ export async function initDemo(): Promise<void> {
         const licenses = licenseResult.value
         licenses.sort((a, b) => a.name.localeCompare(b.name))
         setAllLicenses(licenses)
-        licenseDropdown.setOptions(licenses.map(licenseToOption))
+        const options = licenses.map(licenseToOption)
+        options.push({ value: "custom", label: "Custom License" })
+        licenseDropdown.setOptions(options)
     } else {
-        licenseDropdown.setOptions([{ value: "", label: "Failed to load licenses" }])
+        licenseDropdown.setOptions([
+            { value: "", label: "Failed to load licenses" },
+            { value: "custom", label: "Custom License" },
+        ])
     }
 
     if (fontResult.status === "fulfilled") {
@@ -183,6 +231,19 @@ export async function initDemo(): Promise<void> {
         onControlChange()
         void updateGravatarProfileWarning()
     })
+
+    customLicenseName.addEventListener("input", debouncedChange)
+    customLicenseText.addEventListener("input", debouncedChange)
+
+    const debouncedCustomTheme = debounce(() => {
+        applyCustomThemePreview()
+        onControlChange()
+    }, 300)
+    customThemeBg.addEventListener("input", debouncedCustomTheme)
+    customThemeText.addEventListener("input", debouncedCustomTheme)
+    customThemeTextMuted.addEventListener("input", debouncedCustomTheme)
+    customThemeAccent.addEventListener("input", debouncedCustomTheme)
+    customThemeBorder.addEventListener("input", debouncedCustomTheme)
 
     document.querySelectorAll(".accordion-header").forEach((header) => {
         header.addEventListener("click", () => {
@@ -253,6 +314,19 @@ export async function initDemo(): Promise<void> {
         urlInput.value = config.url ?? ""
         applyYearConfig(config)
         gravatarToggle.checked = config.gravatar ?? false
+
+        if (config.license === "custom") {
+            customLicenseInputs.style.display = ""
+            customLicenseName.value = config.customLicense?.name ?? ""
+            customLicenseText.value = config.customLicense?.text ?? ""
+        }
+        if (config.theme === "custom" && config.customTheme) {
+            customThemeBg.value = config.customTheme.bg ?? ""
+            customThemeText.value = config.customTheme.text ?? ""
+            customThemeTextMuted.value = config.customTheme.textMuted ?? ""
+            customThemeAccent.value = config.customTheme.accent ?? ""
+            customThemeBorder.value = config.customTheme.border ?? ""
+        }
     }
 
     applyProjectConfig(projectConfig)
