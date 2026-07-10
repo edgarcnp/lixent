@@ -83,5 +83,7 @@ export function hasCssDangerous(value: string): boolean {
  * ```
  */
 export function stripCssUrl(value: string): string {
-    return value.replace(CSS_URL_PATTERN, "").replace(CSS_STRUCTURAL_PATTERN, "")
+    return value
+        .replace(/url\s*\(/gi, "")
+        .replace(/[;{}]/g, "")
 }
