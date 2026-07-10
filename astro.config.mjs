@@ -41,9 +41,14 @@ function lixentPublicAssets() {
         }
 
         if (fontCatalog != null && fontCatalog.length > 0) {
+          const sanitized = fontCatalog.map((f) => ({
+            family: f.family,
+            variants: f.variants,
+            category: f.category,
+          }));
           fs.writeFileSync(
             "public/fonts.json",
-            JSON.stringify({ items: fontCatalog }),
+            JSON.stringify({ items: sanitized }),
           );
           logger.info(`Font catalog: ${fontCatalog.length} fonts`);
         } else {
