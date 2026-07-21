@@ -27,7 +27,7 @@ import { LicenseError } from "./errors.ts"
 const SPDX_LIST_URL = "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json"
 const SPDX_TEXT_BASE = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/"
 
-interface SpdxLicense {
+export interface SpdxLicense {
     licenseId: string
     name: string
     isDeprecatedLicenseId: boolean

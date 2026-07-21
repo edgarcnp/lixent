@@ -329,11 +329,11 @@ export async function initDemo(): Promise<void> {
             customLicenseText.value = config.customLicense?.text ?? ""
         }
         if (config.theme === "custom" && config.customTheme) {
-            customThemeBg.value = config.customTheme.bg ?? ""
-            customThemeText.value = config.customTheme.text ?? ""
-            customThemeTextMuted.value = config.customTheme.textMuted ?? ""
-            customThemeAccent.value = config.customTheme.accent ?? ""
-            customThemeBorder.value = config.customTheme.border ?? ""
+            customThemeBg.value = config.customTheme.bg
+            customThemeText.value = config.customTheme.text
+            customThemeTextMuted.value = config.customTheme.textMuted
+            customThemeAccent.value = config.customTheme.accent
+            customThemeBorder.value = config.customTheme.border
         }
     }
 

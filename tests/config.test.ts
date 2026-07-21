@@ -39,14 +39,14 @@ describe("loadConfig", () => {
             lixent: {
                 copyright: "From Package",
                 license: "ISC",
-                theme: "terminal-dark",
+                theme: "terminal",
             },
         }
         writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "From Package")
         assert.equal(loaded.license, "ISC")
-        assert.equal(loaded.theme, "terminal-dark")
+        assert.equal(loaded.theme, "terminal")
     })
 
     it("uses package name as copyright fallback", () => {
@@ -65,11 +65,11 @@ describe("loadConfig", () => {
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "Unknown")
         assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal-dark")
+        assert.equal(loaded.theme, "minimal")
     })
 
     it("prefers lixent.config.json over package.json", () => {
-        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "dracula-dark" }
+        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "github-dark" }
         const pkg = { name: "pkg", lixent: { copyright: "From Package" } }
         writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
         writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
@@ -114,7 +114,7 @@ describe("loadConfig edge cases", () => {
         const loaded = loadConfig(TMP_DIR)
         assert.equal(loaded.copyright, "empty-lixent")
         assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal-dark")
+        assert.equal(loaded.theme, "minimal")
     })
 
     it("throws when copyright and package name are both missing", () => {

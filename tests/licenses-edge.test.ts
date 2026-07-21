@@ -2,16 +2,7 @@ import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import {
     renderLicenseText,
-    getLicenseName,
-    convertPlaceholders,
 } from "../src/lib/license.ts"
-import type { LixentConfig } from "../src/lib/types.ts"
-
-const baseConfig: LixentConfig = {
-    copyright: "Test User",
-    license: "MIT",
-    theme: "minimal-dark",
-}
 
 const baseValues = { year: "2026", name: "Test User" }
 

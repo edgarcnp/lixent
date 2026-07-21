@@ -23,6 +23,12 @@
  * // → "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
  * ```
  */
+export interface GoogleFont {
+    family: string
+    variants: string[]
+    category: string
+}
+
 export function getGoogleFontsUrl(family: string, variants: string[] = ["regular"]): string | null {
     if (family.length === 0) return null
     if (!/^[A-Za-z0-9 -]+$/.test(family)) return null

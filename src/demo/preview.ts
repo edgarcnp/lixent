@@ -379,7 +379,7 @@ export async function fetchAndRender(
         let title: string
         if (licenseId === "custom") {
             rawText = customLicenseText ?? ""
-            title = customLicenseName || "Custom License"
+            title = customLicenseName ?? "Custom License"
         } else {
             rawText = await loadLicenseText(licenseId, controller.signal)
             title = getLicenseName(licenseId)

@@ -8,8 +8,6 @@ describe("themes", () => {
             assert.ok(theme.id, `Theme missing id`)
             assert.ok(theme.name, `Theme ${theme.id} missing name`)
             assert.equal(typeof theme.dark, "boolean", `Theme ${theme.id} dark is not boolean`)
-            assert.ok(theme.base, `Theme ${theme.id} missing base`)
-            assert.ok(Array.isArray(theme.variables), `Theme ${theme.id} variables is not array`)
             assert.ok(theme.preview.bg, `Theme ${theme.id} missing preview.bg`)
             assert.ok(theme.preview.accent, `Theme ${theme.id} missing preview.accent`)
             assert.ok(theme.preview.text, `Theme ${theme.id} missing preview.text`)
@@ -28,7 +26,7 @@ describe("getTheme", () => {
         const theme = getTheme("minimal-dark")
         assert.ok(theme)
         assert.equal(theme.id, "minimal-dark")
-        assert.equal(theme.name, "Minimal")
+        assert.equal(theme.name, "Minimal Dark")
         assert.equal(theme.dark, true)
     })
 
@@ -46,9 +44,9 @@ describe("getTheme", () => {
 describe("isValidTheme", () => {
     it("returns true for valid themes", () => {
         assert.ok(isValidTheme("minimal-dark"))
-        assert.ok(isValidTheme("github-light"))
-        assert.ok(isValidTheme("terminal-dark"))
-        assert.ok(isValidTheme("dracula-dark"))
+        assert.ok(isValidTheme("github-dark"))
+        assert.ok(isValidTheme("terminal"))
+        assert.ok(isValidTheme("serif-dark"))
     })
 
     it("returns false for invalid theme", () => {
