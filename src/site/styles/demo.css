@@ -1031,7 +1031,6 @@
 .preview-content {
     min-height: 100%;
     background: var(--lx-bg, #fff);
-    background: color-mix(in srgb, var(--lx-bg, #fff) 94%, var(--lx-text, #1a1a1a));
     color: var(--lx-text, #1a1a1a);
     font-family: var(--lx-font-body, Georgia, serif);
     font-size: var(--lx-font-size, 1.125rem);
@@ -1043,12 +1042,7 @@
 
 .preview-content .license-page {
     flex: 1;
-    max-width: none;
     padding: 1.5rem 1.25rem 2rem;
-}
-
-.preview-content .license-card {
-    border-radius: 10px;
 }
 
 .preview-content .license-title {

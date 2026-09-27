@@ -43,7 +43,7 @@ src/
 ├── site/                    # Astro adapter (configured as srcDir)
 │   ├── pages/index.astro    # loadConfig + buildPage + markup
 │   ├── layouts/LicenseLayout.astro
-│   ├── components/LicenseView.astro  # document card: eyebrow, identity, body
+│   ├── components/LicenseView.astro  # document: identifier chip, identity, body
 │   ├── components/ui/       # demo-only Astro components
 │   ├── demo/                # demo client: page.astro + browser modules
 │   └── styles/base.css      # base.css, plus demo.css for the demo shell

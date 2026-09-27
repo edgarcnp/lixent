@@ -13,8 +13,7 @@
   --lx-line-height: 1.7;
   --lx-letter-spacing: 0.05em;
   --lx-font-weight: 400;
-  --lx-max-width: 760px;
-  --lx-radius: 14px;
+  --lx-max-width: 68ch;
 }
 
 html {
@@ -29,7 +28,6 @@ body {
   letter-spacing: var(--lx-letter-spacing);
   color: var(--lx-text);
   background-color: var(--lx-bg);
-  background-color: color-mix(in srgb, var(--lx-bg) 94%, var(--lx-text));
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -55,58 +53,57 @@ a:focus-visible {
   width: 100%;
   max-width: var(--lx-max-width);
   margin: 0 auto;
-  padding: clamp(1.75rem, 6vh, 4.5rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 6vh, 3.5rem);
-  background-image: radial-gradient(
-    85% 55% at 50% -5%,
-    color-mix(in srgb, var(--lx-accent) 12%, transparent),
-    transparent 72%
-  );
-  background-repeat: no-repeat;
-}
-
-.license-card {
-  background-color: var(--lx-bg);
-  border: 1px solid var(--lx-divider);
-  border: 1px solid color-mix(in srgb, var(--lx-divider) 72%, transparent);
-  border-radius: var(--lx-radius);
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.04),
-    0 22px 48px -32px rgb(0 0 0 / 0.4);
-  padding: clamp(1.5rem, 4.5vw, 3rem);
+  padding: clamp(2.5rem, 9vh, 6rem) clamp(1.25rem, 5vw, 2rem) clamp(2rem, 6vh, 3rem);
 }
 
 .license-header {
-  margin-bottom: 1.75rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
   border-bottom: 1px solid var(--lx-divider);
-  border-bottom-color: color-mix(in srgb, var(--lx-divider) 70%, transparent);
 }
 
-.eyebrow {
+.license-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+  max-width: 100%;
+  margin-bottom: 1.35rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--lx-divider);
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--lx-accent);
-  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  color: var(--lx-text-muted);
+  overflow-wrap: anywhere;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.eyebrow a {
+.license-id::before {
+  content: "";
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--lx-accent);
+}
+
+.license-id a {
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.15s ease;
 }
 
-.eyebrow a:hover {
-  border-bottom-color: currentColor;
+.license-id:hover {
+  color: var(--lx-text);
+  border-color: color-mix(in srgb, var(--lx-divider) 40%, var(--lx-text));
 }
 
 .license-title {
-  font-size: clamp(1.9rem, 1.4rem + 2.2vw, 2.75rem);
+  font-size: clamp(1.9rem, 1.5rem + 2vw, 2.6rem);
   font-weight: 700;
   line-height: 1.08;
   text-wrap: balance;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .identity-row {
@@ -115,7 +112,7 @@ a:focus-visible {
   flex-wrap: wrap;
   gap: 0.45rem 0.55rem;
   color: var(--lx-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
@@ -129,8 +126,8 @@ a:focus-visible {
 }
 
 .identity-avatar img {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: block;
 }
@@ -139,12 +136,12 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background-color: color-mix(in srgb, var(--lx-accent) 20%, transparent);
   color: var(--lx-accent);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -169,12 +166,12 @@ a.identity-name:hover {
   transition: color 0.15s ease;
 }
 
-.identity-sep {
-  opacity: 0.55;
-}
-
 .identity-email:hover {
   color: var(--lx-accent);
+}
+
+.identity-sep {
+  opacity: 0.55;
 }
 
 .identity-year {
@@ -182,12 +179,11 @@ a.identity-name:hover {
 }
 
 .license-body {
-  max-width: 70ch;
   text-wrap: pretty;
 }
 
 .license-body p {
-  margin-bottom: 1.15em;
+  margin-bottom: 1.25em;
 }
 
 .license-body p:last-child {
@@ -195,9 +191,9 @@ a.identity-name:hover {
 }
 
 .license-body .section-heading {
-  margin-top: 1.9em;
-  margin-bottom: 0.7em;
-  font-weight: 650;
+  margin-top: 2.25em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
   letter-spacing: 0.01em;
 }
 
@@ -207,7 +203,7 @@ a.identity-name:hover {
 
 .page-footer {
   text-align: center;
-  padding: 0 1.25rem 2rem;
+  padding: 1rem 1.25rem 2.5rem;
   color: var(--lx-text-muted);
   font-size: 0.8125rem;
 }
@@ -224,25 +220,17 @@ a.identity-name:hover {
 }
 
 @media (max-width: 640px) {
-  :root {
-    --lx-radius: 10px;
-  }
-
   .license-page {
-    padding-top: 1.25rem;
-  }
-
-  .license-card {
-    padding: 1.35rem 1.15rem;
+    padding-top: 1.75rem;
   }
 
   .license-header {
-    margin-bottom: 1.35rem;
-    padding-bottom: 1.2rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.5rem;
   }
 
   .license-title {
-    font-size: clamp(1.6rem, 8vw, 2rem);
+    font-size: clamp(1.6rem, 7.5vw, 2.1rem);
   }
 }
 
@@ -266,16 +254,6 @@ a.identity-name:hover {
   }
 
   .license-page {
-    max-width: none;
-    padding: 0;
-    background-image: none;
-  }
-
-  .license-card {
-    background: #fff;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
     padding: 0;
   }
 
@@ -283,8 +261,9 @@ a.identity-name:hover {
     border-bottom-color: #ddd;
   }
 
-  .eyebrow {
+  .license-id {
     color: #555;
+    border-color: #ddd;
   }
 
   .identity-row {
