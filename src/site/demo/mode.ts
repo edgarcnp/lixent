@@ -15,7 +15,7 @@ export function applyMode(mode: "dark" | "light"): void {
     const btn = modeIcon.closest("button")
     if (btn) {
         btn.classList.remove("rotate")
-        void btn.offsetWidth
+        void btn.getBoundingClientRect()
         btn.classList.add("rotate")
         const duration = parseFloat(getComputedStyle(btn).animationDuration) * 1000
         setTimeout(() => {
