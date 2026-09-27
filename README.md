@@ -4,7 +4,7 @@ Lixent generates a static HTML page displaying your software license. Fork the r
 
 - Self-hosted — deploy to GitHub Pages, GitLab Pages, Cloudflare Pages, Netlify, Vercel, or your own server
 - Every [SPDX License List](https://github.com/spdx/license-list-data) license
-- 16 built-in themes with light/dark variants
+- 16 built-in themes, from Paper and Solarized to Dracula, Nord, and Terminal
 - Custom license text support (inline or file-based)
 - Theme presets with color overrides, custom CSS files, and Google Fonts
 - Gravatar integration

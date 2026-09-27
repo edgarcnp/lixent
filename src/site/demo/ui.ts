@@ -1,4 +1,5 @@
 import type { GoogleFont } from "../../core/theme/font.ts"
+import { isBuiltInTheme } from "../../core/theme/catalog.ts"
 import { createDropdown } from "./dropdown.ts"
 import { BASE_URL, $, debounce, getPreferredMode } from "./helpers.ts"
 import { loadLicenses, loadProjectConfig, type ProjectConfig } from "./licenses.ts"
@@ -279,7 +280,8 @@ export async function initDemo(): Promise<void> {
     })
 
     function applyProjectConfig(config: ProjectConfig): void {
-        setSelectedTheme(config.theme?.preset ?? DEFAULTS.theme)
+        const preset = config.theme?.preset
+        setSelectedTheme(preset !== undefined && isBuiltInTheme(preset) ? preset : DEFAULTS.theme)
         fontDropdown.setValue(config.theme?.font ?? DEFAULTS.font)
         fontSizeInput.value = config.theme?.fontSize ?? ""
         fontWeightInput.value = config.theme?.fontWeight ?? ""

@@ -39,6 +39,34 @@ describe("theme catalog", () => {
         assert.equal(getTheme("minimal")?.vars["--lx-bg"], "#faf9f7")
         assert.equal(getTheme("terminal")?.vars["--lx-text"], "#33ff33")
         assert.equal(getTheme("minimal")?.name, "Minimal")
+        assert.equal(getTheme("dracula")?.vars["--lx-bg"], "#282a36")
+        assert.equal(getTheme("brutalist")?.vars["--lx-text"], "#000000")
+        assert.equal(getTheme("nord")?.dark, true)
+    })
+
+    it("includes the curated diverse palettes", () => {
+        for (const id of [
+            "solarized-light",
+            "solarized-dark",
+            "dracula",
+            "nord",
+            "gruvbox-dark",
+            "paper",
+            "blush",
+            "sage",
+            "blueprint",
+            "brutalist",
+            "ember",
+        ]) {
+            assert.ok(isBuiltInTheme(id), `missing theme ${id}`)
+        }
+    })
+
+    it("keeps palettes visually varied", () => {
+        const accents = new Set(BUILT_IN_THEMES.map((theme) => theme.vars["--lx-accent"]))
+        const backgrounds = new Set(BUILT_IN_THEMES.map((theme) => theme.vars["--lx-bg"]))
+        assert.ok(accents.size >= 12, `expected varied accents, got ${accents.size}`)
+        assert.ok(backgrounds.size >= 14, `expected varied backgrounds, got ${backgrounds.size}`)
     })
 
     it("recognizes built-in themes only", () => {
