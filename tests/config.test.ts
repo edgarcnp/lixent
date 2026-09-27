@@ -1,306 +1,193 @@
-import { describe, it, beforeEach, afterEach } from "node:test"
+import { afterEach, beforeEach, describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
-import { loadConfig } from "../src/lib/config/index.ts"
+import { ConfigError } from "../src/core/diagnostics.ts"
+import { loadConfig } from "../src/core/config/loader.ts"
 
 const TMP_DIR = join(import.meta.dirname, "../tmp-config-test")
 
-function setup() {
-    mkdirSync(TMP_DIR, { recursive: true })
+function writeConfig(config: unknown): void {
+    writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config, null, 4))
 }
 
-function teardown() {
+function baseConfig(): Record<string, unknown> {
+    return { copyright: "Jane Doe", license: "MIT" }
+}
+
+function configErrorCodes(error: unknown): string[] {
+    assert.ok(error instanceof ConfigError)
+    return error.diagnostics.map((item) => item.code)
+}
+
+beforeEach(() => {
+    mkdirSync(TMP_DIR, { recursive: true })
+})
+
+afterEach(() => {
     if (existsSync(TMP_DIR)) {
         rmSync(TMP_DIR, { recursive: true })
     }
-}
-
-beforeEach(() => setup())
-afterEach(() => teardown())
+})
 
 describe("loadConfig", () => {
-    it("loads from lixent.config.json", () => {
-        const config = {
-            copyright: "Jane Doe",
-            license: "MIT",
-            theme: "github",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "Jane Doe")
-        assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "github")
+    it("loads a minimal config with defaults", () => {
+        writeConfig(baseConfig())
+        const config = loadConfig({ root: TMP_DIR })
+        assert.equal(config.copyright, "Jane Doe")
+        assert.equal(config.license, "MIT")
+        assert.equal(config.gravatar, false)
+        assert.equal(config.theme.preset, "minimal")
     })
 
-    it("falls back to package.json lixent field", () => {
-        const pkg = {
-            name: "my-project",
-            lixent: {
-                copyright: "From Package",
-                license: "ISC",
-                theme: "terminal",
+    it("parses the full theme section and coerces a string year", () => {
+        writeConfig({
+            ...baseConfig(),
+            url: "https://jane.dev",
+            email: "jane@example.com",
+            gravatar: true,
+            year: "2024",
+            basePath: "/license",
+            theme: {
+                preset: "github-dark",
+                colors: { bg: "#101010", accent: "#60a5fa" },
+                font: "Inter",
+                fontSize: "1.125rem",
+                fontWeight: "700",
+                lineHeight: "1.6",
+                letterSpacing: "0.02em",
             },
-        }
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "From Package")
-        assert.equal(loaded.license, "ISC")
-        assert.equal(loaded.theme, "terminal")
+        })
+        const config = loadConfig({ root: TMP_DIR })
+        assert.equal(config.year, 2024)
+        assert.equal(config.basePath, "/license")
+        assert.equal(config.theme.preset, "github-dark")
+        const colors = config.theme.colors
+        assert.ok(colors !== undefined)
+        assert.equal(colors.bg, "#101010")
+        assert.equal(colors.accent, "#60a5fa")
+        assert.equal(config.theme.font, "Inter")
+        assert.equal(config.theme.fontWeight, "700")
     })
 
-    it("uses package name as copyright fallback", () => {
-        const pkg = {
-            name: "awesome-lib",
-            lixent: {
-                license: "MIT",
-            },
-        }
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "awesome-lib")
+    it("accepts the $schema key", () => {
+        writeConfig({ $schema: "./lixent.schema.json", ...baseConfig() })
+        const config = loadConfig({ root: TMP_DIR })
+        assert.equal(config.license, "MIT")
     })
 
-    it("returns defaults when no config found", () => {
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "Unknown")
-        assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal")
+    it("accepts a path theme preset", () => {
+        writeConfig({ ...baseConfig(), theme: { preset: "/my-theme.css" } })
+        const config = loadConfig({ root: TMP_DIR })
+        assert.equal(config.theme.preset, "/my-theme.css")
     })
 
-    it("prefers lixent.config.json over package.json", () => {
-        const config = { copyright: "From Config", license: "BSD-2-Clause", theme: "serif" }
-        const pkg = { name: "pkg", lixent: { copyright: "From Package" } }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "From Config")
+    it("supports an explicit configPath", () => {
+        writeFileSync(join(TMP_DIR, "other.json"), JSON.stringify({ copyright: "Other", license: "MIT" }))
+        const config = loadConfig({ configPath: join(TMP_DIR, "other.json") })
+        assert.equal(config.copyright, "Other")
     })
 
-    it("handles invalid JSON gracefully", () => {
+    it("throws CONFIG_MISSING when no config file exists", () => {
+        assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+            return configErrorCodes(error).includes("CONFIG_MISSING")
+        })
+    })
+
+    it("throws CONFIG_PARSE for invalid JSON", () => {
         writeFileSync(join(TMP_DIR, "lixent.config.json"), "{invalid json")
-        assert.throws(() => loadConfig(TMP_DIR), SyntaxError)
+        assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+            return configErrorCodes(error).includes("CONFIG_PARSE")
+        })
     })
 
-    it("loads custom license config", () => {
-        const config = {
-            copyright: "Test",
-            license: "custom",
-            customLicense: {
-                name: "My Custom License",
-                text: "Custom text for {{name}}",
-            },
-            theme: "minimal",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.license, "custom")
-        assert.ok(loaded.customLicense)
-        assert.equal(loaded.customLicense.name, "My Custom License")
+    it("throws CONFIG_SHAPE for a non-object root", () => {
+        writeConfig([1, 2, 3])
+        assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+            return configErrorCodes(error).includes("CONFIG_SHAPE")
+        })
+    })
+
+    it("requires copyright and license", () => {
+        writeConfig({})
+        assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+            const codes = configErrorCodes(error)
+            assert.equal(codes.filter((code) => code === "MISSING_FIELD").length, 2)
+            return true
+        })
+    })
+
+    it("reports every diagnostic at once", () => {
+        writeConfig({
+            copyright: "",
+            license: "MIT",
+            url: "javascript:alert(1)",
+            year: 1800,
+            theme: { preset: "does-not-exist" },
+            bogus: true,
+        })
+        assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+            const codes = configErrorCodes(error).sort()
+            assert.deepEqual(codes, ["EMPTY_FIELD", "INVALID_PROTOCOL", "INVALID_VALUE", "OUT_OF_RANGE", "UNKNOWN_KEY"])
+            return true
+        })
     })
 })
 
-describe("loadConfig edge cases", () => {
-    it("handles package.json without lixent field", () => {
-        const pkg = { name: "no-lixent" }
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "Unknown")
-    })
+describe("validation diagnostics", () => {
+    const cases: [string, Record<string, unknown>, string][] = [
+        ["rejects HTML in copyright", { ...baseConfig(), copyright: "<script>x</script>" }, "HTML_TAGS"],
+        ["rejects a too-long copyright", { ...baseConfig(), copyright: "x".repeat(257) }, "TOO_LONG"],
+        ["rejects a malformed url", { ...baseConfig(), url: "not a url" }, "INVALID_FORMAT"],
+        ["rejects a non-http url", { ...baseConfig(), url: "javascript:alert(1)" }, "INVALID_PROTOCOL"],
+        ["rejects a malformed email", { ...baseConfig(), email: "nope" }, "INVALID_FORMAT"],
+        ["rejects gravatar without email", { ...baseConfig(), gravatar: true }, "INVALID_VALUE"],
+        ["rejects unknown top-level keys", { ...baseConfig(), nope: 1 }, "UNKNOWN_KEY"],
+        ["rejects unknown theme keys", { ...baseConfig(), theme: { nope: 1 } }, "UNKNOWN_KEY"],
+        ["rejects unknown color keys", { ...baseConfig(), theme: { colors: { nope: "#fff" } } }, "UNKNOWN_KEY"],
+        ["rejects unsafe color values", { ...baseConfig(), theme: { colors: { bg: "url(https://evil)" } } }, "UNSAFE_VALUE"],
+        ["rejects a too-long color value", { ...baseConfig(), theme: { colors: { bg: "#".repeat(65) } } }, "TOO_LONG"],
+        ["rejects an unknown theme preset", { ...baseConfig(), theme: { preset: "does-not-exist" } }, "INVALID_VALUE"],
+        ["rejects invalid font characters", { ...baseConfig(), theme: { font: "Inter;color:red" } }, "UNSAFE_VALUE"],
+        ["rejects a non-integer year", { ...baseConfig(), year: 2024.5 }, "INVALID_TYPE"],
+        ["rejects an out-of-range year", { ...baseConfig(), year: 1800 }, "OUT_OF_RANGE"],
+        ["rejects a non-numeric year string", { ...baseConfig(), year: "abc" }, "INVALID_TYPE"],
+        [
+            "rejects year and yearRange together",
+            { ...baseConfig(), year: 2024, yearRange: { start: 2020, end: 2024 } },
+            "MUTUALLY_EXCLUSIVE",
+        ],
+        ["rejects a reversed year range", { ...baseConfig(), yearRange: { start: 2030, end: 2020 } }, "INVALID_VALUE"],
+        ["rejects custom license without text or file", { ...baseConfig(), license: "custom" }, "MISSING_FIELD"],
+        [
+            "rejects both custom text and file",
+            { ...baseConfig(), license: "custom", customLicense: { text: "x" }, licenseFile: "LICENSE" },
+            "MUTUALLY_EXCLUSIVE",
+        ],
+        ["rejects customLicense with an SPDX license", { ...baseConfig(), customLicense: { text: "x" } }, "INVALID_VALUE"],
+        ["rejects licenseFile with an SPDX license", { ...baseConfig(), licenseFile: "LICENSE" }, "INVALID_VALUE"],
+        [
+            "rejects absolute licenseFile paths",
+            { ...baseConfig(), license: "custom", licenseFile: "/etc/passwd" },
+            "INVALID_FORMAT",
+        ],
+        [
+            "rejects parent-directory licenseFile paths",
+            { ...baseConfig(), license: "custom", licenseFile: "../LICENSE" },
+            "INVALID_FORMAT",
+        ],
+        ["rejects an invalid basePath", { ...baseConfig(), basePath: "license" }, "INVALID_FORMAT"],
+        ["rejects a trailing-slash basePath", { ...baseConfig(), basePath: "/license/" }, "INVALID_FORMAT"],
+        ["rejects an invalid SPDX license shape", { copyright: "Jane", license: "not a license" }, "INVALID_VALUE"],
+        ["rejects a non-object theme", { ...baseConfig(), theme: "minimal" }, "INVALID_TYPE"],
+    ]
 
-    it("handles empty lixent object in package.json", () => {
-        const pkg = { name: "empty-lixent", lixent: {} }
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.copyright, "empty-lixent")
-        assert.equal(loaded.license, "MIT")
-        assert.equal(loaded.theme, "minimal")
-    })
-
-    it("throws when copyright and package name are both missing", () => {
-        const pkg = { lixent: { license: "MIT" } }
-        writeFileSync(join(TMP_DIR, "package.json"), JSON.stringify(pkg))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /copyright is required/,
-        )
-    })
-})
-
-describe("loadConfig custom theme", () => {
-    it("loads custom theme from inline config", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "custom",
-            customTheme: {
-                bg: "#1a1a1a",
-                text: "#e5e5e5",
-                textMuted: "#a3a3a3",
-                accent: "#60a5fa",
-                border: "#404040",
-            },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.theme, "custom")
-        assert.ok(loaded.customTheme)
-        assert.equal(loaded.customTheme.bg, "#1a1a1a")
-    })
-
-    it("throws when theme is custom but customTheme is missing", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "custom",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /Theme is "custom" but customTheme is not set/,
-        )
-    })
-
-    it("throws for disallowed key in customTheme", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "custom",
-            customTheme: { bg: "#000", evil: "#fff" },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /Disallowed key in customTheme/,
-        )
-    })
-})
-
-describe("loadConfig custom license from file", () => {
-    it("loads custom license from licenseFile", () => {
-        const licenseText = "Custom license for {{name}}"
-        writeFileSync(join(TMP_DIR, "CUSTOM-LICENSE"), licenseText)
-        const config = {
-            copyright: "Test",
-            license: "custom",
-            licenseFile: "./CUSTOM-LICENSE",
-            theme: "minimal",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.license, "custom")
-        assert.equal(loaded.licenseFile, "./CUSTOM-LICENSE")
-    })
-
-    it("throws when license is custom but no text or file", () => {
-        const config = {
-            copyright: "Test",
-            license: "custom",
-            theme: "minimal",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /neither customLicense\.text nor licenseFile is set/,
-        )
-    })
-})
-
-describe("loadConfig year and yearRange", () => {
-    it("accepts year only", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            year: 2025,
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.equal(loaded.year, 2025)
-    })
-
-    it("accepts yearRange only", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            yearRange: { start: 2020, end: 2025 },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        const loaded = loadConfig(TMP_DIR)
-        assert.ok(loaded.yearRange)
-        assert.equal(loaded.yearRange.start, 2020)
-        assert.equal(loaded.yearRange.end, 2025)
-    })
-
-    it("throws when both year and yearRange are set", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            year: 2025,
-            yearRange: { start: 2020, end: 2025 },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /Both `year` and `yearRange` are set/,
-        )
-    })
-
-    it("throws when yearRange.start > yearRange.end", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            yearRange: { start: 2026, end: 2020 },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /yearRange\.start \(2026\) must not exceed yearRange\.end \(2020\)/,
-        )
-    })
-
-    it("throws when year is a non-numeric string", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            year: "not-a-number",
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /year must be a number, got "not-a-number"/,
-        )
-    })
-
-    it("throws when yearRange.start is a non-numeric string", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            yearRange: { start: "abc", end: 2025 },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /yearRange\.start must be a number, got "abc"/,
-        )
-    })
-
-    it("throws when yearRange.end is a non-numeric string", () => {
-        const config = {
-            copyright: "Test",
-            license: "MIT",
-            theme: "minimal",
-            yearRange: { start: 2020, end: "xyz" },
-        }
-        writeFileSync(join(TMP_DIR, "lixent.config.json"), JSON.stringify(config))
-        assert.throws(
-            () => loadConfig(TMP_DIR),
-            /yearRange\.end must be a number, got "xyz"/,
-        )
-    })
+    for (const [name, config, expectedCode] of cases) {
+        it(name, () => {
+            writeConfig(config)
+            assert.throws(() => loadConfig({ root: TMP_DIR }), (error: unknown) => {
+                return configErrorCodes(error).includes(expectedCode)
+            })
+        })
+    }
 })

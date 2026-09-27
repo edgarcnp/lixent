@@ -9,123 +9,129 @@ A static license page generator built with Astro 7. Users configure their identi
 ## Critical Architecture
 
 ```
-User config → loadConfig() → resolveLicense() → renderLicenseText() → Astro template
+Raw JSON → loadConfig() → buildPage() → PageModel → Astro layout
 ```
 
-- **Build-time only.** No server runtime. All network requests (SPDX list, Google Fonts catalog) happen at build time.
-- **Config is the source of truth.** `LixentConfig` in `src/lib/types.ts` defines every field.
-- **Security is validation-first.** All user input is validated at config load time (`validators.ts`) and sanitized again at render time (`sanitize.ts`). Never trust user input.
+- **Build-time only.** No server runtime. The only network request in a default build is fetching SPDX license data; there is no font-catalog fetch and no config copied into `public/`.
+- **Pure core, thin adapter.** `src/core` has no Astro imports and no I/O at import time. `src/site` (Astro's `srcDir`) renders a fully resolved `PageModel` and contains no domain logic.
+- **Config has one owner.** `parseConfig()` in `src/core/config/fields.ts` is the only place that knows config keys. It rejects unknown keys and reports every problem at once.
+- **I/O is injected.** `buildPage(config, deps)` accepts `root`, `now`, `readFile`, `fetchImpl`, `spdx`, and `gravatarUrl` overrides so tests never touch the network, the clock, or the filesystem.
 
 ## Project Structure
 
 ```
 src/
-├── components/LicenseBody.astro   # Renders license text as paragraphs
-├── layouts/LicenseLayout.astro    # HTML shell, CSS injection, Gravatar
-├── lib/
+├── core/                    # Pure, testable domain code (no Astro)
 │   ├── config/
-│   │   ├── coercion.ts    # String→number year coercion
-│   │   ├── validator.ts   # Orchestrates all assert* validators
-│   │   ├── loader.ts      # Reads config files, applies defaults
-│   │   └── index.ts       # Re-exports loadConfig
-│   ├── constants.ts       # MAX_*, ALLOWED_SCHEMES, CSS_VALUE_PATTERN, CUSTOM_THEME_KEYS
-│   ├── errors.ts          # ConfigError (code+field), LicenseError (code+licenseId)
-│   ├── font.ts            # Google Fonts URL generation
-│   ├── gravatar.ts        # SHA-256 email hash → Gravatar URL (async)
-│   ├── license.ts         # SPDX fetch, placeholder conversion, rendering
-│   ├── sanitize.ts        # hasHtmlTags, hasCssUrl, stripCssUrl
-│   ├── types.ts           # LixentConfig interface
-│   ├── validators.ts      # 10 assert* functions
-│   └── year.ts            # formatYear, formatYearRange
-├── pages/index.astro      # 30 lines — orchestrates config→license→render
-├── styles/base.css        # Layout, typography, responsive
-└── themes/index.ts        # Theme registry, THEME_VARIABLES, getTheme, isValidTheme
+│   │   ├── types.ts         # LixentConfig and friends
+│   │   ├── fields.ts        # Key registry, parsing, every diagnostic
+│   │   └── loader.ts        # Filesystem edge: loadConfig()
+│   ├── license/
+│   │   ├── id.ts            # SPDX id grammar
+│   │   ├── placeholders.ts  # SPDX dialects → canonical {{year}} / {{name}}
+│   │   ├── render.ts        # Single-pass substitution
+│   │   └── resolve.ts       # Custom + SPDX resolution with injected I/O
+│   ├── theme/
+│   │   ├── catalog.ts       # 16 themes as data; THEME_VARIABLES
+│   │   ├── font.ts          # Google Fonts URL generation
+│   │   └── style.ts         # resolveStyle() → <html> style attribute
+│   ├── page/build.ts        # buildPage() → PageModel
+│   ├── diagnostics.ts       # ConfigError, LicenseError, code unions
+│   ├── sanitize.ts          # hasHtmlTags, hasCssDangerous, stripCssUrl
+│   ├── year.ts              # formatYear, formatYearRange
+│   └── gravatar.ts          # SHA-256 email hash → Gravatar URL
+├── site/                    # Astro adapter (configured as srcDir)
+│   ├── pages/index.astro    # loadConfig + buildPage + markup
+│   ├── layouts/LicenseLayout.astro
+│   ├── components/LicenseBody.astro
+│   └── styles/base.css
+└── env.d.ts
+tests/                       # bun test, node:test style
+lixent.schema.json           # JSON Schema, kept in sync by tests
+lixent.config.json
 ```
 
 ## Error Handling
 
-Every user-facing error throws `ConfigError` or `LicenseError`. Both carry structured data:
+Every user-facing failure throws `ConfigError` or `LicenseError`:
 
 ```ts
-// ConfigError: validation/coercion/loading failures
-catch (e) {
-    if (e instanceof ConfigError) {
-        e.code   // EMPTY_FIELD, TOO_LONG, INVALID_FORMAT, HTML_TAGS, UNSAFE_VALUE, ...
-        e.field  // "copyright", "theme", "customLicense.name", ...
+catch (error) {
+    if (error instanceof ConfigError) {
+        error.diagnostics  // [{ code, field?, message }, ...] — every problem, not just the first
     }
-}
-
-// LicenseError: license fetch/resolve failures
-catch (e) {
-    if (e instanceof LicenseError) {
-        e.code       // FETCH_FAILED, NOT_FOUND, INVALID_ID, MISSING_TEXT
-        e.licenseId  // "MIT", "GPL-3.0-only", ...
+    if (error instanceof LicenseError) {
+        error.code       // INVALID_ID, FETCH_FAILED, NOT_FOUND, MISSING_TEXT, FILE_UNREADABLE
+        error.licenseId
     }
 }
 ```
 
-- All error messages start with `[lixent]` prefix.
-- Never use bare `throw new Error(...)`. Always use `ConfigError` or `LicenseError`.
+- Codes are literal unions in `diagnostics.ts`; keep them in sync with the wiki's error tables.
+- Error constructors prefix each message with `[lixent]`; diagnostic messages themselves do not carry it.
+- Never throw bare `Error` for user-facing failures.
+- JSDoc `@throws` must name `{ConfigError}` or `{LicenseError}`.
 
 ## Security Model
 
-Lixent is a static site generator. Attack surface:
+Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralizes anything that still reaches rendering.
 
-1. **CSS injection** via `themeOverrides`, `font`, `customTheme`. Mitigated by `hasCssUrl()` (blocks `url()`) and `stripCssUrl()` at render time.
-2. **XSS via copyright/license text**. Mitigated by `hasHtmlTags()` (blocks `<script>` etc.) and Astro's HTML escaping.
-3. **URL scheme abuse**. Mitigated by `assertValidUrl()` (allows only `http:`/`https:`).
-
-Sanitization is two-layer: validation rejects bad input at load time, `sanitize.ts` strips anything that slips through at render time.
-
-## Theme System
-
-- 10 built-in themes. CSS files in `public/themes/{id}.css`.
-- Each theme defines 6 CSS variables: `--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-divider`, `--lx-font-body`.
-- `THEME_VARIABLES` in `themes/index.ts` is the allowlist for `themeOverrides`.
-- Custom themes: `"theme": "custom"` + `customTheme` object (5 color keys: `bg`, `text`, `textMuted`, `accent`, `border`).
-- `CUSTOM_THEME_MAP` in `LicenseLayout.astro` maps `border` → `--lx-divider` (not `divider` — the config field is `border`).
+1. **CSS injection** via theme colors, fonts, and metrics. `hasCssDangerous()` rejects `;`, `{`, `}`, and `url(`; `resolveStyle()` applies `stripCssUrl()` as a render-time net. Resolved values become declarations in the `<html style>` attribute — never a raw CSS block.
+2. **XSS** via `copyright` or `customLicense.name`. `hasHtmlTags()` rejects tags; all rendered text goes through Astro expressions (auto-escaped). There is no `set:html` anywhere; keep it that way.
+3. **URL schemes.** Only `http:` and `https:` are accepted for `url`.
+4. **Path traversal.** `licenseFile` must stay a relative path inside the project; absolute paths, drive letters, and `..` segments are rejected.
 
 ## Config Module
 
-Split into 3 files by concern:
-- `coercion.ts` — String→number year coercion via `coerceYear()` helper
-- `validator.ts` — Orchestrates all `assert*` validators
-- `loader.ts` — File reading, `loadConfig()`, `loadFromPackageJson()`
-
-Config priority: `lixent.config.json` → `package.json` "lixent" field → defaults.
+- `fields.ts` owns per-field parsing, the `CONFIG_KEYS` / `THEME_KEYS` allowlists, cross-field rules, and defaults.
+- Unknown keys are errors; `$schema` is the only ignored key.
+- `loadConfig()` reads `lixent.config.json` (or an explicit `configPath`); there is no `package.json` fallback.
+- Defaults: `gravatar: false`, `theme.preset: "minimal"`. `copyright` and `license` are required.
+- `lixent.schema.json` must stay in sync; `tests/schema.test.ts` fails when keys drift.
 
 ## License Module
 
-- `resolveLicense(config)` handles custom (inline/file) and SPDX licenses. Returns `{ name, text }`.
-- SPDX licenses fetched from GitHub raw content. 15s timeout.
-- 12 SPDX placeholder patterns normalized to `{{year}}` / `{{name}}` canonical form.
-- `renderLicenseText()` substitutes canonical placeholders with user values.
+- Placeholder conversion is a table in `placeholders.ts`; rendering is single-pass with a callback in `render.ts`. Never use `replace(pattern, string)` — replacement patterns like `$&` would be reinterpreted.
+- `resolveLicense()` resolves custom text/file or SPDX. For SPDX it fetches the list first, so an unknown id reports `NOT_FOUND` instead of a 404-driven `FETCH_FAILED`.
+- `licenseFile` resolves against the injected `root`, never `process.cwd()` directly.
+- The SPDX list is memoized per `SpdxClient`; tests inject fakes instead of hitting the network.
+
+## Theme System
+
+- Themes are data in `catalog.ts`; there are no per-theme CSS files. Every theme defines the six `--lx-*` variables.
+- `theme.preset` is a built-in id or an absolute CSS path. There is no `"custom"` sentinel; `theme.colors` overrides preset colors.
+- `resolveStyle()` merges preset → colors → typography and returns declarations plus optional font/theme hrefs.
+- `THEME_COLOR_VARIABLES` is the only mapping from semantic color keys to CSS variables (the old `border` → `--lx-divider` trap).
+
+## Page Pipeline
+
+`buildPage()` is the only composition point: year resolution (injectable clock), license resolution, text rendering, identity/gravatar, and style. It returns `PageModel`. Astro files render props only — never branch on config in a template.
+
+## Build & Deployment
+
+- `astro.config.mjs` sets `srcDir: "./src/site"` and `base` from `config.basePath`.
+- Deploy workflows pass `--site` / `--base` for GitHub Pages; GitLab Pages and other hosts build at the root.
+- The self-hosted demo (theme/font picker) is planned behind `LIXENT_DEMO=1`. Keep the default build free of demo-only network calls.
 
 ## Conventions
 
-- No semicolons. Double quotes. 4-space indent.
-- ESLint with `strictTypeChecked` + `stylisticTypeChecked`. Run `bun run cq` before committing.
-- All errors use `[lixent]` prefix.
-- JSDoc `@throws` must specify `{ConfigError}` or `{LicenseError}`, not `{Error}`.
-- No hardcoded values — theme registry auto-generated from CSS files, preview colors parsed from vars.
-- Inputs use `placeholder` for defaults, not `value`. Config JSON only includes user-set values.
-- `year` and `yearRange` are mutually exclusive — both throws an error.
-- `customTheme.border` maps to `--lx-divider` (the CSS var was renamed but the config field kept its name).
-- `getGravatarUrl()` is async (uses `crypto.subtle.digest` for SHA-256).
-- `resolveLicense()` is async (network fetch for SPDX). `loadConfig()` is sync.
+- No semicolons. Double quotes. 4-space indent. Trailing commas in multiline literals.
+- ESLint `strictTypeChecked` + `stylisticTypeChecked`; run `bun run cq` before committing.
+- All user-facing messages start with `[lixent]` (added by the error constructors).
+- Keep `src/core` free of Astro imports so it stays unit-testable.
+- Prefer early returns and narrow values; never use type assertions to paper over unparsed input.
 
 ## Testing
 
-- 134 tests across 10 files using Node's built-in `node:test`.
-- Run `bun run cq` (lint + typecheck + test) before any commit.
-- Tests import from public API only (no testing internals that were de-exported).
+- `bun test` runs 115 tests across 10 files (`node:test` style with `node:assert/strict`).
+- Tests inject fakes for fetch, clock, and filesystem. Do not add tests that hit the network.
+- `tests/schema.test.ts` guards schema/parser drift.
+- Regression tests worth keeping: `$&` replacement patterns, root-relative `licenseFile`, `NOT_FOUND` before text fetch, aggregated diagnostics, and unknown-key rejection.
 
 ## Common Pitfalls
 
-- `CUSTOM_THEME_MAP` key is `"border"` (not `"divider"`). The CSS var is `--lx-divider`.
-- `CSS_DANGEROUS_PATTERN` was removed. Use `hasCssUrl()` from `sanitize.ts` instead.
-- `validation.ts` was split into `constants.ts` + `validators.ts` + `sanitize.ts`.
-- `getLicenseName()` was removed (dead code). Use `resolveLicense()` instead.
-- `GoogleFont` interface was removed (dead code).
-- `SPDX_LIST_URL` / `SPDX_TEXT_BASE` are not exported (internal constants).
-- Font catalog is fetched from `fonts-data` branch via raw GitHub URL (no API key at runtime).
+- `theme` is an object now; `"theme": "minimal"` is invalid.
+- `page.head.style` is an `<html style>` attribute value, not a `<style>` block; do not wrap it in `set:html`.
+- Year resolution uses `deps.now`; do not call `new Date()` inside `buildPage` paths that tests exercise.
+- Adding a config key means updating `fields.ts`, `lixent.schema.json`, and tests.
+- Do not re-add `public/themes/*.css`, a `"custom"` theme sentinel, or `themeOverrides`/`customTheme`; `theme.colors` is the single override mechanism.

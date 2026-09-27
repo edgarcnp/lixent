@@ -1,28 +1,32 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { getGravatarUrl } from "../src/lib/gravatar.ts"
+import { getGravatarUrl } from "../src/core/gravatar.ts"
 
 describe("getGravatarUrl", () => {
-    it("returns valid gravatar URL", async () => {
+    it("returns a valid Gravatar URL", async () => {
         const url = await getGravatarUrl("test@example.com")
-        assert.ok(url.startsWith("https://www.gravatar.com/avatar/"))
-        assert.ok(url.includes("s=80"))
-        assert.ok(url.includes("d=mp"))
+        assert.match(url, /^https:\/\/www\.gravatar\.com\/avatar\/[a-f0-9]{64}\?s=80&d=mp$/)
     })
 
-    it("uses custom size", async () => {
-        const url = await getGravatarUrl("test@example.com", 128)
-        assert.ok(url.includes("s=128"))
+    it("uses a custom size", async () => {
+        const url = await getGravatarUrl("test@example.com", 200)
+        assert.match(url, /\?s=200&d=mp$/)
     })
 
-    it("uses custom default type", async () => {
+    it("uses a custom default type", async () => {
         const url = await getGravatarUrl("test@example.com", 80, "identicon")
-        assert.ok(url.includes("d=identicon"))
+        assert.match(url, /\?s=80&d=identicon$/)
     })
 
-    it("lowercases and trims email", async () => {
-        const url = await getGravatarUrl("  Test@Example.COM  ")
-        const urlLower = await getGravatarUrl("test@example.com")
-        assert.equal(url, urlLower)
+    it("lowercases and trims the email", async () => {
+        const normalized = await getGravatarUrl("  TEST@Example.com ")
+        const expected = await getGravatarUrl("test@example.com")
+        assert.equal(normalized, expected)
+    })
+
+    it("produces different hashes for different emails", async () => {
+        const first = await getGravatarUrl("a@example.com")
+        const second = await getGravatarUrl("b@example.com")
+        assert.notEqual(first, second)
     })
 })

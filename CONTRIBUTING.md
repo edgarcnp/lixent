@@ -43,24 +43,12 @@ results.
 
 ```
 ├── src/
-│   ├── components/     # Astro components (LicenseBody)
-│   ├── layouts/        # Page layouts (LicenseLayout)
-│   ├── lib/            # Core utilities
-│   │   ├── config/     # Config loading (coercion, validation, loader)
-│   │   ├── errors.ts   # ConfigError, LicenseError classes
-│   │   ├── font.ts     # Google Fonts URL generation
-│   │   ├── gravatar.ts # Gravatar URL generation
-│   │   ├── license.ts  # License fetching and rendering
-│   │   ├── types.ts    # LixentConfig interface
-│   │   ├── validators.ts # Input validators
-│   │   ├── constants.ts  # Shared validation constants
-│   │   ├── sanitize.ts   # Input sanitization helpers
-│   │   └── year.ts     # Year formatting
-│   ├── pages/          # Route pages (index.astro)
-│   ├── styles/         # CSS files (base.css)
-│   └── themes/         # Theme registry (index.ts)
-├── public/             # Static assets (theme CSS files, favicons)
+│   ├── core/           # Pure domain code (config, license, theme, page)
+│   ├── site/           # Astro adapter: pages, layouts, components, styles
+│   └── env.d.ts
+├── public/             # Static assets (favicons)
 ├── tests/              # Test files
+├── lixent.schema.json  # JSON Schema for lixent.config.json
 └── dist/               # Build output
 ```
 
@@ -79,10 +67,9 @@ bun run cq      # Lint + typecheck + test (all-in-one)
 
 ### Adding a Theme
 
-1. Create a new CSS file in `public/themes/` (e.g., `my-theme.css`)
-2. Define all 6 required CSS custom properties (`--lx-bg`, `--lx-text`, `--lx-text-muted`, `--lx-accent`, `--lx-divider`, `--lx-font-body`)
-3. Add the theme to `src/themes/index.ts`
-4. Test with `"theme": "my-theme"` in your config
+1. Add an entry to `BUILT_IN_THEMES` in `src/core/theme/catalog.ts` defining all six `--lx-*` variables
+2. Update the expected count in `tests/theme.test.ts`
+3. Use it with `"theme": { "preset": "my-theme" }` in your config
 
 ## Code Style
 

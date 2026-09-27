@@ -1,0 +1,67 @@
+---
+import { Image } from "astro:assets"
+import type { PageModel } from "../../core/page/build.ts"
+import "../styles/base.css"
+
+interface Props {
+    page: PageModel
+}
+
+const { page } = Astro.props
+const { identity, head } = page
+const base = import.meta.env.BASE_URL.replace(/\/$/, "")
+const hasUrl = identity.url !== undefined && identity.url.length > 0
+const hasEmail = identity.email !== undefined && identity.email.length > 0
+const gravatarUrl = identity.gravatarUrl ?? null
+---
+
+<!doctype html>
+<html lang="en" style={head.style}>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+        <link rel="icon" href={`${base}/favicon.ico`} />
+        <meta name="generator" content={Astro.generator} />
+        <title>{page.title}</title>
+        <meta name="description" content={`${page.title} — ${identity.name}`} />
+        {head.fontHref && <link rel="preconnect" href="https://fonts.googleapis.com" />}
+        {head.fontHref && <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />}
+        {head.fontHref && <link rel="stylesheet" href={head.fontHref} />}
+        {head.themeHref && <link rel="stylesheet" href={`${base}${head.themeHref}`} />}
+    </head>
+    <body>
+        <main>
+            <header class="license-header">
+                {gravatarUrl && (
+                    <div class="identity-row">
+                        <Image
+                            class="gravatar"
+                            src={gravatarUrl}
+                            alt={identity.name}
+                            width={40}
+                            height={40}
+                            loading="eager"
+                        />
+                        <h1>{page.title}</h1>
+                    </div>
+                )}
+                {!gravatarUrl && <h1>{page.title}</h1>}
+                <p class="copyright">
+                    Copyright &copy; {page.year}{" "}
+                    {hasUrl
+                        ? <a href={identity.url} target="_blank" rel="noopener noreferrer">{identity.name}</a>
+                        : identity.name
+                    }
+                    {hasEmail && (
+                        <span class="email"> &lt;<a href={`mailto:${identity.email}`}>{identity.email}</a>&gt;</span>
+                    )}
+                </p>
+            </header>
+            <slot />
+        </main>
+        <footer>
+            Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
+        </footer>
+    </body>
+</html>

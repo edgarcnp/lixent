@@ -1,0 +1,11 @@
+---
+interface Props {
+    paragraphs: string[]
+}
+
+const { paragraphs } = Astro.props
+---
+
+<div class="license-body">
+    {paragraphs.map((paragraph: string) => <p>{paragraph}</p>)}
+</div>

@@ -1,7 +1,10 @@
 {
+    "$schema": "./lixent.schema.json",
     "copyright": "John Doe",
     "url": "https://example.com",
     "email": "john@example.com",
     "license": "MIT",
-    "theme": "minimal-dark"
+    "theme": {
+        "preset": "minimal-dark"
+    }
 }

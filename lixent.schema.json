@@ -1,0 +1,128 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/edgarcnp/lixent/main/lixent.schema.json",
+    "title": "Lixent configuration",
+    "description": "Configuration for a Lixent license page.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["copyright", "license"],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "Path or URL of this schema."
+        },
+        "copyright": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "Name or organization shown in the copyright line."
+        },
+        "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "Website linked next to the copyright holder. Must use http: or https:."
+        },
+        "email": {
+            "type": "string",
+            "maxLength": 320,
+            "description": "Email address rendered as a mailto link and used for Gravatar."
+        },
+        "gravatar": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show a Gravatar avatar next to the copyright line. Requires email."
+        },
+        "license": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "SPDX license id (e.g. \"MIT\", \"GPL-3.0-only\") or \"custom\"."
+        },
+        "customLicense": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Inline custom license. Only used when license is \"custom\".",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "description": "Display name. Defaults to \"Custom License\"."
+                },
+                "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 51200,
+                    "description": "License body. Supports {{year}}, {{name}}, {{url}}, and {{email}}."
+                }
+            }
+        },
+        "licenseFile": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "Relative path to a license text file. Only used when license is \"custom\"."
+        },
+        "year": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Single copyright year. Mutually exclusive with yearRange."
+        },
+        "yearRange": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start", "end"],
+            "description": "Copyright year range. Mutually exclusive with year.",
+            "properties": {
+                "start": {
+                    "type": "integer",
+                    "minimum": 1900,
+                    "maximum": 2100
+                },
+                "end": {
+                    "type": "integer",
+                    "minimum": 1900,
+                    "maximum": 2100
+                }
+            }
+        },
+        "basePath": {
+            "type": "string",
+            "pattern": "^/(?:[^/](?:.*[^/])?)?$",
+            "description": "Base path for subpath deploys (e.g. \"/license\")."
+        },
+        "theme": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Theme preset, color overrides, and typography.",
+            "properties": {
+                "preset": {
+                    "type": "string",
+                    "description": "Built-in theme id or an absolute path to a CSS file (e.g. \"/my-theme.css\")."
+                },
+                "colors": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Semantic color overrides applied on top of the preset.",
+                    "properties": {
+                        "bg": { "type": "string", "maxLength": 64 },
+                        "text": { "type": "string", "maxLength": 64 },
+                        "textMuted": { "type": "string", "maxLength": 64 },
+                        "accent": { "type": "string", "maxLength": 64 },
+                        "border": { "type": "string", "maxLength": 64 }
+                    }
+                },
+                "font": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "description": "Google Fonts family name."
+                },
+                "fontSize": { "type": "string", "maxLength": 64 },
+                "fontWeight": { "type": "string", "maxLength": 64 },
+                "lineHeight": { "type": "string", "maxLength": 64 },
+                "letterSpacing": { "type": "string", "maxLength": 64 }
+            }
+        }
+    }
+}
