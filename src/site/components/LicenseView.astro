@@ -17,13 +17,13 @@ const idLabel = licenseId !== null ? `SPDX-License-Identifier: ${licenseId}` : "
 ---
 <main class="license-page">
     <section class="license-hero">
+        <h1 class="license-title">{page.title}</h1>
         <span class="license-id">
             {spdxHref !== null
                 ? <a href={spdxHref} target="_blank" rel="noopener noreferrer">{idLabel}</a>
                 : idLabel
             }
         </span>
-        <h1 class="license-title">{page.title}</h1>
         <p class="identity-row">
             {gravatarUrl && (
                 <span class="identity-avatar">

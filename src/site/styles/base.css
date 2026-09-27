@@ -77,7 +77,7 @@ a:focus-visible {
   gap: 0.6ch;
   min-height: 1.75rem;
   max-width: 100%;
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.25rem;
   /* Optical centering: monospace caps sit above the metric centre. */
   padding: 0.4rem 0.85rem 0.25rem;
   border: 1px solid color-mix(in srgb, var(--lx-divider) 75%, transparent);
@@ -117,7 +117,7 @@ a:focus-visible {
   line-height: 1.04;
   letter-spacing: -0.025em;
   text-wrap: balance;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .identity-row {
@@ -253,14 +253,14 @@ a.identity-name:hover {
 /* Entrance motion */
 
 @media (prefers-reduced-motion: no-preference) {
-  .license-id,
   .license-title,
+  .license-id,
   .identity-row,
   .license-document {
     animation: lx-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  .license-title {
+  .license-id {
     animation-delay: 0.06s;
   }
 
