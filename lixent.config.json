@@ -1,10 +1,10 @@
 {
     "$schema": "./lixent.schema.json",
-    "copyright": "John Doe",
-    "url": "https://example.com",
-    "email": "john@example.com",
+    "copyright": "Edgar Christian",
+    "url": "https://edgarcnp.dev",
+    "email": "hello@edgarcnp.dev",
     "license": "MIT",
     "theme": {
-        "preset": "minimal-dark"
+        "preset": "gruvbox-dark"
     }
 }
