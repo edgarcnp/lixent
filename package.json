@@ -22,7 +22,7 @@
         "@stylistic/eslint-plugin": "^5.10.0",
         "@types/node": "^26.0.0",
         "eslint": "^10.5.0",
-        "eslint-plugin-astro": "^2.0.0",
+        "eslint-plugin-astro": "^3.0.0",
         "globals": "^17.7.0",
         "typescript-eslint": "^8.62.0"
     }
