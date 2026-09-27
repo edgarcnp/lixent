@@ -15,9 +15,8 @@ const licenseId = page.licenseId
 const spdxHref = licenseId !== null ? `https://spdx.org/licenses/${licenseId}.html` : null
 const idLabel = licenseId !== null ? `SPDX-License-Identifier: ${licenseId}` : "Software License"
 ---
-
 <main class="license-page">
-    <header class="license-header">
+    <section class="license-hero">
         <span class="license-id">
             {spdxHref !== null
                 ? <a href={spdxHref} target="_blank" rel="noopener noreferrer">{idLabel}</a>
@@ -44,12 +43,14 @@ const idLabel = licenseId !== null ? `SPDX-License-Identifier: ${licenseId}` : "
             <span class="identity-sep" aria-hidden="true"> · </span>
             <span class="identity-year">&copy; {page.year}</span>
         </p>
-    </header>
-    <div class="license-body">
-        {page.paragraphs.map((paragraph) => (
-            paragraph.kind === "heading"
-                ? <p class="section-heading">{paragraph.text}</p>
-                : <p>{paragraph.text}</p>
-        ))}
-    </div>
+    </section>
+    <section class="license-document">
+        <div class="license-body">
+            {page.paragraphs.map((paragraph) => (
+                paragraph.kind === "heading"
+                    ? <p class="section-heading">{paragraph.text}</p>
+                    : <p>{paragraph.text}</p>
+            ))}
+        </div>
+    </section>
 </main>

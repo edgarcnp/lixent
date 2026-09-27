@@ -1031,6 +1031,13 @@
 .preview-content {
     min-height: 100%;
     background: var(--lx-bg, #fff);
+    background: color-mix(in srgb, var(--lx-bg, #fff) 96%, var(--lx-text, #1a1a1a));
+    background-image: radial-gradient(
+        30rem 15rem at 50% -6rem,
+        color-mix(in srgb, var(--lx-text, #1a1a1a) 6%, transparent),
+        transparent 70%
+    );
+    background-repeat: no-repeat;
     color: var(--lx-text, #1a1a1a);
     font-family: var(--lx-font-body, Georgia, serif);
     font-size: var(--lx-font-size, 1.125rem);
@@ -1042,11 +1049,20 @@
 
 .preview-content .license-page {
     flex: 1;
-    padding: 1.5rem 1.25rem 2rem;
+    padding: 0 1.25rem 2rem;
+}
+
+.preview-content .license-hero {
+    padding: 2rem 0 1.75rem;
 }
 
 .preview-content .license-title {
     font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem);
+}
+
+.preview-content .license-document {
+    border-radius: 14px;
+    padding: 1.35rem 1.25rem;
 }
 
 .gravatar-warning {
