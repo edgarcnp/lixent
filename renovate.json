@@ -10,22 +10,10 @@
         "dependencies"
     ],
     "assignAutomerge": true,
-    "assignees": [
-        "edgarcnp"
-    ],
     "automerge": false,
     "keepUpdatedLabel": "renovate-keep-updated",
     "lockFileMaintenance": {
-        "enabled": true,
-        "recreateWhen": "always",
-        "branchTopic": "lock-file-maintenance",
-        "commitMessageAction": "Lock file maintenance",
-        "schedule": [
-            "* 0 * * 5"
-        ],
-        "prBodyDefinitions": {
-            "Change": "All locks refreshed"
-        }
+        "enabled": false
     },
     "osvVulnerabilityAlerts": true,
     "pruneBranchAfterAutomerge": true,
