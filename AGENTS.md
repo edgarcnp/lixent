@@ -12,7 +12,7 @@ A static license page generator built with Astro 7. Users configure their identi
 Raw JSON → loadConfig() → buildPage() → PageModel → Astro layout
 ```
 
-- **Build-time only.** No server runtime. The only network request in a default build is fetching SPDX license data; there is no font-catalog fetch and no config copied into `public/`.
+- **Build-time only.** No server runtime. The only network request in a default build is fetching SPDX license data; demo builds (`LIXENT_DEMO=1`) additionally fetch the font catalog and copy the config for the `/demo` page.
 - **Pure core, thin adapter.** `src/core` has no Astro imports and no I/O at import time. `src/site` (Astro's `srcDir`) renders a fully resolved `PageModel` and contains no domain logic.
 - **Config has one owner.** `parseConfig()` in `src/core/config/fields.ts` is the only place that knows config keys. It rejects unknown keys and reports every problem at once.
 - **I/O is injected.** `buildPage(config, deps)` accepts `root`, `now`, `readFile`, `fetchImpl`, `spdx`, and `gravatarUrl` overrides so tests never touch the network, the clock, or the filesystem.
@@ -44,7 +44,9 @@ src/
 │   ├── pages/index.astro    # loadConfig + buildPage + markup
 │   ├── layouts/LicenseLayout.astro
 │   ├── components/LicenseBody.astro
-│   └── styles/base.css
+│   ├── components/ui/       # demo-only Astro components
+│   ├── demo/                # demo client: page.astro + browser modules
+│   └── styles/base.css      # base.css, plus demo.css for the demo shell
 └── env.d.ts
 tests/                       # bun test, node:test style
 lixent.schema.json           # JSON Schema, kept in sync by tests
@@ -111,7 +113,14 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 
 - `astro.config.mjs` sets `srcDir: "./src/site"` and `base` from `config.basePath`.
 - Deploy workflows pass `--site` / `--base` for GitHub Pages; GitLab Pages and other hosts build at the root.
-- The self-hosted demo (theme/font picker) is planned behind `LIXENT_DEMO=1`. Keep the default build free of demo-only network calls.
+- The GitHub Pages workflow builds with `LIXENT_DEMO=1`, so the deployed site serves the license page plus `/demo`.
+
+## Demo
+
+- `LIXENT_DEMO=1` injects the `/demo` route (`src/site/demo/page.astro`) and fetches the font catalog into `public/fonts.json` (best effort: a failed fetch only empties the font picker). The config is copied to `public/lixent.config.json` for the demo to load.
+- Default builds contain no demo routes and no demo-only network calls.
+- Demo client modules under `src/site/demo/` may import pure core modules only: `theme/catalog.ts`, `theme/style.ts`, `theme/font.ts`, `license/render.ts`, `paragraphs.ts`, `gravatar.ts`, and `config/types.ts`. Never import `license/resolve.ts` or `config/loader.ts` into client code — they pull in `node:fs`.
+- The preview applies `resolveStyle().declarations` to its DOM element and resolves the same config shape the real page uses (`buildPreviewConfig`), so preview and production styling cannot drift.
 
 ## Conventions
 
@@ -123,9 +132,9 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 
 ## Testing
 
-- `bun test` runs 115 tests across 10 files (`node:test` style with `node:assert/strict`).
+- `bun test` runs 126 tests across 11 files (`node:test` style with `node:assert/strict`).
 - Tests inject fakes for fetch, clock, and filesystem. Do not add tests that hit the network.
-- `tests/schema.test.ts` guards schema/parser drift.
+- `tests/schema.test.ts` guards schema/parser drift; `tests/settings.test.ts` guards the demo's config serialization.
 - Regression tests worth keeping: `$&` replacement patterns, root-relative `licenseFile`, `NOT_FOUND` before text fetch, aggregated diagnostics, and unknown-key rejection.
 
 ## Common Pitfalls
@@ -135,3 +144,4 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 - Year resolution uses `deps.now`; do not call `new Date()` inside `buildPage` paths that tests exercise.
 - Adding a config key means updating `fields.ts`, `lixent.schema.json`, and tests.
 - Do not re-add `public/themes/*.css`, a `"custom"` theme sentinel, or `themeOverrides`/`customTheme`; `theme.colors` is the single override mechanism.
+- Demo client code must stay clear of server-only core modules (`license/resolve.ts`, `config/loader.ts`); importing them breaks the browser bundle.

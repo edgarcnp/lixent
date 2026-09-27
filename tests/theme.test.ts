@@ -8,6 +8,7 @@ import {
     THEME_VARIABLES,
 } from "../src/core/theme/catalog.ts"
 import { resolveStyle } from "../src/core/theme/style.ts"
+import { getFontFamily } from "../src/core/theme/font.ts"
 import type { LixentConfig } from "../src/core/config/types.ts"
 
 function config(theme: LixentConfig["theme"]): LixentConfig {
@@ -95,5 +96,11 @@ describe("resolveStyle", () => {
         const style = resolveStyle(config({ preset: "minimal", colors: { bg: "url(https://evil.example)" } }))
         assert.doesNotMatch(style.style, /url\(/)
         assert.match(style.style, /--lx-bg: https:\/\/evil\.example\)/)
+    })
+
+    it("exposes declarations for client-side application", () => {
+        const style = resolveStyle(config({ preset: "minimal", font: "Inter" }))
+        assert.equal(style.declarations.get("--lx-bg"), "#faf9f7")
+        assert.equal(style.declarations.get("--lx-font-body"), getFontFamily("Inter"))
     })
 })

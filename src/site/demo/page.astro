@@ -1,0 +1,320 @@
+---
+import "../styles/base.css"
+import "../styles/demo.css"
+import { BUILT_IN_THEMES } from "../../core/theme/catalog.ts"
+import { resolveStyle } from "../../core/theme/style.ts"
+import type { LixentConfig } from "../../core/config/types.ts"
+import Button from "../components/ui/astro/Button.astro"
+import IconX from "../components/ui/astro/icons/IconX.astro"
+import IconCheck from "../components/ui/astro/icons/IconCheck.astro"
+import { version } from "../../../package.json"
+import { DEFAULTS } from "./settings.ts"
+
+const themeList = BUILT_IN_THEMES
+const initialConfig: LixentConfig = {
+    copyright: "John Doe",
+    license: "MIT",
+    gravatar: false,
+    theme: { preset: DEFAULTS.theme },
+}
+const initialStyle = resolveStyle(initialConfig).style
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+        <title>Lixent Demo</title>
+        <script is:inline>
+            (function() {
+                var saved = localStorage.getItem("lixent-demo-mode");
+                if (saved === "light") {
+                    document.documentElement.classList.remove("dark");
+                } else {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
+    </head>
+    <body data-base-url={import.meta.env.BASE_URL}>
+        <div class="demo-layout">
+            <aside class="util-menu" id="util-menu">
+                <div class="util-header">
+                    <h2>Lixent Demo <span class="version-badge">v{version}</span></h2>
+                    <div class="util-header-right">
+                        <a href="https://github.com/edgarcnp/lixent" target="_blank" rel="noopener noreferrer" class="mode-toggle-btn" aria-label="GitHub repository">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                        </a>
+                        <button class="mode-toggle-btn" id="mode-toggle" type="button" aria-label="Toggle dark mode">
+                            <svg id="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        </button>
+                        <button class="util-toggle" id="util-toggle" aria-label="Close menu">
+                            <IconX />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="util-scroll">
+                    <div class="accordion open" data-section="theme">
+                        <button class="accordion-header" type="button" aria-expanded="true">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Theme</span>
+                            <span class="accordion-summary" id="summary-theme">Minimal</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="theme-mode-toggle" id="theme-mode-toggle">
+                                    <button class="theme-mode-btn active" data-mode="dark" type="button">Dark</button>
+                                    <button class="theme-mode-btn" data-mode="light" type="button">Light</button>
+                                </div>
+                                <div class="util-section">
+                                    <div class="theme-gallery" id="theme-gallery" data-mode="dark">
+                                        {themeList.map((t) => (
+                                            <button
+                                                class:list={["theme-card", { selected: t.id === DEFAULTS.theme }]}
+                                                data-theme={t.id}
+                                                data-mode={t.dark ? "dark" : "light"}
+                                                type="button"
+                                                aria-label={`Select ${t.name} ${t.dark ? "dark" : "light"} theme`}
+                                            >
+                                                <div class="theme-color-strip">
+                                                    <span style={`background: ${t.vars["--lx-bg"]}`}></span>
+                                                    <span style={`background: ${t.vars["--lx-accent"]}`}></span>
+                                                    <span style={`background: ${t.vars["--lx-text"]}`}></span>
+                                                </div>
+                                                <span class="theme-card-name">{t.name}</span>
+                                                <span class="theme-check"><IconCheck /></span>
+                                            </button>
+                                        ))}
+                                        <button
+                                            class="theme-card"
+                                            data-theme="custom"
+                                            type="button"
+                                            aria-label="Custom theme"
+                                        >
+                                            <div class="theme-color-strip">
+                                                <span style="background: #1a1a1a"></span>
+                                                <span style="background: #60a5fa"></span>
+                                                <span style="background: #e5e5e5"></span>
+                                            </div>
+                                            <span class="theme-card-name">Custom</span>
+                                            <span class="theme-check"><IconCheck /></span>
+                                        </button>
+                                    </div>
+                                    <div class="custom-theme-inputs" id="custom-theme-inputs" style="display:none;">
+                                        <div class="field-row">
+                                            <div class="util-section">
+                                                <label for="custom-theme-bg">Background</label>
+                                                <input type="text" id="custom-theme-bg" placeholder="#1a1a1a" />
+                                            </div>
+                                            <div class="util-section">
+                                                <label for="custom-theme-text">Text</label>
+                                                <input type="text" id="custom-theme-text" placeholder="#e5e5e5" />
+                                            </div>
+                                        </div>
+                                        <div class="field-row">
+                                            <div class="util-section">
+                                                <label for="custom-theme-text-muted">Text Muted</label>
+                                                <input type="text" id="custom-theme-text-muted" placeholder="#a3a3a3" />
+                                            </div>
+                                            <div class="util-section">
+                                                <label for="custom-theme-accent">Accent</label>
+                                                <input type="text" id="custom-theme-accent" placeholder="#60a5fa" />
+                                            </div>
+                                        </div>
+                                        <div class="util-section">
+                                            <label for="custom-theme-border">Border</label>
+                                            <input type="text" id="custom-theme-border" placeholder="#404040" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" data-section="font-styling">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Font & Styling</span>
+                            <span class="accordion-summary" id="summary-font-styling">Default</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <span class="util-label">Font</span>
+                                    <div id="font-dropdown"></div>
+                                </div>
+                                <div class="font-preview-card" id="font-preview">
+                                    <span class="font-preview-pangram">The quick brown fox jumps over the lazy dog.</span>
+                                    <span class="font-preview-specimen">AaBbCcDd 0123456789</span>
+                                </div>
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="font-size-input">Font Size</label>
+                                        <input type="text" id="font-size-input" placeholder="18px" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="font-weight-input">Font Weight</label>
+                                        <input type="text" id="font-weight-input" placeholder="400" />
+                                    </div>
+                                </div>
+                                <div class="field-row">
+                                    <div class="util-section">
+                                        <label for="line-height-input">Line Height</label>
+                                        <input type="text" id="line-height-input" placeholder="1.7" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="letter-spacing-input">Letter Spacing</label>
+                                        <input type="text" id="letter-spacing-input" placeholder="0.5px" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" data-section="license">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">License</span>
+                            <span class="accordion-summary" id="summary-license">MIT</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <span class="util-label">License</span>
+                                    <div id="license-dropdown"></div>
+                                    <span class="util-warn-icon" id="deprecated-warning" style="display:none;" data-tip="This license is deprecated">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                    </span>
+                                </div>
+                                <div class="custom-license-inputs" id="custom-license-inputs" style="display:none;">
+                                    <div class="util-section">
+                                        <label for="custom-license-name">License Name</label>
+                                        <input type="text" id="custom-license-name" placeholder="My Custom License" />
+                                    </div>
+                                    <div class="util-section">
+                                        <label for="custom-license-text">License Text</label>
+                                        <textarea id="custom-license-text" rows="6" placeholder={"Copyright (c) {{year}} {{name}}\n\nPermission is hereby granted..."}></textarea>
+                                        <span class="util-hint">
+                                            <code>{"{{year}}"}</code> copyright year<br />
+                                            <code>{"{{name}}"}</code> copyright name
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" data-section="identity">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <span class="accordion-title">Identity</span>
+                            <span class="accordion-summary" id="summary-identity">John Doe</span>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-body-inner">
+                                <div class="util-section">
+                                    <label for="copyright-input">Copyright Name</label>
+                                    <input type="text" id="copyright-input" placeholder="John Doe" />
+                                </div>
+                                <div class="util-section">
+                                    <label for="email-input">Email</label>
+                                    <div class="util-input-wrap">
+                                        <input type="email" id="email-input" placeholder="john@example.com" />
+                                        <span class="util-warn-icon" id="email-warning" style="display:none;" data-tip="Enter an email to use Gravatar">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <label for="url-input">URL</label>
+                                    <div class="util-input-wrap">
+                                        <input type="url" id="url-input" placeholder="https://example.com" />
+                                        <span class="util-warn-icon" id="url-warning" style="display:none;" data-tip="Invalid URL format">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <label for="year-start-input">Year</label>
+                                    <div class="year-mode-toggle" id="year-mode-toggle">
+                                        <button class="year-mode-btn active" data-mode="single" type="button">Single</button>
+                                        <button class="year-mode-btn" data-mode="range" type="button">Range</button>
+                                    </div>
+                                    <div class="year-range-row" id="year-single-row">
+                                        <input type="number" id="year-input" min="1900" max="2100" placeholder={new Date().getFullYear().toString()} />
+                                    </div>
+                                    <div class="year-range-row" id="year-range-row" style="display:none;">
+                                        <input type="number" id="year-start-input" min="1900" max="2100" placeholder="Start" />
+                                        <span class="year-range-sep">–</span>
+                                        <input type="number" id="year-end-input" min="1900" max="2100" placeholder="End" />
+                                    </div>
+                                </div>
+                                <div class="util-section">
+                                    <div class="toggle-label">
+                                        <input type="checkbox" id="gravatar-toggle" />
+                                        <label for="gravatar-toggle">Show Gravatar</label>
+                                    </div>
+                                    <span class="gravatar-warning" id="gravatar-warning" style="display:none;">
+                                        No Gravatar profile found for this email.<br />
+                                        <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer">Create one at gravatar.com</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="util-actions">
+                    <span class="util-actions-label">Config</span>
+                    <div class="util-actions-row">
+                        <Button id="util-copy" primary>
+                            <span id="util-copy-label">Copy</span>
+                            <span id="util-copy-check" class="copy-check"><IconCheck /></span>
+                        </Button>
+                        <Button id="util-download" primary>
+                            <span id="util-download-label">Download</span>
+                            <span id="util-download-check" class="copy-check"><IconCheck /></span>
+                        </Button>
+                    </div>
+                </div>
+            </aside>
+
+            <button class="util-open" id="util-open" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" />
+                </svg>
+            </button>
+
+            <div class="preview-area">
+                <div class="preview-frame">
+                    <div class="preview-header">
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-url" id="preview-url">preview</span>
+                    </div>
+                    <div class="preview-content" id="preview-content" style={initialStyle}>
+                        <main>
+                            <header class="license-header">
+                                <h1 id="preview-title">MIT License</h1>
+                                <p class="copyright" id="preview-copyright">Copyright © 2026 John Doe</p>
+                            </header>
+                            <div class="license-body" id="preview-license-text">Loading license text...</div>
+                        </main>
+                        <footer>
+                            Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            import { initDemo } from "./index.ts"
+            void initDemo()
+        </script>
+    </body>
+</html>

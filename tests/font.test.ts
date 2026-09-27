@@ -1,6 +1,11 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { cssWeightToVariants, getGoogleFontsUrl } from "../src/core/theme/font.ts"
+import {
+    cssWeightToVariants,
+    FONT_FALLBACK,
+    getFontFamily,
+    getGoogleFontsUrl,
+} from "../src/core/theme/font.ts"
 
 describe("getGoogleFontsUrl", () => {
     it("returns null for an empty family", () => {
@@ -48,5 +53,15 @@ describe("cssWeightToVariants", () => {
     it("keeps numeric weights", () => {
         assert.deepEqual(cssWeightToVariants("300"), ["regular", "300"])
         assert.deepEqual(cssWeightToVariants("700"), ["regular", "700"])
+    })
+})
+
+describe("getFontFamily", () => {
+    it("appends the shared fallback stack", () => {
+        assert.equal(getFontFamily("Inter"), `"Inter", ${FONT_FALLBACK}`)
+    })
+
+    it("returns the fallback stack for an empty family", () => {
+        assert.equal(getFontFamily(""), FONT_FALLBACK)
     })
 })

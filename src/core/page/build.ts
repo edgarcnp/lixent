@@ -12,8 +12,11 @@ import type { LixentConfig } from "../config/types.ts"
 import { getGravatarUrl } from "../gravatar.ts"
 import { renderLicenseText } from "../license/render.ts"
 import { resolveLicense, type ResolveLicenseOptions } from "../license/resolve.ts"
+import { toParagraphs } from "../paragraphs.ts"
 import { resolveStyle } from "../theme/style.ts"
 import { formatYear, formatYearRange } from "../year.ts"
+
+export { toParagraphs }
 
 /** Copyright identity shown in the page header. */
 export interface PageIdentity {
@@ -86,14 +89,6 @@ export async function buildPage(config: LixentConfig, deps: BuildPageDeps = {}):
             themeHref: style.themeHref,
         },
     }
-}
-
-/** Splits license text into paragraphs, collapsing single newlines. */
-export function toParagraphs(text: string): string[] {
-    return text
-        .split(/\n\n+/)
-        .map((paragraph) => paragraph.replace(/\n/g, " ").trim())
-        .filter((paragraph) => paragraph.length > 0)
 }
 
 function resolveYear(config: LixentConfig, now?: () => Date): string {

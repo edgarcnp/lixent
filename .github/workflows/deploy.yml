@@ -49,6 +49,8 @@ jobs:
               working-directory: ${{ env.BUILD_PATH }}
 
             - name: Build with Astro
+              env:
+                  LIXENT_DEMO: "1"
               run: |
                   bunx astro build \
                     --site "${{ steps.pages.outputs.origin }}" \

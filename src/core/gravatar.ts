@@ -13,11 +13,13 @@
  *
  * @param size        - Avatar size in pixels.
  * @param defaultType - Fallback avatar when the email has no Gravatar.
+ *                      `"404"` makes Gravatar return an error instead of an image,
+ *                      which the demo uses to detect missing profiles.
  */
 export async function getGravatarUrl(
     email: string,
     size = 80,
-    defaultType: "mp" | "identicon" | "monsterid" | "wavatar" | "retro" | "robohash" | "blank" = "mp",
+    defaultType: "mp" | "identicon" | "monsterid" | "wavatar" | "retro" | "robohash" | "blank" | "404" = "mp",
 ): Promise<string> {
     const normalized = email.trim().toLowerCase()
     const data = new TextEncoder().encode(normalized)

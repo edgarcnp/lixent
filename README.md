@@ -69,6 +69,17 @@ bun run cq      # Lint + typecheck + test
 
 The whole pipeline is `loadConfig()` → `buildPage()` → one resolved `PageModel` → an Astro layout that renders it. Domain logic lives in `src/core` with injectable I/O; see [AGENTS.md](AGENTS.md) for the architecture.
 
+## Demo
+
+The interactive demo (theme gallery, font picker, live license preview) lives in this repo and is built only when `LIXENT_DEMO=1`:
+
+```bash
+LIXENT_DEMO=1 bun dev     # http://localhost:4321/demo
+LIXENT_DEMO=1 bun run build
+```
+
+Demo builds also fetch the Google Fonts catalog into `public/fonts.json` and copy your config for the demo to load. Default builds are unaffected: no demo route, no extra network calls. The included GitHub Pages workflow builds with the flag enabled.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

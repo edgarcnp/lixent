@@ -6,6 +6,26 @@
  * @module
  */
 
+/** A font catalog entry as published on the `fonts-data` branch. */
+export interface GoogleFont {
+    family: string
+    variants: string[]
+    category: string
+}
+
+/** Fallback stack appended after a configured Google Font. */
+export const FONT_FALLBACK = "system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"
+
+/**
+ * Builds a CSS `font-family` value for a Google Font family.
+ *
+ * @returns The family plus the shared fallback stack; the fallback alone when empty.
+ */
+export function getFontFamily(family: string): string {
+    if (family.length === 0) return FONT_FALLBACK
+    return `"${family}", ${FONT_FALLBACK}`
+}
+
 /**
  * Generates a Google Fonts CSS2 URL for a family and its variants.
  *

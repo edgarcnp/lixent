@@ -56,6 +56,7 @@ results.
 
 ```bash
 bun dev         # Start dev server at localhost:4321
+LIXENT_DEMO=1 bun dev   # Start with the demo at localhost:4321/demo
 bun run build   # Build for production
 bun run preview # Preview build locally
 bun run lint    # Run ESLint
