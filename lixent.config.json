@@ -3,6 +3,7 @@
     "copyright": "Edgar Christian",
     "url": "https://edgarcnp.dev",
     "email": "hello@edgarcnp.dev",
+    "gravatar": true,
     "license": "MIT",
     "theme": {
         "preset": "gruvbox-dark"
