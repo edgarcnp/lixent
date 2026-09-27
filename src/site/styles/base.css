@@ -95,6 +95,8 @@ a:focus-visible {
   flex-shrink: 0;
   width: 6px;
   height: 6px;
+  /* Offsets the asymmetric text padding so the dot stays optically centred. */
+  margin-bottom: 0.15rem;
   border-radius: 50%;
   background-color: var(--lx-accent);
 }
