@@ -297,14 +297,23 @@ const initialStyle = resolveStyle(initialConfig).style
                         <span class="preview-url" id="preview-url">preview</span>
                     </div>
                     <div class="preview-content" id="preview-content" style={initialStyle}>
-                        <main>
-                            <header class="license-header">
-                                <h1 id="preview-title">MIT License</h1>
-                                <p class="copyright" id="preview-copyright">Copyright © 2026 John Doe</p>
-                            </header>
-                            <div class="license-body" id="preview-license-text">Loading license text...</div>
+                        <main class="license-page">
+                            <article class="license-card">
+                                <header class="license-header">
+                                    <p class="eyebrow" id="preview-eyebrow">SPDX-License-Identifier: MIT</p>
+                                    <h1 class="license-title" id="preview-title">MIT License</h1>
+                                    <p class="identity-row" id="preview-identity">
+                                        <span class="identity-avatar" id="preview-avatar"></span>
+                                        <span class="identity-name">John Doe</span>
+                                        <span class="identity-year">© 2026</span>
+                                    </p>
+                                </header>
+                                <div class="license-body" id="preview-license-text">
+                                    <p>Loading license text...</p>
+                                </div>
+                            </article>
                         </main>
-                        <footer>
+                        <footer class="page-footer">
                             Powered by <a href="https://github.com/edgarcnp/lixent">Lixent</a>
                         </footer>
                     </div>

@@ -2,12 +2,9 @@
 import { loadConfig } from "../../core/config/loader.ts"
 import { buildPage } from "../../core/page/build.ts"
 import LicenseLayout from "../layouts/LicenseLayout.astro"
-import LicenseBody from "../components/LicenseBody.astro"
 
 const config = loadConfig()
 const page = await buildPage(config)
 ---
 
-<LicenseLayout page={page}>
-    <LicenseBody paragraphs={page.paragraphs} />
-</LicenseLayout>
+<LicenseLayout page={page} />

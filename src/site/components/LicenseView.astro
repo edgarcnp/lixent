@@ -1,0 +1,56 @@
+---
+import { Image } from "astro:assets"
+import type { PageModel } from "../../core/page/build.ts"
+
+interface Props {
+    page: PageModel
+}
+
+const { page } = Astro.props
+const { identity } = page
+const hasUrl = identity.url !== undefined && identity.url.length > 0
+const hasEmail = identity.email !== undefined && identity.email.length > 0
+const gravatarUrl = identity.gravatarUrl ?? null
+const spdxHref = page.licenseId !== null ? `https://spdx.org/licenses/${page.licenseId}.html` : null
+const eyebrow = page.licenseId !== null ? `SPDX-License-Identifier: ${page.licenseId}` : "Software License"
+---
+
+<main class="license-page">
+    <article class="license-card">
+        <header class="license-header">
+            <p class="eyebrow">
+                {spdxHref !== null
+                    ? <a href={spdxHref} target="_blank" rel="noopener noreferrer">{eyebrow}</a>
+                    : eyebrow
+                }
+            </p>
+            <h1 class="license-title">{page.title}</h1>
+            <p class="identity-row">
+                {gravatarUrl && (
+                    <span class="identity-avatar">
+                        <Image src={gravatarUrl} alt={identity.name} width={32} height={32} loading="eager" />
+                    </span>
+                )}
+                {hasUrl
+                    ? <a class="identity-name" href={identity.url} target="_blank" rel="noopener noreferrer">{identity.name}</a>
+                    : <span class="identity-name">{identity.name}</span>
+                }
+                {hasEmail && (
+                    <>
+                        <span class="identity-sep" aria-hidden="true"> · </span>
+                        <a class="identity-email" href={`mailto:${identity.email}`}>{identity.email}</a>
+                    </>
+                )}
+                <span class="identity-sep" aria-hidden="true"> · </span>
+                <span class="identity-year">&copy; {page.year}</span>
+            </p>
+        </header>
+        <div class="license-body">
+            {page.paragraphs.map((paragraph) => (
+                paragraph.kind === "heading"
+                    ? <p class="section-heading">{paragraph.text}</p>
+                    : <p>{paragraph.text}</p>
+            ))}
+        </div>
+    </article>
+</main>

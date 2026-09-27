@@ -1,6 +1,6 @@
 import { getGravatarUrl } from "../../core/gravatar.ts"
 import { renderLicenseText } from "../../core/license/render.ts"
-import { toParagraphs } from "../../core/paragraphs.ts"
+import { stripDuplicateTitle, toParagraphs } from "../../core/paragraphs.ts"
 import { getTheme } from "../../core/theme/catalog.ts"
 import { getFontFamily, getGoogleFontsUrl, type GoogleFont } from "../../core/theme/font.ts"
 import { resolveStyle, STYLE_VARIABLES } from "../../core/theme/style.ts"
@@ -18,9 +18,10 @@ let licenseAbort: AbortController | null = null
 
 let el: {
     previewContent: HTMLElement
-    previewCopyright: HTMLElement
-    previewLicenseText: HTMLElement
+    previewEyebrow: HTMLElement
     previewTitle: HTMLElement
+    previewIdentity: HTMLElement
+    previewLicenseText: HTMLElement
     previewUrl: HTMLElement
     fontPreview: HTMLElement
     summaryTheme: HTMLElement
@@ -30,15 +31,13 @@ let el: {
     deprecatedWarning: HTMLElement
 } | null = null
 
-let gravatarInline: HTMLImageElement | null = null
-let gravatarFallback: HTMLElement | null = null
-
 export function initPreviewElements(): void {
     el = {
         previewContent: $("preview-content"),
-        previewCopyright: $("preview-copyright"),
-        previewLicenseText: $("preview-license-text"),
+        previewEyebrow: $("preview-eyebrow"),
         previewTitle: $("preview-title"),
+        previewIdentity: $("preview-identity"),
+        previewLicenseText: $("preview-license-text"),
         previewUrl: $("preview-url"),
         fontPreview: $("font-preview"),
         summaryTheme: $("summary-theme"),
@@ -142,63 +141,77 @@ function applyPreviewStyle(settings: DemoSettings): void {
     updateFontPreview(settings.font)
 }
 
-function updateCopyrightLine(copyright: string, email: string, url: string, yearStart: number, yearEnd: number): void {
+function updateEyebrow(licenseId: string): void {
     const view = el
     if (view === null) return
-    const hasUrl = url.length > 0 && isValidUrl(url)
-    const hasEmail = email.length > 0 && isValidEmail(email)
-    const safeCopyright = escapeHtml(copyright)
-    const safeEmail = escapeHtml(email)
-    const nameHtml = hasUrl
-        ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${safeCopyright}</a>`
-        : safeCopyright
-    const emailHtml = hasEmail ? ` &lt;<a href="mailto:${safeEmail}">${safeEmail}</a>&gt;` : ""
-    const yearDisplay = yearStart !== yearEnd ? `${yearStart}\u2013${yearEnd}` : String(yearStart)
-    view.previewCopyright.innerHTML = `Copyright &copy; ${yearDisplay} ${nameHtml}${emailHtml}`
+    if (licenseId === "custom") {
+        view.previewEyebrow.textContent = "Software License"
+        return
+    }
+    const href = `https://spdx.org/licenses/${encodeURIComponent(licenseId)}.html`
+    view.previewEyebrow.innerHTML = `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(`SPDX-License-Identifier: ${licenseId}`)}</a>`
 }
 
-async function updateGravatar(email: string, copyright: string, showGravatar: boolean): Promise<void> {
+function identityHtml(copyright: string, email: string, url: string, yearStart: number, yearEnd: number): string {
+    const hasUrl = url.length > 0 && isValidUrl(url)
+    const hasEmail = email.length > 0 && isValidEmail(email)
+    const safeName = escapeHtml(copyright)
+    const nameHtml = hasUrl
+        ? `<a class="identity-name" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${safeName}</a>`
+        : `<span class="identity-name">${safeName}</span>`
+    const emailHtml = hasEmail
+        ? `<span class="identity-sep" aria-hidden="true"> · </span><a class="identity-email" href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>`
+        : ""
+    const yearDisplay = yearStart !== yearEnd ? `${yearStart}\u2013${yearEnd}` : String(yearStart)
+    return `<span class="identity-avatar" id="preview-avatar"></span>${nameHtml}${emailHtml}<span class="identity-sep" aria-hidden="true"> · </span><span class="identity-year">&copy; ${yearDisplay}</span>`
+}
+
+function initialsOf(name: string): string {
+    return name
+        .split(" ")
+        .filter((word) => word.length > 0)
+        .map((word) => word[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+}
+
+async function updateAvatar(email: string, copyright: string, showGravatar: boolean): Promise<void> {
     const view = el
     if (view === null) return
+    const avatar = view.previewIdentity.querySelector<HTMLElement>("#preview-avatar")
+    if (avatar === null) return
+    avatar.replaceChildren()
     const hasEmail = email.length > 0 && isValidEmail(email)
-    if (showGravatar && hasEmail) {
-        if (gravatarInline === null) {
-            const img = document.createElement("img")
-            img.className = "gravatar-inline"
-            img.width = 24
-            img.height = 24
-            img.onerror = () => {
-                img.style.display = "none"
-                if (gravatarFallback === null) {
-                    gravatarFallback = document.createElement("span")
-                    gravatarFallback.className = "gravatar-inline gravatar-fallback"
-                    gravatarFallback.textContent = copyright
-                        .split(" ")
-                        .filter((word) => word.length > 0)
-                        .map((word) => word[0])
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase()
-                    img.parentNode?.insertBefore(gravatarFallback, img.nextSibling)
-                }
-            }
-            view.previewCopyright.prepend(img)
-            gravatarInline = img
-        }
-        const newSrc = await getGravatarUrl(email, 24)
-        if (gravatarInline.src !== newSrc) {
-            gravatarInline.src = newSrc
-            gravatarInline.alt = copyright
-            gravatarFallback?.remove()
-            gravatarFallback = null
-            gravatarInline.style.display = ""
-        }
-    } else if (gravatarInline !== null) {
-        gravatarInline.remove()
-        gravatarInline = null
-        gravatarFallback?.remove()
-        gravatarFallback = null
+    if (!showGravatar || !hasEmail) return
+
+    const img = document.createElement("img")
+    img.alt = copyright
+    img.width = 32
+    img.height = 32
+    img.onerror = () => {
+        const fallback = document.createElement("span")
+        fallback.className = "identity-initials"
+        fallback.textContent = initialsOf(copyright)
+        avatar.replaceChildren(fallback)
     }
+    try {
+        img.src = await getGravatarUrl(email, 64)
+        avatar.replaceChildren(img)
+    } catch {
+        // Hashing failed; leave the avatar empty.
+    }
+}
+
+function updateHeader(settings: DemoSettings, copyright: string, yearStart: number, yearEnd: number): void {
+    const view = el
+    if (view === null) return
+    updateEyebrow(settings.license)
+    view.previewTitle.textContent = settings.license === "custom"
+        ? settings.customLicenseName || "Custom License"
+        : getLicenseName(settings.license)
+    view.previewIdentity.innerHTML = identityHtml(copyright, settings.email, settings.url, yearStart, yearEnd)
+    void updateAvatar(settings.email, copyright, settings.gravatar)
 }
 
 function updateSummary(settings: DemoSettings): void {
@@ -211,7 +224,9 @@ function updateSummary(settings: DemoSettings): void {
     if (settings.font.length > 0 && settings.font !== DEFAULTS.font) parts.push(settings.font)
     if (settings.fontSize.length > 0) parts.push(settings.fontSize)
     view.summaryFontStyling.textContent = parts.length > 0 ? parts.join(" · ") : "Default"
-    view.summaryLicense.textContent = getLicenseName(settings.license)
+    view.summaryLicense.textContent = settings.license === "custom"
+        ? settings.customLicenseName || "Custom License"
+        : getLicenseName(settings.license)
     const hasEmail = isValidEmail(settings.email)
     view.summaryIdentity.textContent = (settings.copyright || "John Doe")
         + (hasEmail ? ` · ${settings.email.split("@")[1]}` : "")
@@ -229,15 +244,9 @@ async function fetchAndRender(
     const controller = new AbortController()
     licenseAbort = controller
     try {
-        let rawText: string
-        let title: string
-        if (settings.license === "custom") {
-            rawText = settings.customLicenseText
-            title = settings.customLicenseName || "Custom License"
-        } else {
-            rawText = await loadLicenseText(settings.license, controller.signal)
-            title = getLicenseName(settings.license)
-        }
+        const rawText = settings.license === "custom"
+            ? settings.customLicenseText
+            : await loadLicenseText(settings.license, controller.signal)
         const yearStr = yearStart !== yearEnd ? `${yearStart}\u2013${yearEnd}` : String(yearStart)
         const rendered = renderLicenseText(rawText, {
             year: yearStr,
@@ -245,9 +254,13 @@ async function fetchAndRender(
             url: settings.url,
             email: settings.email,
         })
-        view.previewTitle.textContent = title
-        view.previewLicenseText.innerHTML = toParagraphs(rendered)
-            .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+        const title = settings.license === "custom"
+            ? settings.customLicenseName || "Custom License"
+            : getLicenseName(settings.license)
+        view.previewLicenseText.innerHTML = stripDuplicateTitle(toParagraphs(rendered), title)
+            .map((paragraph) => paragraph.kind === "heading"
+                ? `<p class="section-heading">${escapeHtml(paragraph.text)}</p>`
+                : `<p>${escapeHtml(paragraph.text)}</p>`)
             .join("")
     } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return
@@ -270,9 +283,8 @@ export function updatePreview(settings: DemoSettings, currentYear: number): void
         : (settings.yearEnd.length > 0 ? parseInt(settings.yearEnd, 10) : currentYear)
     const copyright = settings.copyright || "John Doe"
 
+    updateHeader(settings, copyright, yearStart, yearEnd)
     void fetchAndRender(settings, copyright, yearStart, yearEnd)
-    updateCopyrightLine(copyright, settings.email, settings.url, yearStart, yearEnd)
-    void updateGravatar(settings.email, copyright, settings.gravatar)
     view.previewUrl.textContent = `${settings.theme} / ${settings.license}`
     updateSummary(settings)
 }

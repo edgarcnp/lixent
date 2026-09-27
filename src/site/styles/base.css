@@ -1,3 +1,5 @@
+/* Lixent styles: document layout, typography, and print output. */
+
 *,
 *::before,
 *::after {
@@ -11,7 +13,8 @@
   --lx-line-height: 1.7;
   --lx-letter-spacing: 0.05em;
   --lx-font-weight: 400;
-  --lx-max-width: clamp(320px, 88vw, 800px);
+  --lx-max-width: 760px;
+  --lx-radius: 14px;
 }
 
 html {
@@ -26,6 +29,7 @@ body {
   letter-spacing: var(--lx-letter-spacing);
   color: var(--lx-text);
   background-color: var(--lx-bg);
+  background-color: color-mix(in srgb, var(--lx-bg) 94%, var(--lx-text));
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -37,113 +41,263 @@ body {
 
 ::selection {
   background-color: var(--lx-accent);
-  color: #fff;
+  color: var(--lx-bg);
 }
 
-main {
+a:focus-visible {
+  outline: 2px solid var(--lx-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.license-page {
   flex: 1;
   width: 100%;
   max-width: var(--lx-max-width);
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 5vw, 4rem);
-  margin-top: clamp(2rem, 8vh, 6rem);
-  display: flex;
-  flex-direction: column;
+  padding: clamp(1.75rem, 6vh, 4.5rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 6vh, 3.5rem);
+  background-image: radial-gradient(
+    85% 55% at 50% -5%,
+    color-mix(in srgb, var(--lx-accent) 12%, transparent),
+    transparent 72%
+  );
+  background-repeat: no-repeat;
+}
+
+.license-card {
+  background-color: var(--lx-bg);
+  border: 1px solid var(--lx-divider);
+  border: 1px solid color-mix(in srgb, var(--lx-divider) 72%, transparent);
+  border-radius: var(--lx-radius);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 22px 48px -32px rgb(0 0 0 / 0.4);
+  padding: clamp(1.5rem, 4.5vw, 3rem);
 }
 
 .license-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   padding-bottom: 1.5rem;
-  border-bottom: 0.5px solid var(--lx-divider);
+  border-bottom: 1px solid var(--lx-divider);
+  border-bottom-color: color-mix(in srgb, var(--lx-divider) 70%, transparent);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--lx-accent);
+  margin-bottom: 0.75rem;
+}
+
+.eyebrow a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.eyebrow a:hover {
+  border-bottom-color: currentColor;
+}
+
+.license-title {
+  font-size: clamp(1.9rem, 1.4rem + 2.2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  text-wrap: balance;
+  margin-bottom: 1rem;
 }
 
 .identity-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.gravatar {
-  border-radius: 50%;
-  display: block;
-  flex-shrink: 0;
-}
-
-h1 {
-  font-size: clamp(2.5rem, 2rem + 2.5vw, 4rem);
-  font-weight: 700;
-  line-height: 1.05;
-  margin-bottom: 1rem;
-  color: var(--lx-text);
-}
-
-.copyright {
+  flex-wrap: wrap;
+  gap: 0.45rem 0.55rem;
   color: var(--lx-text-muted);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.copyright a {
+.identity-avatar {
+  display: inline-flex;
+  align-items: center;
+}
+
+.identity-avatar:empty {
+  display: none;
+}
+
+.identity-avatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: block;
+}
+
+.identity-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--lx-accent) 20%, transparent);
   color: var(--lx-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.identity-name {
+  color: var(--lx-text);
+  font-weight: 600;
   text-decoration: none;
-  font-weight: 500;
+}
+
+a.identity-name {
   transition: color 0.15s ease;
 }
 
-.copyright a:hover {
-  text-decoration: underline;
+a.identity-name:hover {
+  color: var(--lx-accent);
 }
 
-.copyright .email {
+.identity-email {
   color: var(--lx-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.identity-sep {
+  opacity: 0.55;
+}
+
+.identity-email:hover {
+  color: var(--lx-accent);
+}
+
+.identity-year {
+  font-variant-numeric: tabular-nums;
 }
 
 .license-body {
-  font-size: var(--lx-font-size);
-  line-height: var(--lx-line-height);
+  max-width: 70ch;
+  text-wrap: pretty;
 }
 
 .license-body p {
-  margin-bottom: 1.25em;
-  text-align: justify;
-  hyphens: auto;
+  margin-bottom: 1.15em;
 }
 
 .license-body p:last-child {
   margin-bottom: 0;
 }
 
-footer {
+.license-body .section-heading {
+  margin-top: 1.9em;
+  margin-bottom: 0.7em;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.license-body .section-heading:first-child {
+  margin-top: 0;
+}
+
+.page-footer {
   text-align: center;
-  padding: 2rem 1.25rem;
+  padding: 0 1.25rem 2rem;
   color: var(--lx-text-muted);
   font-size: 0.8125rem;
 }
 
-footer a {
+.page-footer a {
   color: var(--lx-accent);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s ease;
 }
 
-footer a:hover {
+.page-footer a:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-  main {
-    margin-top: clamp(1.5rem, 6vh, 4rem);
+@media (max-width: 640px) {
+  :root {
+    --lx-radius: 10px;
   }
 
-  h1 {
-    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  .license-page {
+    padding-top: 1.25rem;
+  }
+
+  .license-card {
+    padding: 1.35rem 1.15rem;
+  }
+
+  .license-header {
+    margin-bottom: 1.35rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .license-title {
+    font-size: clamp(1.6rem, 8vw, 2rem);
   }
 }
 
-@media (max-width: 640px) {
-  main {
-    margin-top: clamp(1.25rem, 5vh, 3rem);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #111;
+  }
+
+  .license-page {
+    max-width: none;
+    padding: 0;
+    background-image: none;
+  }
+
+  .license-card {
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .license-header {
+    border-bottom-color: #ddd;
+  }
+
+  .eyebrow {
+    color: #555;
+  }
+
+  .identity-row {
+    color: #444;
+  }
+
+  .identity-name,
+  .identity-email,
+  .page-footer a {
+    color: inherit;
+  }
+
+  .page-footer {
+    display: none;
   }
 }

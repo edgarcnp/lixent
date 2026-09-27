@@ -141,7 +141,11 @@ export function createDropdown(config: DropdownConfig): DropdownInstance {
     function renderOptions(filter = ""): void {
         const lower = filter.toLowerCase()
         filteredOptions = lower.length > 0
-            ? currentOptions.filter((o) => o.label.toLowerCase().includes(lower) || (o.meta?.toLowerCase().includes(lower) ?? false))
+            ? currentOptions.filter((o) => {
+                const label = o.label.toLowerCase()
+                const meta = o.meta?.toLowerCase() ?? ""
+                return label.includes(lower) || meta.includes(lower) || o.value.toLowerCase().includes(lower)
+            })
             : [...currentOptions]
 
         if (filteredOptions.length === 0) {

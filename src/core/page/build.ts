@@ -12,11 +12,9 @@ import type { LixentConfig } from "../config/types.ts"
 import { getGravatarUrl } from "../gravatar.ts"
 import { renderLicenseText } from "../license/render.ts"
 import { resolveLicense, type ResolveLicenseOptions } from "../license/resolve.ts"
-import { toParagraphs } from "../paragraphs.ts"
+import { stripDuplicateTitle, toParagraphs, type Paragraph } from "../paragraphs.ts"
 import { resolveStyle } from "../theme/style.ts"
 import { formatYear, formatYearRange } from "../year.ts"
-
-export { toParagraphs }
 
 /** Copyright identity shown in the page header. */
 export interface PageIdentity {
@@ -39,9 +37,11 @@ export interface PageHead {
 /** Everything the license page needs to render. */
 export interface PageModel {
     title: string
+    /** SPDX id, or `null` for custom licenses. */
+    licenseId: string | null
     year: string
     identity: PageIdentity
-    paragraphs: string[]
+    paragraphs: Paragraph[]
     head: PageHead
 }
 
@@ -80,9 +80,10 @@ export async function buildPage(config: LixentConfig, deps: BuildPageDeps = {}):
 
     return {
         title: license.name,
+        licenseId: config.license === "custom" ? null : config.license,
         year,
         identity,
-        paragraphs: toParagraphs(text),
+        paragraphs: stripDuplicateTitle(toParagraphs(text), license.name),
         head: {
             style: style.style,
             fontHref: style.fontHref,

@@ -43,7 +43,7 @@ src/
 ├── site/                    # Astro adapter (configured as srcDir)
 │   ├── pages/index.astro    # loadConfig + buildPage + markup
 │   ├── layouts/LicenseLayout.astro
-│   ├── components/LicenseBody.astro
+│   ├── components/LicenseView.astro  # document card: eyebrow, identity, body
 │   ├── components/ui/       # demo-only Astro components
 │   ├── demo/                # demo client: page.astro + browser modules
 │   └── styles/base.css      # base.css, plus demo.css for the demo shell
@@ -109,6 +109,8 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 
 `buildPage()` is the only composition point: year resolution (injectable clock), license resolution, text rendering, identity/gravatar, and style. It returns `PageModel`. Astro files render props only — never branch on config in a template.
 
+Paragraphs are classified (`body` vs `heading`) and a leading paragraph that repeats the license name is dropped, so `LicenseView` renders structure without parsing text. Keep classification presentation-only: never alter the license text itself.
+
 ## Build & Deployment
 
 - `astro.config.mjs` sets `srcDir: "./src/site"` and `base` from `config.basePath`.
@@ -120,7 +122,7 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 - `LIXENT_DEMO=1` injects the `/demo` route (`src/site/demo/page.astro`) and fetches the font catalog into `public/fonts.json` (best effort: a failed fetch only empties the font picker). The config is copied to `public/lixent.config.json` for the demo to load.
 - Default builds contain no demo routes and no demo-only network calls.
 - Demo client modules under `src/site/demo/` may import pure core modules only: `theme/catalog.ts`, `theme/style.ts`, `theme/font.ts`, `license/render.ts`, `paragraphs.ts`, `gravatar.ts`, and `config/types.ts`. Never import `license/resolve.ts` or `config/loader.ts` into client code — they pull in `node:fs`.
-- The preview applies `resolveStyle().declarations` to its DOM element and resolves the same config shape the real page uses (`buildPreviewConfig`), so preview and production styling cannot drift.
+- The preview applies `resolveStyle().declarations` to its DOM element and resolves the same config shape the real page uses (`buildPreviewConfig`), and it renders the same classified paragraphs and identity markup as `LicenseView`, so preview and production cannot drift.
 
 ## Conventions
 
@@ -132,9 +134,9 @@ Two layers: validation rejects bad input at parse time; `sanitize.ts` neutralize
 
 ## Testing
 
-- `bun test` runs 126 tests across 11 files (`node:test` style with `node:assert/strict`).
+- `bun test` runs 137 tests across 12 files (`node:test` style with `node:assert/strict`).
 - Tests inject fakes for fetch, clock, and filesystem. Do not add tests that hit the network.
-- `tests/schema.test.ts` guards schema/parser drift; `tests/settings.test.ts` guards the demo's config serialization.
+- `tests/schema.test.ts` guards schema/parser drift; `tests/settings.test.ts` guards the demo's config serialization; `tests/paragraphs.test.ts` guards paragraph classification.
 - Regression tests worth keeping: `$&` replacement patterns, root-relative `licenseFile`, `NOT_FOUND` before text fetch, aggregated diagnostics, and unknown-key rejection.
 
 ## Common Pitfalls

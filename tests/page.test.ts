@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { buildPage, toParagraphs } from "../src/core/page/build.ts"
+import { buildPage } from "../src/core/page/build.ts"
 import type { LixentConfig } from "../src/core/config/types.ts"
 import type { SpdxClient } from "../src/core/license/resolve.ts"
 
@@ -27,11 +27,15 @@ function spdxClient(name: string, text: string): SpdxClient {
 }
 
 describe("buildPage", () => {
-    it("builds title, year, and paragraphs", async () => {
+    it("builds title, year, licenseId, and paragraphs", async () => {
         const page = await buildPage(customConfig(), { now: fixedNow })
         assert.equal(page.title, "Test License")
+        assert.equal(page.licenseId, null)
         assert.equal(page.year, "2026")
-        assert.deepEqual(page.paragraphs, ["First paragraph.", "Second paragraph with a soft wrap."])
+        assert.deepEqual(page.paragraphs, [
+            { text: "First paragraph.", kind: "body" },
+            { text: "Second paragraph with a soft wrap.", kind: "body" },
+        ])
     })
 
     it("prefers an explicit year and supports year ranges", async () => {
@@ -47,7 +51,9 @@ describe("buildPage", () => {
             email: "jane@example.com",
             customLicense: { name: "Mine", text: "{{year}} {{name}} ({{url}}, {{email}})" },
         }), { now: fixedNow })
-        assert.deepEqual(page.paragraphs, ["2026 Jane Doe (https://jane.dev, jane@example.com)"])
+        assert.deepEqual(page.paragraphs, [
+            { text: "2026 Jane Doe (https://jane.dev, jane@example.com)", kind: "body" },
+        ])
     })
 
     it("includes identity links and resolves gravatar", async () => {
@@ -73,7 +79,38 @@ describe("buildPage", () => {
             theme: { preset: "minimal" },
         }, { now: fixedNow, spdx: spdxClient("MIT License", "MIT text") })
         assert.equal(page.title, "MIT License")
-        assert.deepEqual(page.paragraphs, ["MIT text"])
+        assert.equal(page.licenseId, "MIT")
+        assert.deepEqual(page.paragraphs, [{ text: "MIT text", kind: "body" }])
+    })
+
+    it("drops a leading paragraph that repeats the license name", async () => {
+        const page = await buildPage({
+            copyright: "Jane Doe",
+            license: "MIT",
+            gravatar: false,
+            theme: { preset: "minimal" },
+        }, {
+            now: fixedNow,
+            spdx: spdxClient("MIT License", "MIT License\n\nPermission is hereby granted..."),
+        })
+        assert.deepEqual(page.paragraphs, [{ text: "Permission is hereby granted...", kind: "body" }])
+    })
+
+    it("classifies section headings in SPDX texts", async () => {
+        const page = await buildPage({
+            copyright: "Jane Doe",
+            license: "MIT",
+            gravatar: false,
+            theme: { preset: "minimal" },
+        }, {
+            now: fixedNow,
+            spdx: spdxClient("MIT License", "TERMS AND CONDITIONS\n\n1. Definitions.\n\nBody text."),
+        })
+        assert.deepEqual(page.paragraphs, [
+            { text: "TERMS AND CONDITIONS", kind: "heading" },
+            { text: "1. Definitions.", kind: "heading" },
+            { text: "Body text.", kind: "body" },
+        ])
     })
 
     it("resolves head style and font assets", async () => {
@@ -90,15 +127,5 @@ describe("buildPage", () => {
         const first = await buildPage(customConfig(), { now: fixedNow })
         const second = await buildPage(customConfig(), { now: fixedNow })
         assert.deepEqual(first, second)
-    })
-})
-
-describe("toParagraphs", () => {
-    it("splits on blank lines and collapses soft wraps", () => {
-        assert.deepEqual(toParagraphs("a\nb\n\nc"), ["a b", "c"])
-    })
-
-    it("returns an empty list for blank text", () => {
-        assert.deepEqual(toParagraphs("   \n\n  "), [])
     })
 })
