@@ -74,11 +74,11 @@ The whole pipeline is `loadConfig()` → `buildPage()` → one resolved `PageMod
 The interactive demo (theme gallery, font picker, live license preview) lives in this repo and is built only when `LIXENT_DEMO=1`:
 
 ```bash
-LIXENT_DEMO=1 bun dev     # http://localhost:4321/demo
+LIXENT_DEMO=1 bun dev     # demo at http://localhost:4321/
 LIXENT_DEMO=1 bun run build
 ```
 
-Demo builds also fetch the Google Fonts catalog into `public/fonts.json` and copy your config for the demo to load. Default builds are unaffected: no demo route, no extra network calls. The included GitHub Pages workflow builds with the flag enabled.
+Demo builds make the demo the root: `/` and `/demo` serve the interactive editor, and the generated license page moves to `/license`. They also fetch the Google Fonts catalog into `public/fonts.json` and copy your config for the demo to load. Default builds are unaffected: the license page at `/`, no demo routes, no extra network calls. The included GitHub Pages workflow builds with the flag enabled.
 
 ## License
 

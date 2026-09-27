@@ -35,15 +35,26 @@ async function writeFontCatalog(logger) {
     }
 }
 
-/** Adds the /demo route and its public assets, only when LIXENT_DEMO=1. */
-function lixentDemo() {
+/**
+ * Injects the routes for the current mode.
+ *
+ * Normal builds serve the license page at `/`. Demo builds (`LIXENT_DEMO=1`)
+ * serve the interactive demo at `/` and `/demo`, and the license page at
+ * `/license`.
+ */
+function lixentRoutes() {
     return {
-        name: "lixent-demo",
+        name: "lixent-routes",
         hooks: {
             "astro:config:setup": ({ injectRoute, logger }) => {
-                if (!demoMode) return
-                injectRoute({ pattern: "/demo", entrypoint: "./src/site/demo/page.astro" })
-                logger.info("Demo mode enabled: /demo")
+                if (demoMode) {
+                    injectRoute({ pattern: "/", entrypoint: "./src/site/demo/page.astro" })
+                    injectRoute({ pattern: "/demo", entrypoint: "./src/site/demo/page.astro" })
+                    injectRoute({ pattern: "/license", entrypoint: "./src/site/views/LicensePage.astro" })
+                    logger.info("Demo mode: / and /demo (demo), /license (license page)")
+                    return
+                }
+                injectRoute({ pattern: "/", entrypoint: "./src/site/views/LicensePage.astro" })
             },
             "astro:config:done": async ({ logger }) => {
                 if (!demoMode) return
@@ -61,5 +72,5 @@ export default defineConfig({
     image: {
         domains: ["www.gravatar.com", "secure.gravatar.com"],
     },
-    integrations: [lixentDemo()],
+    integrations: [lixentRoutes()],
 })
