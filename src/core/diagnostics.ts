@@ -12,8 +12,8 @@
  */
 
 /** Machine-readable codes for configuration problems. */
-export type ConfigErrorCode
-    = | "CONFIG_MISSING"
+export type ConfigErrorCode =
+    | "CONFIG_MISSING"
     | "CONFIG_PARSE"
     | "CONFIG_SHAPE"
     | "UNKNOWN_KEY"
@@ -54,8 +54,8 @@ export class ConfigError extends Error {
 }
 
 /** Machine-readable codes for license problems. */
-export type LicenseErrorCode
-    = | "INVALID_ID"
+export type LicenseErrorCode =
+    | "INVALID_ID"
     | "FETCH_FAILED"
     | "NOT_FOUND"
     | "MISSING_TEXT"

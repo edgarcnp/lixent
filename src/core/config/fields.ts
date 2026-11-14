@@ -42,8 +42,8 @@ export const THEME_KEYS = [
 ] as const
 
 /** Result of parsing one value: either a typed value or collected problems. */
-export type ParseResult<T>
-    = | { ok: true, value: T }
+export type ParseResult<T> =
+    | { ok: true, value: T }
     | { ok: false, diagnostics: Diagnostic[] }
 
 /** `theme` keys that hold a single CSS value. */
