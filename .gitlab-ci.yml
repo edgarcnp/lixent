@@ -1,5 +1,5 @@
 default:
-    image: oven/bun:1.4.4
+    image: oven/bun:1.4.5
 
 pages:
     stage: deploy
